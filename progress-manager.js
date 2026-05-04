@@ -238,7 +238,18 @@
     },
 
     reset: function () { setLocal(clone(DEFAULT_PROGRESS)); },
-
+var DEFAULT_PROGRESS = {
+  coins: 30,
+  saved: 0,
+  joy: 50,
+  wisdom: 0,
+  level: 1,
+  badges: [],
+  currentLevel: 0,
+  unlockedLevel: 0,
+  completedLevels: [],
+  completedLessons: []   // <-- add this
+};
     addCoins:  function (n) { var p = this.get(); this.set({ coins: p.coins + n }); },
     addSaved:  function (n) { var p = this.get(); this.set({ saved: p.saved + n }); },
     addJoy:    function (n) { var p = this.get(); this.set({ joy: Math.min(100, p.joy + n) }); },
