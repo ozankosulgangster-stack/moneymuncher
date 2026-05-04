@@ -11,13 +11,17 @@
   var STORAGE_KEY = "mm_progress_v2";
 
   var DEFAULT_PROGRESS = {
-    coins: 30,
-    saved: 0,
-    joy: 50,
-    wisdom: 0,
-    level: 1,
-    badges: []
-  };
+  coins: 30,
+  saved: 0,
+  joy: 50,
+  wisdom: 0,
+  level: 1,
+  badges: [],
+  // game map fields
+  currentLevel: 0,
+  unlockedLevel: 0,
+  completedLevels: []
+};
 
   function clone(obj) {
     return JSON.parse(JSON.stringify(obj));
