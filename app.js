@@ -71,15 +71,23 @@ const levels = [
   }
 ];
 
-const $ = (id) => document.getElementById(id);
-const api = async (path, options = {}) => {
-  const response = await fetch(path, {
-    headers: { "Content-Type": "application/json", ...(options.headers || {}) },
-    ...options
-  });
-  if (!response.ok) throw new Error(await response.text());
-  return response.json();
-};
+document.getElementById('signUpBtn').addEventListener('click', function() {
+  var email = document.getElementById('emailInput').value;
+  var pass  = document.getElementById('passInput').value;
+  MoneyMuncher.signUp(email, pass).then(function(u) {
+    alert('Account created! Your progress is now saved to the cloud.');
+    document.getElementById('loginDialog').close();
+  }).catch(function(err) { alert(err.message); });
+});
+
+document.getElementById('signInBtn').addEventListener('click', function() {
+  var email = document.getElementById('emailInput').value;
+  var pass  = document.getElementById('passInput').value;
+  MoneyMuncher.signIn(email, pass).then(function(u) {
+    alert('Welcome back!');
+    document.getElementById('loginDialog').close();
+  }).catch(function(err) { alert(err.message); });
+});
 
 function clamp(n) { return Math.max(0, Math.round(n)); }
 function levelAccessible(index) { return index <= progress.unlockedLevel; }
