@@ -124,5 +124,10 @@
   </dialog>
 
   <script src="app.js"></script>
+  <script src="progress-manager.js"></script>
+<script>
+  MoneyMuncher.init();            // no arguments = offline only
+  console.log(MoneyMuncher.get()); // should print progress object immediately
+</script>
 </body>
 </html>
