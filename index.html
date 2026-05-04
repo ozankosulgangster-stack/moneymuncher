@@ -124,6 +124,14 @@
   </dialog>
 
   <script src="app.js"></script>
+
+
+    <!-- 1. Firebase SDKs (must load BEFORE your game code) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+  <!-- 2. Your MoneyMuncher manager -->
   <script src="progress-manager.js"></script>
 <script>
   MoneyMuncher.init();            // no arguments = offline only
