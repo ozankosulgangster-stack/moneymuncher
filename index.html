@@ -123,32 +123,30 @@
     </form>
   </dialog>
 
-  <script src="app.js"></script>
-
-
-    <!-- 1. Firebase SDKs (must load BEFORE your game code) -->
+   <!-- 1. Firebase SDKs (must load FIRST) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
-  <!-- 2. Your MoneyMuncher manager -->
+  <!-- 2. Progress manager -->
   <script src="progress-manager.js"></script>
-<script>
-  MoneyMuncher.init();            // no arguments = offline only
-  console.log(MoneyMuncher.get()); // should print progress object immediately
-</script>
+
+  <!-- 3. Initialize with your real config -->
   <script>
-MoneyMuncher.init({
-  firebaseConfig: {
- apiKey: "AIzaSyBdfx_DSFz6d8zy7RdHUczyt95n0wQElbc",
-  authDomain: "money-muncher-kids.firebaseapp.com",
-  projectId: "money-muncher-kids",
-  storageBucket: "money-muncher-kids.firebasestorage.app",
-  messagingSenderId: "762747678860",
-  appId: "1:762747678860:web:c02a85bb9c2520d2170ba9",
-  measurementId: "G-Q7N6XMMLZR"
-  }
-});
-</script>
+    MoneyMuncher.init({
+      firebaseConfig: {
+        apiKey: "AIzaSyBdfx_DSFz6d8zy7RdHUczyt95n0wQElbc",
+        authDomain: "money-muncher-kids.firebaseapp.com",
+        projectId: "money-muncher-kids",
+        storageBucket: "money-muncher-kids.firebasestorage.app",
+        messagingSenderId: "762747678860",
+        appId: "1:762747678860:web:c02a85bb9c2520d2170ba9"
+      }
+    });
+    console.log("MoneyMuncher ready:", MoneyMuncher.get());
+  </script>
+
+  <!-- 4. Your game logic (LAST — it needs MoneyMuncher to exist first) -->
+  <script src="app.js"></script>
 </body>
 </html>
