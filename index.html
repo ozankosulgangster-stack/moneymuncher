@@ -103,25 +103,26 @@
     </section>
   </main>
 
-  <dialog id="loginDialog" class="modal">
-    <form id="loginForm" class="modal-card" method="dialog">
-      <button class="close" value="cancel" aria-label="Close">×</button>
-      <p class="eyebrow">Account</p>
-      <h2>Log in to save progress</h2>
-      <p class="modal-copy">Enter a name and role. MoneyMuncher will save your map progress on this computer’s local server.</p>
-      <label>Your name
-        <input id="nameInput" required placeholder="Example: Oz" />
-      </label>
-      <label>I am a
-        <select id="roleInput">
-          <option>Kid</option>
-          <option>Parent</option>
-          <option>Teacher</option>
-        </select>
-      </label>
-      <button class="primary" type="submit">Save Login</button>
-    </form>
-  </dialog>
+<dialog id="loginDialog" class="modal">
+  <form id="loginForm" class="modal-card" method="dialog">
+    <button class="close" value="cancel" aria-label="Close">×</button>
+    <p class="eyebrow">Account</p>
+    <h2>Save progress online</h2>
+
+    <label>Email
+      <input id="emailInput" type="email" required placeholder="parent@email.com" />
+    </label>
+    <label>Password
+      <input id="passInput" type="password" required placeholder="Choose a password" />
+    </label>
+
+    <div style="display:flex;gap:10px;margin-top:10px;">
+      <button type="button" id="signUpBtn" class="primary">Sign Up</button>
+      <button type="button" id="signInBtn" class="secondary">Sign In</button>
+    </div>
+    <p style="font-size:12px;color:#666;">Kids: ask a parent to help with email.</p>
+  </form>
+</dialog>
 
    <!-- 1. Firebase SDKs (must load FIRST) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
