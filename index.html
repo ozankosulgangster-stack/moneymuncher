@@ -14,6 +14,7 @@
     <nav class="topbar panel">
       <div class="brand"><span>🪙</span> MoneyMuncher</div>
       <div class="account-area">
+        <button id="academyBtn" class="secondary small">Academy</button>
         <span id="accountStatus" class="account-status">Guest explorer</span>
         <button id="loginOpenBtn" class="secondary small">Log in</button>
         <button id="logoutBtn" class="secondary small hidden">Log out</button>
@@ -100,6 +101,32 @@
         <button class="primary" type="submit">Add Idea</button>
       </form>
       <ul id="questList" class="quest-list"></ul>
+    </section>
+        <!-- MoneyMuncher Academy -->
+    <section id="academy" class="academy panel hidden">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">📚 MoneyMuncher Academy</p>
+          <h2>Learn money superpowers</h2>
+        </div>
+        <div class="academy-controls">
+          <button id="academyKidMode" class="primary small active">Kid View</button>
+          <button id="academyParentMode" class="secondary small">Parent View</button>
+        </div>
+      </div>
+
+      <div id="lessonGrid" class="lesson-grid"></div>
+
+      <div id="lessonReader" class="lesson-reader hidden">
+        <button id="closeLessonBtn" class="secondary small">← Back to Library</button>
+        <div id="lessonContent" class="lesson-content"></div>
+        <div id="quizBox" class="quiz-box hidden">
+          <h3>Quick Quiz 🎯</h3>
+          <div id="quizQuestions"></div>
+          <button id="submitQuizBtn" class="primary">Check Answers</button>
+          <div id="quizResult" class="quiz-result"></div>
+        </div>
+      </div>
     </section>
   </main>
 
