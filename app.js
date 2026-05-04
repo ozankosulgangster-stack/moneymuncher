@@ -1,13 +1,64 @@
+/* ============================================================
+   MoneyMuncher Game Logic
+   Reads/writes through MoneyMuncher (Firebase + localStorage).
+   ============================================================ */
+
+// --- 0. Helpers ---
+function $(id) { return document.getElementById(id); }
+
+const hasMM = typeof window.MoneyMuncher !== 'undefined';
+
+// --- 1. Data ---
 const defaultState = { coins: 30, saved: 0, joy: 50, wisdom: 0, currentLevel: 0 };
-const state = { ...defaultState };
+let state   = { ...defaultState };
 let progress = { unlockedLevel: 0, completedLevels: [] };
 let account = { id: "", name: "", role: "" };
 
+// --- 2. Load from MoneyMuncher (or keep local defaults) ---
+function loadFromManager() {
+  if (!hasMM) return;
+  var p = MoneyMuncher.get();
+
+  state.coins       = (typeof p.coins === 'number')       ? p.coins       : defaultState.coins;
+  state.saved       = (typeof p.saved === 'number')       ? p.saved       : defaultState.saved;
+  state.joy         = (typeof p.joy === 'number')         ? p.joy         : defaultState.joy;
+  state.wisdom      = (typeof p.wisdom === 'number')      ? p.wisdom      : defaultState.wisdom;
+  state.currentLevel = (typeof p.currentLevel === 'number') ? p.currentLevel : defaultState.currentLevel;
+
+  progress.unlockedLevel   = (typeof p.unlockedLevel === 'number')   ? p.unlockedLevel   : 0;
+  progress.completedLevels = Array.isArray(p.completedLevels) ? [...p.completedLevels] : [];
+
+  // Local name/role display
+  var sess = JSON.parse(localStorage.getItem('moneymuncherSession') || 'null');
+  if (sess && sess.name) account = sess;
+}
+
+// --- 3. Save back to MoneyMuncher ---
+function sync() {
+  if (!hasMM) return;
+  MoneyMuncher.set({
+    coins: state.coins,
+    saved: state.saved,
+    joy: state.joy,
+    wisdom: state.wisdom,
+    currentLevel: state.currentLevel,
+    unlockedLevel: progress.unlockedLevel,
+    completedLevels: progress.completedLevels
+  });
+}
+
+// --- 4. Local session (for name/role display) ---
+function saveSession()  { localStorage.setItem('moneymuncherSession', JSON.stringify(account)); }
+function clearSession() { localStorage.removeItem('moneymuncherSession'); }
+function restoreSession() {
+  var s = JSON.parse(localStorage.getItem('moneymuncherSession') || 'null');
+  if (s && s.name) account = s;
+}
+
+// --- 5. Levels (unchanged) ---
 const levels = [
   {
-    icon: "🍿",
-    name: "Snack Shop",
-    skill: "Needs vs wants",
+    icon: "🍿", name: "Snack Shop", skill: "Needs vs wants",
     eyebrow: "Level 1: Snack Shop Saturday",
     title: "You got 30 coins!",
     text: "You helped a neighbor water plants and earned 30 coins. What will you do first?",
@@ -18,9 +69,7 @@ const levels = [
     ]
   },
   {
-    icon: "🛍️",
-    name: "Toy Market",
-    skill: "Impulse control",
+    icon: "🛍️", name: "Toy Market", skill: "Impulse control",
     eyebrow: "Level 2: Toy Market Temptation",
     title: "A shiny toy appears!",
     text: "The toy costs 25 coins. You want it, but you also want a bigger skateboard later.",
@@ -31,9 +80,7 @@ const levels = [
     ]
   },
   {
-    icon: "🏦",
-    name: "Savings Bank",
-    skill: "Goals and patience",
+    icon: "🏦", name: "Savings Bank", skill: "Goals and patience",
     eyebrow: "Level 3: Savings Bank Bridge",
     title: "Your skateboard goal needs 60 coins.",
     text: "You can earn slowly, save regularly, or borrow from future-you. What is your move?",
@@ -44,9 +91,7 @@ const levels = [
     ]
   },
   {
-    icon: "🎁",
-    name: "Sharing Square",
-    skill: "Giving and community",
+    icon: "🎁", name: "Sharing Square", skill: "Giving and community",
     eyebrow: "Level 4: Sharing Square",
     title: "A class fundraiser needs help.",
     text: "You care about the cause, but you also have your own goal. How do you balance it?",
@@ -57,9 +102,7 @@ const levels = [
     ]
   },
   {
-    icon: "🏡",
-    name: "Family Budget",
-    skill: "Planning together",
+    icon: "🏡", name: "Family Budget", skill: "Planning together",
     eyebrow: "Level 5: Family Budget Builder",
     title: "Plan a weekly family snack budget.",
     text: "You need snacks for 5 days, a small treat, and some savings. What plan wins?",
@@ -71,195 +114,212 @@ const levels = [
   }
 ];
 
-document.getElementById('signUpBtn').addEventListener('click', function() {
-  var email = document.getElementById('emailInput').value;
-  var pass  = document.getElementById('passInput').value;
-  MoneyMuncher.signUp(email, pass).then(function(u) {
-    alert('Account created! Your progress is now saved to the cloud.');
-    document.getElementById('loginDialog').close();
-  }).catch(function(err) { alert(err.message); });
+// --- 6. Auth wiring (only attaches if buttons exist) ---
+document.addEventListener('DOMContentLoaded', function() {
+  var signUpBtn  = $('signUpBtn');
+  var signInBtn  = $('signInBtn');
+  var emailIn    = $('emailInput');
+  var passIn     = $('passInput');
+
+  if (signUpBtn && emailIn && passIn) {
+    signUpBtn.addEventListener('click', function() {
+      var em = emailIn.value.trim(), pw = passIn.value;
+      if (!em || !pw) return alert('Enter email and password');
+      MoneyMuncher.signUp(em, pw).then(function(u) {
+        account = { id: u.uid, name: em.split('@')[0], role: 'Player' };
+        saveSession(); sync();
+        $('loginDialog').close();
+        $('feedback').textContent = 'Account created! Cloud save active.';
+        renderAccount(); renderStats(); renderMap();
+      }).catch(function(e) { alert(e.message); });
+    });
+  }
+
+  if (signInBtn && emailIn && passIn) {
+    signInBtn.addEventListener('click', function() {
+      var em = emailIn.value.trim(), pw = passIn.value;
+      if (!em || !pw) return alert('Enter email and password');
+      MoneyMuncher.signIn(em, pw).then(function(u) {
+        account = { id: u.uid, name: em.split('@')[0], role: 'Player' };
+        saveSession();
+        $('loginDialog').close();
+        $('feedback').textContent = 'Welcome back!';
+        renderAccount(); renderStats(); renderMap();
+      }).catch(function(e) { alert(e.message); });
+    });
+  }
 });
 
-document.getElementById('signInBtn').addEventListener('click', function() {
-  var email = document.getElementById('emailInput').value;
-  var pass  = document.getElementById('passInput').value;
-  MoneyMuncher.signIn(email, pass).then(function(u) {
-    alert('Welcome back!');
-    document.getElementById('loginDialog').close();
-  }).catch(function(err) { alert(err.message); });
-});
-
+// --- 7. Game functions ---
 function clamp(n) { return Math.max(0, Math.round(n)); }
 function levelAccessible(index) { return index <= progress.unlockedLevel; }
-function saveSession() { localStorage.setItem("moneymuncherSession", JSON.stringify(account)); }
-function clearSession() { localStorage.removeItem("moneymuncherSession"); }
-
-async function saveProgress() {
-  if (!account.id) return;
-  await api(`/api/users/${account.id}/progress`, {
-    method: "PUT",
-    body: JSON.stringify({ progress })
-  });
-}
-
-async function restoreSession() {
-  const saved = JSON.parse(localStorage.getItem("moneymuncherSession") || "null");
-  if (!saved?.id) return;
-  try {
-    const data = await api(`/api/users/${saved.id}`);
-    account = data.user;
-    progress = data.progress;
-  } catch {
-    clearSession();
-  }
-}
 
 function renderStats() {
-  $("coins").textContent = clamp(state.coins);
-  $("saved").textContent = clamp(state.saved);
-  $("joy").textContent = clamp(state.joy);
-  $("wisdom").textContent = clamp(state.wisdom);
-  $("badge").textContent = state.wisdom >= 60 ? "Map Master" : state.wisdom >= 40 ? "Coin Commander" : state.wisdom >= 20 ? "Smart Saver" : "Beginner Saver";
+  $('coins').textContent   = clamp(state.coins);
+  $('saved').textContent   = clamp(state.saved);
+  $('joy').textContent     = clamp(state.joy);
+  $('wisdom').textContent  = clamp(state.wisdom);
+  $('badge').textContent    = state.wisdom >= 60 ? "Map Master"
+                           : state.wisdom >= 40 ? "Coin Commander"
+                           : state.wisdom >= 20 ? "Smart Saver"
+                           : "Beginner Saver";
 }
 
 function renderAccount() {
-  const loggedIn = Boolean(account.id);
-  $("accountStatus").textContent = loggedIn ? `${account.name} (${account.role}) • server saved` : "Guest explorer";
-  $("loginOpenBtn").classList.toggle("hidden", loggedIn);
-  $("logoutBtn").classList.toggle("hidden", !loggedIn);
+  var loggedIn = Boolean(account.id) || (hasMM && MoneyMuncher.isLoggedIn());
+  $('accountStatus').textContent = loggedIn
+    ? (account.name || 'Player') + (hasMM && MoneyMuncher.isLoggedIn() ? ' • cloud saved' : ' • local')
+    : 'Guest explorer';
+  $('loginOpenBtn').classList.toggle('hidden', loggedIn);
+  $('logoutBtn').classList.toggle('hidden', !loggedIn);
 }
 
 function renderMap() {
-  $("mapProgress").textContent = `Level ${Math.min(progress.unlockedLevel + 1, levels.length)} / ${levels.length}`;
-  $("mapPath").innerHTML = "";
-  levels.forEach((level, index) => {
-    const complete = progress.completedLevels.includes(index);
-    const unlocked = index <= progress.unlockedLevel;
-    const node = document.createElement("article");
-    node.className = `level-node ${complete ? "complete" : ""} ${state.currentLevel === index ? "current" : ""} ${!unlocked ? "locked" : ""}`;
-    const action = !unlocked ? "Locked" : complete ? "Replay" : state.currentLevel === index ? "Current" : "Play";
-    node.innerHTML = `
-      <span>${level.icon}</span>
-      <strong>${level.name}</strong>
-      <small>${level.skill}</small>
-      <button class="${unlocked ? "primary" : "secondary"}" ${!unlocked ? "disabled" : ""}>${action}</button>
-    `;
-    node.querySelector("button").addEventListener("click", () => {
-      if (!unlocked) return;
-      startLevel(index);
+  $('mapProgress').textContent = 'Level ' + Math.min(progress.unlockedLevel + 1, levels.length) + ' / ' + levels.length;
+  $('mapPath').innerHTML = '';
+  levels.forEach(function(level, index) {
+    var complete = progress.completedLevels.includes(index);
+    var unlocked = index <= progress.unlockedLevel;
+    var node = document.createElement('article');
+    node.className = 'level-node'
+      + (complete ? ' complete' : '')
+      + (state.currentLevel === index ? ' current' : '')
+      + (!unlocked ? ' locked' : '');
+    var action = !unlocked ? 'Locked' : complete ? 'Replay' : state.currentLevel === index ? 'Current' : 'Play';
+    node.innerHTML =
+      '<span>' + level.icon + '</span>' +
+      '<strong>' + level.name + '</strong>' +
+      '<small>' + level.skill + '</small>' +
+      '<button class="' + (unlocked ? 'primary' : 'secondary') + '" ' + (!unlocked ? 'disabled' : '') + '>' + action + '</button>';
+    node.querySelector('button').addEventListener('click', function() {
+      if (unlocked) startLevel(index);
     });
-    $("mapPath").appendChild(node);
+    $('mapPath').appendChild(node);
   });
 }
 
 function renderScenario() {
-  const level = levels[state.currentLevel];
-  $("levelEyebrow").textContent = level.eyebrow;
-  $("scenarioTitle").textContent = level.title;
-  $("scenarioText").textContent = level.text;
-  $("choices").innerHTML = "";
-  level.choices.forEach((choice) => {
-    const btn = document.createElement("button");
-    btn.className = "choice";
-    btn.innerHTML = `<strong>${choice.label}</strong><span>${choice.detail}</span>`;
-    btn.addEventListener("click", () => choose(choice));
-    $("choices").appendChild(btn);
+  var level = levels[state.currentLevel];
+  if (!level) return;
+  $('levelEyebrow').textContent   = level.eyebrow;
+  $('scenarioTitle').textContent  = level.title;
+  $('scenarioText').textContent   = level.text;
+  $('choices').innerHTML = '';
+  level.choices.forEach(function(choice) {
+    var btn = document.createElement('button');
+    btn.className = 'choice';
+    btn.innerHTML = '<strong>' + choice.label + '</strong><span>' + choice.detail + '</span>';
+    btn.addEventListener('click', function() { choose(choice); });
+    $('choices').appendChild(btn);
   });
 }
 
-function openDialog(dialogId) {
-  const dialog = $(dialogId);
-  if (typeof dialog.showModal === "function") dialog.showModal();
-  else dialog.classList.remove("hidden");
+function openDialog(id) {
+  var d = $(id);
+  if (typeof d.showModal === 'function') d.showModal();
+  else d.classList.remove('hidden');
 }
 
 function startLevel(index) {
   if (!levelAccessible(index)) return;
   state.currentLevel = index;
-  $("worldMap").classList.remove("hidden");
-  $("game").classList.remove("hidden");
+  $('worldMap').classList.remove('hidden');
+  $('game').classList.remove('hidden');
+  sync();
   renderMap();
   renderScenario();
-  $("game").scrollIntoView({ behavior: "smooth", block: "start" });
+  $('game').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-async function completeCurrentLevel() {
-  if (!progress.completedLevels.includes(state.currentLevel)) progress.completedLevels.push(state.currentLevel);
-  if (state.currentLevel === progress.unlockedLevel && progress.unlockedLevel < levels.length - 1) progress.unlockedLevel += 1;
-  renderMap();
-  await saveProgress();
-}
-
-async function choose(choice) {
-  state.coins += choice.coins || 0;
-  state.saved += choice.saved || 0;
-  state.joy += choice.joy || 0;
-  state.wisdom += choice.wisdom || 0;
-  $("feedback").textContent = choice.feedback;
-  try {
-    await completeCurrentLevel();
-    if (account.id) $("feedback").textContent += " Progress saved.";
-  } catch {
-    $("feedback").textContent += " Progress updated here, but server save failed.";
+function completeCurrentLevel() {
+  if (!progress.completedLevels.includes(state.currentLevel)) {
+    progress.completedLevels.push(state.currentLevel);
   }
+  if (state.currentLevel === progress.unlockedLevel && progress.unlockedLevel < levels.length - 1) {
+    progress.unlockedLevel += 1;
+  }
+  renderMap();
+  sync();
+}
+
+function choose(choice) {
+  state.coins  += choice.coins  || 0;
+  state.saved  += choice.saved  || 0;
+  state.joy    += choice.joy    || 0;
+  state.wisdom += choice.wisdom || 0;
+
+  $('feedback').textContent = choice.feedback;
+  completeCurrentLevel();
+
+  if (hasMM && MoneyMuncher.isLoggedIn()) {
+    $('feedback').textContent += ' Cloud saved.';
+  } else if (hasMM) {
+    $('feedback').textContent += ' Saved on this device.';
+  }
+
   renderStats();
-  const next = state.currentLevel + 1;
+  var next = state.currentLevel + 1;
   if (next < levels.length) {
-    setTimeout(() => {
-      $("feedback").textContent += ` Next unlocked: ${levels[next].name}. Open the map to continue.`;
+    setTimeout(function() {
+      $('feedback').textContent += ' Next unlocked: ' + levels[next].name + '. Open the map to continue.';
     }, 250);
   } else {
-    setTimeout(() => { $("feedback").textContent += " You finished the current Money World map!"; }, 250);
+    setTimeout(function() {
+      $('feedback').textContent += ' You finished the current Money World map!';
+    }, 250);
   }
 }
 
-$("startBtn").addEventListener("click", () => startLevel(progress.unlockedLevel));
-$("mapBtn").addEventListener("click", () => {
-  $("worldMap").classList.remove("hidden");
+// --- 8. UI Event wiring ---
+$('startBtn').addEventListener('click', function() { startLevel(progress.unlockedLevel); });
+
+$('mapBtn').addEventListener('click', function() {
+  $('worldMap').classList.remove('hidden');
   renderMap();
-  $("worldMap").scrollIntoView({ behavior: "smooth", block: "start" });
+  $('worldMap').scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
-$("teacherBtn").addEventListener("click", () => {
-  $("hub").classList.remove("hidden");
-  $("hub").scrollIntoView({ behavior: "smooth", block: "start" });
+
+$('teacherBtn').addEventListener('click', function() {
+  $('hub').classList.remove('hidden');
+  $('hub').scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
-$("loginOpenBtn").addEventListener("click", () => openDialog("loginDialog"));
-$("logoutBtn").addEventListener("click", () => {
+
+$('loginOpenBtn').addEventListener('click', function() { openDialog('loginDialog'); });
+
+$('logoutBtn').addEventListener('click', function() {
   account = { id: "", name: "", role: "" };
-  progress = { unlockedLevel: 0, completedLevels: [] };
   clearSession();
+  if (hasMM) MoneyMuncher.signOut();
   renderAccount(); renderStats(); renderMap(); renderScenario();
 });
 
-$("loginForm").addEventListener("submit", async (event) => {
-  event.preventDefault();
-  const name = $("nameInput").value.trim();
-  const role = $("roleInput").value;
-  try {
-    const data = await api("/api/login", { method: "POST", body: JSON.stringify({ name, role }) });
-    account = data.user;
-    progress = data.progress;
-    saveSession();
-    $("loginDialog").close();
-    $("feedback").textContent = `Welcome, ${account.name}. Your MoneyMuncher progress is saved on the server.`;
-    renderAccount(); renderMap(); renderScenario();
-  } catch {
-    $("feedback").textContent = "Login failed. Please make sure the MoneyMuncher server is running.";
-  }
+// Original name/role form (local-only login)
+$('loginForm').addEventListener('submit', function(ev) {
+  ev.preventDefault();
+  var name = $('nameInput').value.trim();
+  var role = $('roleInput').value;
+  if (!name) return;
+  account = { id: 'local_' + Date.now(), name: name, role: role };
+  saveSession();
+  $('loginDialog').close();
+  $('feedback').textContent = 'Welcome, ' + account.name + '. Your progress is saved on this device.';
+  renderAccount(); renderMap(); renderScenario();
 });
 
-$("questForm").addEventListener("submit", (event) => {
-  event.preventDefault();
-  const value = $("questInput").value.trim();
-  if (!value) return;
-  const li = document.createElement("li");
-  li.textContent = `Community quest idea: ${value}`;
-  $("questList").appendChild(li);
-  $("questInput").value = "";
+$('questForm').addEventListener('submit', function(ev) {
+  ev.preventDefault();
+  var val = $('questInput').value.trim();
+  if (!val) return;
+  var li = document.createElement('li');
+  li.textContent = 'Community quest idea: ' + val;
+  $('questList').appendChild(li);
+  $('questInput').value = '';
 });
 
-(async function init() {
-  await restoreSession();
+// --- 9. Boot ---
+(function init() {
+  restoreSession();
+  loadFromManager();
   renderAccount();
   renderStats();
   renderMap();
