@@ -11,17 +11,17 @@
   var STORAGE_KEY = "mm_progress_v2";
 
   var DEFAULT_PROGRESS = {
-  coins: 30,
-  saved: 0,
-  joy: 50,
-  wisdom: 0,
-  level: 1,
-  badges: [],
-  // game map fields
-  currentLevel: 0,
-  unlockedLevel: 0,
-  completedLevels: []
-};
+    coins: 30,
+    saved: 0,
+    joy: 50,
+    wisdom: 0,
+    level: 1,
+    badges: [],
+    currentLevel: 0,
+    unlockedLevel: 0,
+    completedLevels: [],
+    completedLessons: []
+  };
 
   function clone(obj) {
     return JSON.parse(JSON.stringify(obj));
@@ -168,20 +168,31 @@
     }
   }
 
+  function getProfile() {
+    try {
+      return JSON.parse(localStorage.getItem("moneymuncherSession") || "null") || {};
+    } catch (e) {
+      return {};
+    }
+  }
+
   function pushCloud() {
     if (!cloud.ready || !cloud.user) return;
     var p = getLocal();
-    cloud.db.collection("players").doc(cloud.user.uid).set({
-      coins: p.coins,
-      saved: p.saved,
-      joy: p.joy,
-      wisdom: p.wisdom,
-      level: p.level,
-      badges: p.badges,
+    var profile = getProfile();
+    var payload = Object.assign({}, p, {
+      uid: cloud.user.uid,
+      email: cloud.user.email || profile.email || "",
+      name: profile.name || (cloud.user.email ? cloud.user.email.split("@")[0] : ""),
+      role: profile.role || "Player",
+      authProvider: cloud.user.isAnonymous ? "anonymous" : "password",
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }).catch(function (e) {
-      console.error("[MM] Cloud save failed", e);
     });
+
+    cloud.db.collection("players").doc(cloud.user.uid).set(payload, { merge: true })
+      .catch(function (e) {
+        console.error("[MM] Cloud save failed", e);
+      });
   }
 
   function pullCloud() {
@@ -193,14 +204,26 @@
 
         // Merge rule: highest numbers win, union badges
         var merged = {
-          coins:  Math.max(local.coins,  data.coins  || 0),
-          saved:  Math.max(local.saved,  data.saved  || 0),
-          joy:    Math.max(local.joy,    data.joy    || 0),
+          coins: Math.max(local.coins, data.coins || 0),
+          saved: Math.max(local.saved, data.saved || 0),
+          joy: Math.max(local.joy, data.joy || 0),
           wisdom: Math.max(local.wisdom, data.wisdom || 0),
-          level:  Math.max(local.level,  data.level  || 1),
-          badges: union(local.badges, data.badges || [])
+          level: Math.max(local.level, data.level || 1),
+          badges: union(local.badges || [], data.badges || []),
+          currentLevel: Math.max(local.currentLevel || 0, data.currentLevel || 0),
+          unlockedLevel: Math.max(local.unlockedLevel || 0, data.unlockedLevel || 0),
+          completedLevels: union(local.completedLevels || [], data.completedLevels || []),
+          completedLessons: union(local.completedLessons || [], data.completedLessons || [])
         };
         setLocal(merged);
+        if (data.email || data.name || data.role) {
+          localStorage.setItem("moneymuncherSession", JSON.stringify({
+            id: cloud.user.uid,
+            email: data.email || cloud.user.email || "",
+            name: data.name || (cloud.user.email ? cloud.user.email.split("@")[0] : "Player"),
+            role: data.role || "Player"
+          }));
+        }
         console.log("[MM] Cloud progress merged into local");
       } else {
         // First time: seed cloud with what they have locally
@@ -238,18 +261,30 @@
     },
 
     reset: function () { setLocal(clone(DEFAULT_PROGRESS)); },
-var DEFAULT_PROGRESS = {
-  coins: 30,
-  saved: 0,
-  joy: 50,
-  wisdom: 0,
-  level: 1,
-  badges: [],
-  currentLevel: 0,
-  unlockedLevel: 0,
-  completedLevels: [],
-  completedLessons: []   // <-- add this
-};
+
+    setProfile: function (profile) {
+      profile = profile || {};
+      var next = {
+        id: profile.id || (cloud.user && cloud.user.uid) || "",
+        email: profile.email || (cloud.user && cloud.user.email) || "",
+        name: profile.name || "",
+        role: profile.role || "Player"
+      };
+      localStorage.setItem("moneymuncherSession", JSON.stringify(next));
+      if (cloud.ready && cloud.user) pushCloud();
+      return next;
+    },
+
+    getUser: function () {
+      if (!cloud.user) return null;
+      var profile = getProfile();
+      return {
+        uid: cloud.user.uid,
+        email: cloud.user.email || profile.email || "",
+        name: profile.name || "",
+        role: profile.role || "Player"
+      };
+    },
     addCoins:  function (n) { var p = this.get(); this.set({ coins: p.coins + n }); },
     addSaved:  function (n) { var p = this.get(); this.set({ saved: p.saved + n }); },
     addJoy:    function (n) { var p = this.get(); this.set({ joy: Math.min(100, p.joy + n) }); },
@@ -277,12 +312,18 @@ var DEFAULT_PROGRESS = {
     },
 
     // ---- Auth / Sign Up / Sign In (requires Firebase CDN) ----
-    signUp: function (email, password) {
+    signUp: function (email, password, profile) {
       return new Promise(function (resolve, reject) {
         if (!cloud.ready) return reject(new Error("Cloud not initialized"));
         cloud.auth.createUserWithEmailAndPassword(email, password)
           .then(function (cred) {
             cloud.user = cred.user;
+            window.MoneyMuncher.setProfile({
+              id: cred.user.uid,
+              email: cred.user.email,
+              name: profile && profile.name ? profile.name : cred.user.email.split("@")[0],
+              role: profile && profile.role ? profile.role : "Player"
+            });
             pushCloud(); // push current local progress immediately
             resolve({ uid: cred.user.uid, email: cred.user.email });
           })
@@ -290,12 +331,20 @@ var DEFAULT_PROGRESS = {
       });
     },
 
-    signIn: function (email, password) {
+    signIn: function (email, password, profile) {
       return new Promise(function (resolve, reject) {
         if (!cloud.ready) return reject(new Error("Cloud not initialized"));
         cloud.auth.signInWithEmailAndPassword(email, password)
           .then(function (cred) {
             cloud.user = cred.user;
+            if (profile && (profile.name || profile.role)) {
+              window.MoneyMuncher.setProfile({
+                id: cred.user.uid,
+                email: cred.user.email,
+                name: profile.name || cred.user.email.split("@")[0],
+                role: profile.role || "Player"
+              });
+            }
             resolve({ uid: cred.user.uid, email: cred.user.email });
             // pullCloud() will auto-fire via onAuthStateChanged
           })

@@ -8,8 +8,20 @@ const dataDir = path.join(root, "data");
 const dbPath = path.join(dataDir, "db.json");
 const port = process.env.PORT || 4173;
 
-const defaultProgress = () => ({ unlockedLevel: 0, completedLevels: [] });
+const defaultProgress = () => ({
+  coins: 30,
+  saved: 0,
+  joy: 50,
+  wisdom: 0,
+  level: 1,
+  badges: [],
+  currentLevel: 0,
+  unlockedLevel: 0,
+  completedLevels: [],
+  completedLessons: []
+});
 const sanitize = (value) => String(value || "").trim().slice(0, 80);
+const sanitizeEmail = (value) => String(value || "").trim().toLowerCase().slice(0, 160);
 
 async function readDb() {
   await fs.mkdir(dataDir, { recursive: true });
@@ -37,7 +49,7 @@ function sendJson(res, status, payload) {
 }
 
 function safeUser(user) {
-  return { id: user.id, name: user.name, role: user.role, createdAt: user.createdAt, updatedAt: user.updatedAt };
+  return { id: user.id, email: user.email || "", name: user.name, role: user.role, createdAt: user.createdAt, updatedAt: user.updatedAt };
 }
 
 async function handleApi(req, res) {
@@ -46,18 +58,20 @@ async function handleApi(req, res) {
   if (req.method === "POST" && url.pathname === "/api/login") {
     const body = await readBody(req);
     const name = sanitize(body.name);
+    const email = sanitizeEmail(body.email);
     const role = ["Kid", "Parent", "Teacher"].includes(body.role) ? body.role : "Kid";
-    if (!name) return sendJson(res, 400, { error: "Name is required" });
+    if (!name && !email) return sendJson(res, 400, { error: "Name or email is required" });
 
     const db = await readDb();
-    const key = `${name.toLowerCase()}::${role.toLowerCase()}`;
+    const key = email || `${name.toLowerCase()}::${role.toLowerCase()}`;
     let user = db.users.find((item) => item.key === key);
     const now = new Date().toISOString();
     if (!user) {
-      user = { id: crypto.randomUUID(), key, name, role, progress: defaultProgress(), createdAt: now, updatedAt: now };
+      user = { id: crypto.randomUUID(), key, email, name: name || email.split("@")[0], role, progress: defaultProgress(), createdAt: now, updatedAt: now };
       db.users.push(user);
     } else {
-      user.name = name;
+      user.email = email || user.email || "";
+      user.name = name || user.name;
       user.role = role;
       user.updatedAt = now;
     }
@@ -81,8 +95,18 @@ async function handleApi(req, res) {
     const user = db.users.find((item) => item.id === progressMatch[1]);
     if (!user) return sendJson(res, 404, { error: "User not found" });
     user.progress = {
+      ...defaultProgress(),
+      ...user.progress,
+      coins: Math.max(0, Number(incoming.coins) || 0),
+      saved: Math.max(0, Number(incoming.saved) || 0),
+      joy: Math.max(0, Number(incoming.joy) || 0),
+      wisdom: Math.max(0, Number(incoming.wisdom) || 0),
+      level: Math.max(1, Number(incoming.level) || 1),
+      badges: Array.from(new Set(incoming.badges || [])),
+      currentLevel: Math.max(0, Math.min(4, Number(incoming.currentLevel) || 0)),
       unlockedLevel: Math.max(0, Math.min(4, Number(incoming.unlockedLevel) || 0)),
-      completedLevels: Array.from(new Set((incoming.completedLevels || []).map(Number).filter((n) => n >= 0 && n <= 4)))
+      completedLevels: Array.from(new Set((incoming.completedLevels || []).map(Number).filter((n) => n >= 0 && n <= 4))),
+      completedLessons: Array.from(new Set(incoming.completedLessons || []))
     };
     user.updatedAt = new Date().toISOString();
     await writeDb(db);

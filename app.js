@@ -118,15 +118,21 @@ const levels = [
 document.addEventListener('DOMContentLoaded', function() {
   var signUpBtn  = $('signUpBtn');
   var signInBtn  = $('signInBtn');
+  var nameIn     = $('nameInput');
+  var roleIn     = $('roleInput');
   var emailIn    = $('emailInput');
   var passIn     = $('passInput');
 
   if (signUpBtn && emailIn && passIn) {
     signUpBtn.addEventListener('click', function() {
       var em = emailIn.value.trim(), pw = passIn.value;
+      var profile = {
+        name: (nameIn && nameIn.value.trim()) || em.split('@')[0],
+        role: (roleIn && roleIn.value) || 'Player'
+      };
       if (!em || !pw) return alert('Enter email and password');
-      MoneyMuncher.signUp(em, pw).then(function(u) {
-        account = { id: u.uid, name: em.split('@')[0], role: 'Player' };
+      MoneyMuncher.signUp(em, pw, profile).then(function(u) {
+        account = { id: u.uid, email: u.email, name: profile.name, role: profile.role };
         saveSession(); sync();
         $('loginDialog').close();
         $('feedback').textContent = 'Account created! Cloud save active.';
@@ -138,9 +144,17 @@ document.addEventListener('DOMContentLoaded', function() {
   if (signInBtn && emailIn && passIn) {
     signInBtn.addEventListener('click', function() {
       var em = emailIn.value.trim(), pw = passIn.value;
+      var signInName = nameIn && nameIn.value.trim();
+      var profile = signInName ? { name: signInName, role: roleIn && roleIn.value } : null;
       if (!em || !pw) return alert('Enter email and password');
-      MoneyMuncher.signIn(em, pw).then(function(u) {
-        account = { id: u.uid, name: em.split('@')[0], role: 'Player' };
+      MoneyMuncher.signIn(em, pw, profile).then(function(u) {
+        var saved = (hasMM && MoneyMuncher.getUser && MoneyMuncher.getUser()) || {};
+        account = {
+          id: u.uid,
+          email: u.email,
+          name: (profile && profile.name) || saved.name || em.split('@')[0],
+          role: (profile && profile.role) || saved.role || 'Player'
+        };
         saveSession();
         $('loginDialog').close();
         $('feedback').textContent = 'Welcome back!';
@@ -167,6 +181,17 @@ function renderStats() {
 
 function renderAccount() {
   var loggedIn = Boolean(account.id) || (hasMM && MoneyMuncher.isLoggedIn());
+  if (loggedIn && hasMM && MoneyMuncher.getUser && !account.id) {
+    var user = MoneyMuncher.getUser();
+    if (user) {
+      account = {
+        id: user.uid,
+        email: user.email,
+        name: user.name || (user.email ? user.email.split('@')[0] : 'Player'),
+        role: user.role || 'Player'
+      };
+    }
+  }
   $('accountStatus').textContent = loggedIn
     ? (account.name || 'Player') + (hasMM && MoneyMuncher.isLoggedIn() ? ' • cloud saved' : ' • local')
     : 'Guest explorer';
@@ -287,7 +312,7 @@ $('teacherBtn').addEventListener('click', function() {
 $('loginOpenBtn').addEventListener('click', function() { openDialog('loginDialog'); });
 
 $('logoutBtn').addEventListener('click', function() {
-  account = { id: "", name: "", role: "" };
+  account = { id: "", email: "", name: "", role: "" };
   clearSession();
   if (hasMM) MoneyMuncher.signOut();
   renderAccount(); renderStats(); renderMap(); renderScenario();
@@ -298,8 +323,9 @@ $('loginForm').addEventListener('submit', function(ev) {
   ev.preventDefault();
   var name = $('nameInput').value.trim();
   var role = $('roleInput').value;
-  if (!name) return;
-  account = { id: 'local_' + Date.now(), name: name, role: role };
+  var email = $('emailInput').value.trim();
+  if (!name && !email) return;
+  account = { id: 'local_' + Date.now(), email: email, name: name || email.split('@')[0], role: role };
   saveSession();
   $('loginDialog').close();
   $('feedback').textContent = 'Welcome, ' + account.name + '. Your progress is saved on this device.';
