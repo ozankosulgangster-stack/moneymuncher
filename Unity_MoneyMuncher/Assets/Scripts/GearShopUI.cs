@@ -8,6 +8,7 @@ public class GearShopUI : MonoBehaviour
     public Button speedButton;
     public Button magnetButton;
     public Button nextLevelButton;
+    public Text nextLevelButtonLabel;
     public string nextLevelSceneName = "MoneyMuncherSoccerStadium";
 
     private void Awake()
@@ -43,7 +44,7 @@ public class GearShopUI : MonoBehaviour
 
     public void GoToNextLevel()
     {
-        if (gameManager != null)
+        if (gameManager != null && gameManager.IsNextLevelUnlocked)
         {
             gameManager.LoadSceneByName(nextLevelSceneName);
         }
@@ -71,6 +72,16 @@ public class GearShopUI : MonoBehaviour
         if (magnetButton != null)
         {
             magnetButton.interactable = canBuy;
+        }
+
+        if (nextLevelButton != null)
+        {
+            nextLevelButton.interactable = gameManager.IsNextLevelUnlocked;
+        }
+
+        if (nextLevelButtonLabel != null)
+        {
+            nextLevelButtonLabel.text = gameManager.IsNextLevelUnlocked ? "Play Level 2" : "Level 2 Locked";
         }
     }
 }

@@ -5,6 +5,8 @@ using UnityEngine.SceneManagement;
 public class MoneyMuncherGameManager : MonoBehaviour
 {
     [Header("Round")]
+    public int levelNumber = 1;
+    public string levelName = "Treasure Island";
     public float roundDuration = 90f;
     public bool roundActive = true;
 
@@ -20,10 +22,12 @@ public class MoneyMuncherGameManager : MonoBehaviour
     [Header("Events")]
     public UnityEvent onScoreChanged;
     public UnityEvent onRoundEnded;
+    public UnityEvent onLevelCompleted;
 
     private float timeRemaining;
     private float comboTimer;
     private bool highScoreSaved;
+    private bool levelCompleted;
 
     public float TimeRemaining => timeRemaining;
     public int NetWorth => grossScore - debt;
@@ -31,6 +35,8 @@ public class MoneyMuncherGameManager : MonoBehaviour
     public int SavedCoins => PlayerPrefs.GetInt("MoneyMuncher.SavedCoins", 0);
     public int SpeedGearLevel => PlayerPrefs.GetInt("MoneyMuncher.SpeedGearLevel", 0);
     public int MagnetGearLevel => PlayerPrefs.GetInt("MoneyMuncher.MagnetGearLevel", 0);
+    public bool LevelCompleted => levelCompleted;
+    public bool IsNextLevelUnlocked => PlayerPrefs.GetInt("MoneyMuncher.Level2Unlocked", 0) == 1;
 
     private void Start()
     {
@@ -67,6 +73,7 @@ public class MoneyMuncherGameManager : MonoBehaviour
         timeRemaining = roundDuration;
         roundActive = true;
         highScoreSaved = false;
+        levelCompleted = false;
         onScoreChanged?.Invoke();
     }
 
@@ -122,6 +129,28 @@ public class MoneyMuncherGameManager : MonoBehaviour
         roundActive = false;
         SaveBestScore();
         AddSavedCoins(Mathf.Max(0, NetWorth));
+        onRoundEnded?.Invoke();
+    }
+
+    public void CompleteLevel()
+    {
+        if (!roundActive || levelCompleted)
+        {
+            return;
+        }
+
+        levelCompleted = true;
+        roundActive = false;
+        SaveBestScore();
+        AddSavedCoins(Mathf.Max(0, NetWorth));
+
+        if (levelNumber == 1)
+        {
+            PlayerPrefs.SetInt("MoneyMuncher.Level2Unlocked", 1);
+            PlayerPrefs.Save();
+        }
+
+        onLevelCompleted?.Invoke();
         onRoundEnded?.Invoke();
     }
 

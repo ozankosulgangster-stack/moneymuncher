@@ -27,6 +27,8 @@ public static class MoneyMuncherIslandBuilder
 
         GameObject managerObject = new GameObject("Game Manager");
         MoneyMuncherGameManager gameManager = managerObject.AddComponent<MoneyMuncherGameManager>();
+        gameManager.levelNumber = 1;
+        gameManager.levelName = "Treasure Island";
         gameManager.roundDuration = 120f;
 
         CreateIslandMap(materials);
@@ -61,6 +63,7 @@ public static class MoneyMuncherIslandBuilder
         };
 
         CreateIslandTaxLessonZones(materials);
+        CreateLevelExitChest(new Vector3(0f, 0.54f, 5.95f), materials, gameManager);
         CreateHud(gameManager);
 
         EditorSceneManager.SaveScene(scene, ScenePath);
@@ -284,6 +287,40 @@ public static class MoneyMuncherIslandBuilder
         Object.DestroyImmediate(chest.GetComponent<Collider>());
         GameObject band = CreateCube("Chest Gold Band", position + new Vector3(0f, 0.13f, 0f), new Vector3(1.5f, 0.12f, 0.96f), materials.chestGold);
         Object.DestroyImmediate(band.GetComponent<Collider>());
+    }
+
+    private static void CreateLevelExitChest(Vector3 position, IslandMaterials materials, MoneyMuncherGameManager gameManager)
+    {
+        GameObject exit = new GameObject("Level Complete Captain Chest");
+        exit.transform.position = position;
+
+        BoxCollider collider = exit.AddComponent<BoxCollider>();
+        collider.size = new Vector3(2.5f, 1.6f, 1.8f);
+        collider.center = new Vector3(0f, 0.35f, 0f);
+        collider.isTrigger = true;
+
+        LevelExit levelExit = exit.AddComponent<LevelExit>();
+        levelExit.gameManager = gameManager;
+
+        GameObject baseBox = CreateCube("Captain Chest Base", position, new Vector3(2.1f, 0.78f, 1.25f), materials.chestWood);
+        baseBox.transform.SetParent(exit.transform, true);
+        Object.DestroyImmediate(baseBox.GetComponent<Collider>());
+
+        GameObject lid = CreateCube("Captain Chest Gold Lid", position + new Vector3(0f, 0.47f, 0f), new Vector3(2.22f, 0.24f, 1.32f), materials.chestGold);
+        lid.transform.SetParent(exit.transform, true);
+        Object.DestroyImmediate(lid.GetComponent<Collider>());
+
+        GameObject glow = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+        glow.name = "Level Complete Glow";
+        glow.transform.SetParent(exit.transform, false);
+        glow.transform.localPosition = new Vector3(0f, -0.33f, 0f);
+        glow.transform.localScale = new Vector3(1.75f, 0.035f, 1.75f);
+        glow.GetComponent<Renderer>().sharedMaterial = materials.coin;
+        Object.DestroyImmediate(glow.GetComponent<Collider>());
+
+        GameObject sign = CreateCube("Level 2 Unlock Sign", position + new Vector3(0f, 1.35f, -0.65f), new Vector3(2.6f, 0.5f, 0.14f), materials.trim);
+        sign.transform.SetParent(exit.transform, true);
+        Object.DestroyImmediate(sign.GetComponent<Collider>());
     }
 
     private static void CreateBushCluster(Vector3 position, IslandMaterials materials)
@@ -651,9 +688,10 @@ public static class MoneyMuncherIslandBuilder
         shopText.rectTransform.sizeDelta = new Vector2(380f, 100f);
         shop.shopText = shopText;
 
-        shop.speedButton = CreateShopButton(shopObject.transform, "Buy Speed", new Vector2(-120f, -72f), font);
+        shop.speedButton = CreateShopButton(shopObject.transform, "Buy Speed", new Vector2(-140f, -72f), font);
         shop.magnetButton = CreateShopButton(shopObject.transform, "Buy Magnet", new Vector2(0f, -72f), font);
-        shop.nextLevelButton = CreateShopButton(shopObject.transform, "Level 2", new Vector2(120f, -72f), font);
+        shop.nextLevelButton = CreateShopButton(shopObject.transform, "Level 2 Locked", new Vector2(140f, -72f), font);
+        shop.nextLevelButtonLabel = shop.nextLevelButton.GetComponentInChildren<Text>();
 
         UnityEventTools.AddPersistentListener(shop.speedButton.onClick, shop.BuySpeed);
         UnityEventTools.AddPersistentListener(shop.magnetButton.onClick, shop.BuyMagnet);
@@ -733,13 +771,13 @@ public static class MoneyMuncherIslandBuilder
         rect.anchorMin = new Vector2(0.5f, 0.5f);
         rect.anchorMax = new Vector2(0.5f, 0.5f);
         rect.pivot = new Vector2(0.5f, 0.5f);
-        rect.sizeDelta = new Vector2(105f, 34f);
+        rect.sizeDelta = new Vector2(125f, 36f);
         rect.anchoredPosition = position;
 
         Text label = CreatePanelText(buttonObject.transform, "Label", labelText, Vector2.zero, font, 15);
         label.color = Color.black;
         label.raycastTarget = false;
-        label.rectTransform.sizeDelta = new Vector2(100f, 30f);
+        label.rectTransform.sizeDelta = new Vector2(120f, 32f);
         return button;
     }
 

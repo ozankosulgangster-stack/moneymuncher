@@ -27,6 +27,8 @@ public static class MoneyMuncherSoccerBuilder
 
         GameObject managerObject = new GameObject("Game Manager");
         MoneyMuncherGameManager gameManager = managerObject.AddComponent<MoneyMuncherGameManager>();
+        gameManager.levelNumber = 2;
+        gameManager.levelName = "Soccer Stadium";
         gameManager.roundDuration = 120f;
 
         CreateStadium(materials);
@@ -195,8 +197,8 @@ public static class MoneyMuncherSoccerBuilder
         ball.GetComponent<Renderer>().sharedMaterial = materials.white;
         ball.AddComponent<SoccerBall>();
         Rigidbody ballBody = ball.AddComponent<Rigidbody>();
-        ballBody.drag = 0.45f;
-        ballBody.angularDrag = 0.65f;
+        ballBody.linearDamping = 0.45f;
+        ballBody.angularDamping = 0.65f;
 
         CreateGoal("Left Goal", new Vector3(-11.2f, 0.65f, 0f), new Vector3(0.4f, 1.2f, 4f), resetPoint.transform, materials);
         CreateGoal("Right Goal", new Vector3(11.2f, 0.65f, 0f), new Vector3(0.4f, 1.2f, 4f), resetPoint.transform, materials);

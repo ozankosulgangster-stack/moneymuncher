@@ -30,6 +30,7 @@ public class MoneyMuncherHud : MonoBehaviour
         {
             gameManager.onScoreChanged.AddListener(Refresh);
             gameManager.onRoundEnded.AddListener(Refresh);
+            gameManager.onLevelCompleted.AddListener(Refresh);
         }
     }
 
@@ -39,6 +40,7 @@ public class MoneyMuncherHud : MonoBehaviour
         {
             gameManager.onScoreChanged.RemoveListener(Refresh);
             gameManager.onRoundEnded.RemoveListener(Refresh);
+            gameManager.onLevelCompleted.RemoveListener(Refresh);
         }
     }
 
@@ -60,7 +62,9 @@ public class MoneyMuncherHud : MonoBehaviour
         string combo = $"Combo x{gameManager.comboMultiplier}";
         string timer = $"Time: {Mathf.CeilToInt(gameManager.TimeRemaining)}";
         string best = $"Best: ${gameManager.BestNetWorth}";
-        string results = $"Round Complete\nNet Worth: ${gameManager.NetWorth}\nBest: ${gameManager.BestNetWorth}";
+        string results = gameManager.LevelCompleted
+            ? $"Level {gameManager.levelNumber} Complete!\n{gameManager.levelName}\nSaved Coins: ${gameManager.SavedCoins}\nBest: ${gameManager.BestNetWorth}"
+            : $"Round Complete\nNet Worth: ${gameManager.NetWorth}\nSaved Coins: ${gameManager.SavedCoins}\nBest: ${gameManager.BestNetWorth}";
 
         SetText(scoreLabel, score);
         SetText(debtLabel, debt);
