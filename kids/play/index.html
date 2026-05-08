@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Play Money Muncher</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #17212b;
+      background: #e9f8fb;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 20px;
+      background: #fff;
+      border-bottom: 1px solid #d9e2ea;
+    }
+    a { color: #17212b; font-weight: 800; text-decoration: none; }
+    main {
+      width: min(980px, calc(100% - 24px));
+      margin: 22px auto;
+    }
+    .hud {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .hud div, .panel {
+      background: #fff;
+      border: 1px solid #d9e2ea;
+      border-radius: 8px;
+      padding: 12px;
+    }
+    .hud strong {
+      display: block;
+      font-size: 24px;
+    }
+    canvas {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      display: block;
+      background: #f6d77b;
+      border: 3px solid #17212b;
+      border-radius: 8px;
+      touch-action: none;
+    }
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    button {
+      min-height: 42px;
+      padding: 0 16px;
+      border: 2px solid #17212b;
+      border-radius: 8px;
+      background: #ffbd2d;
+      color: #17212b;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .tip {
+      color: #51606f;
+      font-size: 16px;
+      line-height: 1.35;
+    }
+    @media (max-width: 700px) {
+      .hud { grid-template-columns: repeat(2, 1fr); }
+      .controls { align-items: stretch; flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="../index.html">Money Muncher Kids</a>
+    <a href="../privacy.html">Privacy</a>
+  </header>
+
+  <main>
+    <section class="hud" aria-label="Game stats">
+      <div><span>Coins</span><strong id="score">0</strong></div>
+      <div><span>Saved</span><strong id="saved">0</strong></div>
+      <div><span>Debt</span><strong id="debt">0</strong></div>
+      <div><span>Time</span><strong id="time">60</strong></div>
+    </section>
+
+    <canvas id="game" width="960" height="540" aria-label="Money Muncher mini game"></canvas>
+
+    <section class="controls">
+      <p class="tip">Move with WASD or arrow keys. Eat coins, gems, and treasure chests. Avoid purple debt and blue tax forms. Touch works on phones: drag inside the game area.</p>
+      <button id="restart">Restart</button>
+    </section>
+  </main>
+
+  <script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+    const scoreEl = document.getElementById("score");
+    const savedEl = document.getElementById("saved");
+    const debtEl = document.getElementById("debt");
+    const timeEl = document.getElementById("time");
+    const restartBtn = document.getElementById("restart");
+
+    const keys = new Set();
+    let pointerTarget = null;
+    let game;
+
+    const rand = (min, max) => Math.random() * (max - min) + min;
+    const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+    const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+
+    function reset() {
+      game = {
+        player: { x: 480, y: 270, r: 22, speed: 245 },
+        items: [],
+        score: 0,
+        saved: Number(localStorage.getItem("moneyMuncherMiniSaved") || 0),
+        debt: 0,
+        time: 60,
+        over: false,
+        spawnTimer: 0
+      };
+      for (let i = 0; i < 28; i++) spawnItem();
+    }
+
+    function spawnItem() {
+      const roll = Math.random();
+      let item;
+      if (roll < 0.56) item = { kind: "coin", value: 10, color: "#ffbd2d", r: 12 };
+      else if (roll < 0.76) item = { kind: "gem", value: 30, color: "#10d98b", r: 13 };
+      else if (roll < 0.86) item = { kind: "chest", value: 80, color: "#8a4a19", r: 18 };
+      else if (roll < 0.94) item = { kind: "debt", value: 35, color: "#7b2bd1", r: 15 };
+      else item = { kind: "tax", value: 0, color: "#159bd3", r: 15 };
+
+      item.x = rand(36, canvas.width - 36);
+      item.y = rand(50, canvas.height - 36);
+      game.items.push(item);
+    }
+
+    function update(dt) {
+      if (game.over) return;
+
+      game.time -= dt;
+      if (game.time <= 0) {
+        game.time = 0;
+        game.over = true;
+        game.saved += Math.max(0, game.score - game.debt);
+        localStorage.setItem("moneyMuncherMiniSaved", game.saved);
+      }
+
+      let dx = 0;
+      let dy = 0;
+      if (keys.has("ArrowLeft") || keys.has("a")) dx -= 1;
+      if (keys.has("ArrowRight") || keys.has("d")) dx += 1;
+      if (keys.has("ArrowUp") || keys.has("w")) dy -= 1;
+      if (keys.has("ArrowDown") || keys.has("s")) dy += 1;
+
+      if (pointerTarget) {
+        dx += pointerTarget.x - game.player.x;
+        dy += pointerTarget.y - game.player.y;
+      }
+
+      const length = Math.hypot(dx, dy) || 1;
+      game.player.x = clamp(game.player.x + (dx / length) * game.player.speed * dt, 24, canvas.width - 24);
+      game.player.y = clamp(game.player.y + (dy / length) * game.player.speed * dt, 38, canvas.height - 24);
+
+      for (let i = game.items.length - 1; i >= 0; i--) {
+        const item = game.items[i];
+        if (dist(game.player, item) < game.player.r + item.r) {
+          if (item.kind === "debt") game.debt += item.value;
+          else if (item.kind === "tax") game.debt += Math.ceil(game.score * 0.08);
+          else game.score += item.value;
+          game.items.splice(i, 1);
+          spawnItem();
+        }
+      }
+
+      game.spawnTimer -= dt;
+      if (game.spawnTimer <= 0 && game.items.length < 36) {
+        game.spawnTimer = 0.8;
+        spawnItem();
+      }
+    }
+
+    function drawItem(item) {
+      ctx.save();
+      ctx.translate(item.x, item.y);
+      ctx.fillStyle = item.color;
+      if (item.kind === "chest") {
+        ctx.fillRect(-20, -12, 40, 24);
+        ctx.fillStyle = "#ffbd2d";
+        ctx.fillRect(-22, -4, 44, 8);
+      } else if (item.kind === "tax") {
+        ctx.fillRect(-12, -16, 24, 32);
+        ctx.fillStyle = "#fff";
+        ctx.font = "bold 13px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("%", 0, 5);
+      } else {
+        ctx.beginPath();
+        ctx.arc(0, 0, item.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "#159bd3";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#f6d77b";
+      ctx.beginPath();
+      ctx.ellipse(canvas.width / 2, canvas.height / 2, 390, 220, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#2fa85a";
+      ctx.beginPath();
+      ctx.ellipse(canvas.width / 2, canvas.height / 2 + 10, 230, 110, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      game.items.forEach(drawItem);
+
+      const p = game.player;
+      ctx.fillStyle = "#c51d32";
+      ctx.fillRect(p.x - 28, p.y - 20, 56, 40);
+      ctx.fillStyle = "#ffbd2d";
+      ctx.fillRect(p.x - 30, p.y - 24, 60, 8);
+      ctx.fillStyle = "#111";
+      ctx.beginPath();
+      ctx.arc(p.x - 11, p.y - 5, 4, 0, Math.PI * 2);
+      ctx.arc(p.x + 11, p.y - 5, 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      if (game.over) {
+        ctx.fillStyle = "rgba(0,0,0,0.72)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#fff";
+        ctx.textAlign = "center";
+        ctx.font = "bold 42px Arial";
+        ctx.fillText("Round Complete", canvas.width / 2, 220);
+        ctx.font = "bold 26px Arial";
+        ctx.fillText(`Net coins: ${Math.max(0, game.score - game.debt)}`, canvas.width / 2, 268);
+        ctx.fillText(`Saved total: ${game.saved}`, canvas.width / 2, 306);
+        ctx.font = "18px Arial";
+        ctx.fillText("Press Restart to play again.", canvas.width / 2, 346);
+      }
+
+      scoreEl.textContent = game.score;
+      savedEl.textContent = game.saved;
+      debtEl.textContent = game.debt;
+      timeEl.textContent = Math.ceil(game.time);
+    }
+
+    let last = performance.now();
+    function frame(now) {
+      const dt = Math.min(0.04, (now - last) / 1000);
+      last = now;
+      update(dt);
+      draw();
+      requestAnimationFrame(frame);
+    }
+
+    window.addEventListener("keydown", (event) => keys.add(event.key));
+    window.addEventListener("keyup", (event) => keys.delete(event.key));
+    restartBtn.addEventListener("click", reset);
+    canvas.addEventListener("pointerdown", setPointer);
+    canvas.addEventListener("pointermove", setPointer);
+    canvas.addEventListener("pointerup", () => pointerTarget = null);
+    canvas.addEventListener("pointerleave", () => pointerTarget = null);
+
+    function setPointer(event) {
+      const rect = canvas.getBoundingClientRect();
+      pointerTarget = {
+        x: ((event.clientX - rect.left) / rect.width) * canvas.width,
+        y: ((event.clientY - rect.top) / rect.height) * canvas.height
+      };
+    }
+
+    reset();
+    requestAnimationFrame(frame);
+  </script>
+</body>
+</html>
