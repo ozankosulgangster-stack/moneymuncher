@@ -8,4 +8,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/SampleScene.unity
     guid: 2cda990e2423bbf4892e6590ba056729
+  - enabled: 1
+    path: Assets/Scenes/MoneyMuncherTreasureIsland.unity
+    guid: 77403fefa71e5dd4a9ae9a1f17cded09
+  - enabled: 1
+    path: Assets/Scenes/MoneyMuncherSoccerStadium.unity
+    guid: 56ef6ee7e9e7b4643b1197e5bbe86009
   m_configObjects: {}

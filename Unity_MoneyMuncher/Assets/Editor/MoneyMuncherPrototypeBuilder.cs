@@ -267,7 +267,7 @@ public static class MoneyMuncherPrototypeBuilder
         MoneyMuncherHud hud = canvasObject.AddComponent<MoneyMuncherHud>();
         hud.gameManager = gameManager;
 
-        Font font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
         hud.scoreLabel = CreateHudText(canvasObject.transform, "Score", "Gross: $0", new Vector2(18f, -18f), font, TextAnchor.UpperLeft);
         hud.debtLabel = CreateHudText(canvasObject.transform, "Debt", "Debt: $0", new Vector2(18f, -48f), font, TextAnchor.UpperLeft);
         hud.netWorthLabel = CreateHudText(canvasObject.transform, "Net Worth", "Net: $0", new Vector2(18f, -78f), font, TextAnchor.UpperLeft);
