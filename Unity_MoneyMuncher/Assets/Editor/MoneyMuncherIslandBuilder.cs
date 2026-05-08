@@ -89,6 +89,8 @@ public static class MoneyMuncherIslandBuilder
             sand = CreateMaterial("IslandSand", new Color(0.92f, 0.78f, 0.43f)),
             water = CreateTransparentMaterial("IslandWater", new Color(0.08f, 0.62f, 0.86f, 0.72f)),
             grass = CreateMaterial("IslandGrass", new Color(0.22f, 0.62f, 0.22f)),
+            darkGrass = CreateMaterial("IslandDarkGrass", new Color(0.08f, 0.38f, 0.16f)),
+            flower = CreateMaterial("IslandFlower", new Color(1f, 0.28f, 0.48f)),
             trunk = CreateMaterial("PalmTrunk", new Color(0.45f, 0.25f, 0.12f)),
             leaf = CreateMaterial("PalmLeaf", new Color(0.08f, 0.45f, 0.18f)),
             rock = CreateMaterial("IslandRock", new Color(0.36f, 0.36f, 0.34f)),
@@ -156,20 +158,66 @@ public static class MoneyMuncherIslandBuilder
     private static void CreateIslandMap(IslandMaterials materials)
     {
         CreateCube("Ocean", new Vector3(0f, -0.18f, 0f), new Vector3(32f, 0.16f, 24f), materials.water);
-        CreateCube("Main Sand Island", new Vector3(0f, 0f, 0f), new Vector3(22f, 0.25f, 15f), materials.sand);
-        CreateCube("Grassy Center", new Vector3(0f, 0.14f, 0f), new Vector3(11f, 0.08f, 6f), materials.grass);
+        CreateCube("Main Sand Island", new Vector3(0f, 0f, 0f), new Vector3(20f, 0.25f, 13f), materials.sand);
+        CreateCube("West Beach Curve", new Vector3(-8.2f, 0.01f, 0.5f), new Vector3(5f, 0.22f, 8f), materials.sand);
+        CreateCube("East Beach Curve", new Vector3(8.4f, 0.01f, -0.3f), new Vector3(5f, 0.22f, 8.4f), materials.sand);
+        CreateCube("North Sand Bulge", new Vector3(0.8f, 0.01f, 5.6f), new Vector3(12f, 0.22f, 3.2f), materials.sand);
+        CreateCube("South Sand Bulge", new Vector3(-0.6f, 0.01f, -5.6f), new Vector3(11f, 0.22f, 3.2f), materials.sand);
+
+        CreateRaisedPatch("Grassy Center", new Vector3(0f, 0.18f, 0f), new Vector3(10.5f, 0.18f, 5.6f), materials.grass, materials.darkGrass);
+        CreateRaisedPatch("Treasure Grove", new Vector3(-5.6f, 0.25f, 3.6f), new Vector3(4.2f, 0.24f, 2.8f), materials.grass, materials.darkGrass);
+        CreateRaisedPatch("Gear Dock Hill", new Vector3(5.7f, 0.23f, -3.7f), new Vector3(4.8f, 0.22f, 2.8f), materials.grass, materials.darkGrass);
 
         CreateCube("North Driftwood Wall", new Vector3(0f, 0.55f, 7.4f), new Vector3(20f, 1.1f, 0.45f), materials.trunk);
         CreateCube("South Driftwood Wall", new Vector3(0f, 0.55f, -7.4f), new Vector3(20f, 1.1f, 0.45f), materials.trunk);
         CreateCube("East Driftwood Wall", new Vector3(10.8f, 0.55f, 0f), new Vector3(0.45f, 1.1f, 14f), materials.trunk);
         CreateCube("West Driftwood Wall", new Vector3(-10.8f, 0.55f, 0f), new Vector3(0.45f, 1.1f, 14f), materials.trunk);
 
-        CreatePalmTree(new Vector3(-8f, 0.2f, 5f), materials);
-        CreatePalmTree(new Vector3(7.5f, 0.2f, 4.5f), materials);
-        CreatePalmTree(new Vector3(-7f, 0.2f, -5.2f), materials);
+        Vector3[] palmPositions =
+        {
+            new Vector3(-8f, 0.2f, 5f),
+            new Vector3(7.5f, 0.2f, 4.5f),
+            new Vector3(-7f, 0.2f, -5.2f),
+            new Vector3(8.4f, 0.2f, -5.4f),
+            new Vector3(-9.1f, 0.2f, 0.9f),
+            new Vector3(9.2f, 0.2f, 1.2f),
+            new Vector3(-4.8f, 0.34f, 4.6f),
+            new Vector3(-6.4f, 0.34f, 2.9f),
+            new Vector3(5.6f, 0.32f, -4.8f),
+            new Vector3(7f, 0.32f, -3.1f),
+            new Vector3(1.6f, 0.2f, 6.1f),
+            new Vector3(-1.8f, 0.2f, -6.2f)
+        };
+
+        foreach (Vector3 palmPosition in palmPositions)
+        {
+            CreatePalmTree(palmPosition, materials);
+        }
+
         CreateRockCluster(new Vector3(5.5f, 0.2f, -4.8f), materials);
         CreateRockCluster(new Vector3(-2f, 0.2f, 4.9f), materials);
+        CreateRockCluster(new Vector3(8.5f, 0.2f, 5.7f), materials);
+        CreateRockCluster(new Vector3(-8.7f, 0.2f, -3.9f), materials);
+
+        CreateBushCluster(new Vector3(-4.2f, 0.4f, 2.2f), materials);
+        CreateBushCluster(new Vector3(3.6f, 0.35f, 3.2f), materials);
+        CreateBushCluster(new Vector3(6.2f, 0.35f, -1.9f), materials);
+        CreateBushCluster(new Vector3(-6.5f, 0.35f, -1.5f), materials);
+
         CreateDecorativeChest(new Vector3(0f, 0.38f, 4.2f), materials);
+        CreateDecorativeChest(new Vector3(-5.6f, 0.55f, 3.4f), materials);
+        CreateTreasurePile(new Vector3(2.3f, 0.34f, 4.9f), materials);
+        CreateTreasurePile(new Vector3(6.2f, 0.42f, -3.8f), materials);
+        CreateDock(new Vector3(9.5f, 0.22f, -1.7f), materials);
+        CreateSteppingStones(materials);
+    }
+
+    private static void CreateRaisedPatch(string name, Vector3 position, Vector3 scale, Material topMaterial, Material edgeMaterial)
+    {
+        GameObject edge = CreateCube($"{name} Raised Edge", position - new Vector3(0f, 0.08f, 0f), scale + new Vector3(0.45f, 0.08f, 0.45f), edgeMaterial);
+        edge.GetComponent<Collider>().enabled = false;
+        GameObject top = CreateCube(name, position, scale, topMaterial);
+        top.GetComponent<Collider>().enabled = false;
     }
 
     private static void CreateIslandTaxLessonZones(IslandMaterials materials)
@@ -200,18 +248,19 @@ public static class MoneyMuncherIslandBuilder
     {
         GameObject trunk = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
         trunk.name = "Palm Trunk";
-        trunk.transform.position = position + new Vector3(0f, 1.2f, 0f);
-        trunk.transform.localScale = new Vector3(0.28f, 1.25f, 0.28f);
+        trunk.transform.position = position + new Vector3(0f, 1.35f, 0f);
+        trunk.transform.localScale = new Vector3(0.3f, 1.45f, 0.3f);
+        trunk.transform.rotation = Quaternion.Euler(Random.Range(-4f, 4f), 0f, Random.Range(-7f, 7f));
         trunk.GetComponent<Renderer>().sharedMaterial = materials.trunk;
         Object.DestroyImmediate(trunk.GetComponent<Collider>());
 
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 6; i++)
         {
             GameObject leaf = GameObject.CreatePrimitive(PrimitiveType.Cube);
             leaf.name = "Palm Leaf";
-            leaf.transform.position = position + new Vector3(0f, 2.55f, 0f);
-            leaf.transform.rotation = Quaternion.Euler(0f, i * 72f, 18f);
-            leaf.transform.localScale = new Vector3(0.45f, 0.12f, 2.1f);
+            leaf.transform.position = position + new Vector3(0f, 2.95f, 0f);
+            leaf.transform.rotation = Quaternion.Euler(0f, i * 60f, 18f + Random.Range(-5f, 5f));
+            leaf.transform.localScale = new Vector3(0.5f, 0.12f, 2.35f);
             leaf.GetComponent<Renderer>().sharedMaterial = materials.leaf;
             Object.DestroyImmediate(leaf.GetComponent<Collider>());
         }
@@ -235,6 +284,64 @@ public static class MoneyMuncherIslandBuilder
         Object.DestroyImmediate(chest.GetComponent<Collider>());
         GameObject band = CreateCube("Chest Gold Band", position + new Vector3(0f, 0.13f, 0f), new Vector3(1.5f, 0.12f, 0.96f), materials.chestGold);
         Object.DestroyImmediate(band.GetComponent<Collider>());
+    }
+
+    private static void CreateBushCluster(Vector3 position, IslandMaterials materials)
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            GameObject bush = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            bush.name = "Island Bush";
+            bush.transform.position = position + new Vector3((i - 2) * 0.32f, 0f, (i % 2) * 0.28f);
+            bush.transform.localScale = new Vector3(0.58f, 0.42f, 0.58f);
+            bush.GetComponent<Renderer>().sharedMaterial = i == 2 ? materials.flower : materials.darkGrass;
+            Object.DestroyImmediate(bush.GetComponent<Collider>());
+        }
+    }
+
+    private static void CreateTreasurePile(Vector3 position, IslandMaterials materials)
+    {
+        for (int i = 0; i < 7; i++)
+        {
+            GameObject coin = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            coin.name = "Decorative Coin Pile";
+            coin.transform.position = position + new Vector3((i % 3) * 0.22f, i * 0.035f, (i / 3) * 0.2f);
+            coin.transform.localScale = new Vector3(0.22f, 0.035f, 0.22f);
+            coin.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+            coin.GetComponent<Renderer>().sharedMaterial = materials.coin;
+            Object.DestroyImmediate(coin.GetComponent<Collider>());
+        }
+    }
+
+    private static void CreateDock(Vector3 position, IslandMaterials materials)
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            GameObject plank = CreateCube("Gear Dock Plank", position + new Vector3(0f, 0f, i * 0.55f), new Vector3(2.1f, 0.14f, 0.42f), materials.trunk);
+            Object.DestroyImmediate(plank.GetComponent<Collider>());
+        }
+    }
+
+    private static void CreateSteppingStones(IslandMaterials materials)
+    {
+        Vector3[] stones =
+        {
+            new Vector3(-2.8f, 0.24f, -2.2f),
+            new Vector3(-1.5f, 0.24f, -2.8f),
+            new Vector3(-0.1f, 0.24f, -2.3f),
+            new Vector3(1.2f, 0.24f, -2.8f),
+            new Vector3(2.6f, 0.24f, -2.1f)
+        };
+
+        foreach (Vector3 stonePosition in stones)
+        {
+            GameObject stone = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            stone.name = "Stepping Stone";
+            stone.transform.position = stonePosition;
+            stone.transform.localScale = new Vector3(0.9f, 0.18f, 0.65f);
+            stone.GetComponent<Renderer>().sharedMaterial = materials.rock;
+            Object.DestroyImmediate(stone.GetComponent<Collider>());
+        }
     }
 
     private static GameObject CreatePlayerWithSkins(IslandMaterials materials)
@@ -405,12 +512,14 @@ public static class MoneyMuncherIslandBuilder
         GameObject cameraObject = new GameObject("Main Camera");
         Camera camera = cameraObject.AddComponent<Camera>();
         cameraObject.tag = "MainCamera";
-        camera.fieldOfView = 55f;
-        cameraObject.transform.position = new Vector3(0f, 15f, -12f);
+        camera.fieldOfView = 50f;
+        cameraObject.transform.position = new Vector3(0f, 13f, -15f);
         cameraObject.transform.LookAt(target.position);
 
         FollowCamera followCamera = cameraObject.AddComponent<FollowCamera>();
         followCamera.target = target;
+        followCamera.offset = new Vector3(0f, 13f, -15f);
+        followCamera.followSpeed = 5.5f;
     }
 
     private static MoneyPickup CreateSimplePickup(string name, PickupKind kind, int value, Material material, PrimitiveType primitive, float scale)
@@ -639,6 +748,8 @@ public static class MoneyMuncherIslandBuilder
         public Material sand;
         public Material water;
         public Material grass;
+        public Material darkGrass;
+        public Material flower;
         public Material trunk;
         public Material leaf;
         public Material rock;
