@@ -6,3 +6,23 @@
   from = "/api/*"
   to = "/.netlify/functions/api?path=:splat"
   status = 200
+
+[[redirects]]
+  from = "/kids"
+  to = "/kids/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/kids/"
+  to = "/kids/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/kids/play"
+  to = "/kids/play/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/kids/play/"
+  to = "/kids/play/index.html"
+  status = 200
