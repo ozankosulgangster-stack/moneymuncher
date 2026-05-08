@@ -1,8 +1,15 @@
-# MoneyMuncher Alpha
+# MoneyMuncher
 
-A first playable web prototype for moneymuncher.ca.
+A kid-friendly money learning game for `moneymuncher.ca`.
 
-## What it includes
+This repository now contains two tracks:
+
+- The existing MoneyMuncher Alpha web prototype on `main`.
+- A new Unity WebGL kids game prototype under `Unity_MoneyMuncher`, with a GitHub Pages-ready website package under `Website`.
+
+## Existing Alpha App
+
+The original app includes:
 
 - Kid-facing landing page
 - Interactive financial choices game
@@ -11,15 +18,15 @@ A first playable web prototype for moneymuncher.ca.
 - Money World Map with level nodes
 - Locked/unlocked level progression saved to `data/db.json`
 - 5 prototype levels:
-  1. Snack Shop — needs vs wants
-  2. Toy Market — impulse control
-  3. Savings Bank — goals and patience
-  4. Sharing Square — giving and community
-  5. Family Budget — planning together
+  1. Snack Shop - needs vs wants
+  2. Toy Market - impulse control
+  3. Savings Bank - goals and patience
+  4. Sharing Square - giving and community
+  5. Family Budget - planning together
 - Teacher / parent community hub concept
 - Quest idea input prototype
 
-## Run locally
+Run locally:
 
 ```bash
 npm start
@@ -31,6 +38,54 @@ Then open:
 http://127.0.0.1:4173
 ```
 
-## Notes
+## Unity Kids Game
 
-Premium is intentionally removed for now. User login and progress are stored on the local Node server in `data/db.json`. This is much closer to real app storage than browser-only `localStorage`, but production should use a real database and parent-safe authentication.
+Money Muncher Unity is a WebGL arcade game about collecting coins, avoiding debt and taxes, saving money, buying gear, and playing arcade-style levels.
+
+The Unity project is in:
+
+```text
+Unity_MoneyMuncher
+```
+
+The kids website for GitHub Pages is in:
+
+```text
+Website/kids
+```
+
+Unity flow:
+
+1. Open `Unity_MoneyMuncher` in Unity Hub.
+2. In Unity, click `Money Muncher > Build Campaign Levels`.
+3. Open `Assets/Scenes/MoneyMuncherTreasureIsland.unity`.
+4. Press Play.
+
+Controls:
+
+- `WASD` or arrow keys to move.
+- In Level 1, press `1` through `6` to switch characters.
+- Eat coins, emeralds, treasures, trophies, and useful power-ups.
+- Avoid debt, tax traps, cursed items, and red cards.
+- At the end of Level 1, buy Speed Shoes or Magnet Gear, then go to Level 2.
+
+## Publishing
+
+The first public Unity target is a WebGL build on:
+
+```text
+https://moneymuncher.ca/kids
+```
+
+Build steps:
+
+1. In Unity, click `Money Muncher > Build Campaign Levels`.
+2. In Unity, click `Money Muncher > Build Kids WebGL`.
+3. Commit the generated WebGL files under `Website/kids/play`.
+4. Push to `main`.
+5. GitHub Actions deploys the `Website` folder through GitHub Pages.
+
+See:
+
+- `Docs/MoneyMuncherKidsLaunch.md`
+- `Docs/GitHubPagesDeployment.md`

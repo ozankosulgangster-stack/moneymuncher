@@ -2,4 +2,36 @@ node_modules/
 data/db.json
 .env
 .netlify/
+
+# Unity scratch folders at repo root from early prototyping
+/Assets/
+/Packages/
+/ProjectSettings/
+
+# Unity generated folders
+Unity_MoneyMuncher/Library/
+Unity_MoneyMuncher/Temp/
+Unity_MoneyMuncher/Obj/
+Unity_MoneyMuncher/Build/
+Unity_MoneyMuncher/Builds/
+Unity_MoneyMuncher/Logs/
+Unity_MoneyMuncher/UserSettings/
+Unity_MoneyMuncher/MemoryCaptures/
+
+# Unity generated files
+*.csproj
+*.sln
+*.user
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# OS/editor noise
 .DS_Store
+Thumbs.db
+.vscode/
+.idea/
