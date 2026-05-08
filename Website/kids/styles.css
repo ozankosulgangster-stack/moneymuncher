@@ -1,0 +1,160 @@
+:root {
+  color-scheme: light;
+  --ink: #17212b;
+  --muted: #51606f;
+  --sand: #f6d77b;
+  --water: #159bd3;
+  --grass: #2fa85a;
+  --gold: #ffbd2d;
+  --panel: #ffffff;
+  --line: #d9e2ea;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--ink);
+  background: #eef8fb;
+}
+
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding: 18px 28px;
+  background: #fff;
+  border-bottom: 1px solid var(--line);
+}
+
+.brand {
+  color: var(--ink);
+  font-size: 24px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+nav {
+  display: flex;
+  gap: 18px;
+}
+
+nav a {
+  color: var(--ink);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.hero {
+  min-height: 460px;
+  display: grid;
+  align-items: center;
+  padding: 54px 28px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.25), rgba(255,255,255,0.5)),
+    radial-gradient(circle at 20% 30%, #ffe08a 0 14%, transparent 15%),
+    linear-gradient(135deg, var(--water), #75d7eb 45%, var(--sand) 46% 70%, var(--grass));
+}
+
+.hero > div,
+.content-page {
+  width: min(980px, 100%);
+  margin: 0 auto;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  font-size: 17px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 0;
+  font-size: 64px;
+  line-height: 1;
+}
+
+.intro {
+  max-width: 560px;
+  font-size: 22px;
+  line-height: 1.35;
+}
+
+.play-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 0 24px;
+  background: var(--gold);
+  color: #171717;
+  border: 2px solid #171717;
+  border-radius: 8px;
+  font-size: 20px;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: 0 5px 0 #171717;
+}
+
+.level-grid {
+  width: min(980px, calc(100% - 36px));
+  margin: 32px auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.level-grid article,
+.safety-note,
+.content-page {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.level-number {
+  font-weight: 800;
+  color: var(--water);
+}
+
+h2 {
+  margin: 8px 0 10px;
+}
+
+p,
+li {
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1.45;
+}
+
+.safety-note {
+  width: min(980px, calc(100% - 36px));
+  margin: 0 auto 36px;
+}
+
+.content-page {
+  margin-top: 32px;
+}
+
+@media (max-width: 720px) {
+  .site-header,
+  nav {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  h1 {
+    font-size: 44px;
+  }
+
+  .level-grid {
+    grid-template-columns: 1fr;
+  }
+}
