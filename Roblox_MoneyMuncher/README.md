@@ -7,6 +7,8 @@ It is not a Unity export. Roblox games are built inside Roblox Studio with Luau 
 - Super Mario-style learning trail
 - Coin pickups
 - Money question gates
+- Themed areas: Saving Forest, Budget Bridge, Investment Mountain, Tax Tunnel
+- Debt puddle hazards
 - Correct answers open gates and award coins
 - Wrong answers add a small debt penalty and teach the concept
 - Simple player progress saving
@@ -27,6 +29,7 @@ It is not a Unity export. Roblox games are built inside Roblox Studio with Luau 
 | `src/ServerScriptService/MapBuilder.server.lua` | `ServerScriptService/MapBuilder` | Script |
 | `src/ServerScriptService/PlayerProgress.server.lua` | `ServerScriptService/PlayerProgress` | Script |
 | `src/ServerScriptService/CoinPickup.server.lua` | `ServerScriptService/CoinPickup` | Script |
+| `src/ServerScriptService/DebtHazard.server.lua` | `ServerScriptService/DebtHazard` | Script |
 | `src/ServerScriptService/QuestionGate.server.lua` | `ServerScriptService/QuestionGate` | Script |
 | `src/ServerScriptService/FinishTrail.server.lua` | `ServerScriptService/FinishTrail` | Script |
 | `src/StarterPlayerScripts/LearningTrailClient.client.lua` | `StarterPlayer > StarterPlayerScripts > LearningTrailClient` | LocalScript |

@@ -21,6 +21,7 @@ Create these objects:
 - `ServerScriptService > Script` named `MapBuilder`
 - `ServerScriptService > Script` named `PlayerProgress`
 - `ServerScriptService > Script` named `CoinPickup`
+- `ServerScriptService > Script` named `DebtHazard`
 - `ServerScriptService > Script` named `QuestionGate`
 - `ServerScriptService > Script` named `FinishTrail`
 - `StarterPlayer > StarterPlayerScripts > LocalScript` named `LearningTrailClient`
@@ -35,6 +36,7 @@ You should see:
 
 - A colorful side-scrolling trail
 - Coins along the path
+- Saving Forest, Budget Bridge, Investment Mountain, and Tax Tunnel areas
 - Three question gates
 - A UI question prompt when you reach a gate
 - Gates opening when you answer correctly
