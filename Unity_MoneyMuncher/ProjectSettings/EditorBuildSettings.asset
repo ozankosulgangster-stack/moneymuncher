@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/MoneyMuncherSoccerStadium.unity
     guid: 56ef6ee7e9e7b4643b1197e5bbe86009
+  - enabled: 1
+    path: Assets/Scenes/MoneyMuncherLearningTrail.unity
+    guid: bdd62b648a3947748953bf25f0d7d88a
   m_configObjects: {}

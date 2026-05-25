@@ -7,6 +7,7 @@ public static class MoneyMuncherWebGLPublisher
 {
     private static readonly string[] CampaignScenes =
     {
+        "Assets/Scenes/MoneyMuncherLearningTrail.unity",
         "Assets/Scenes/MoneyMuncherTreasureIsland.unity",
         "Assets/Scenes/MoneyMuncherSoccerStadium.unity"
     };

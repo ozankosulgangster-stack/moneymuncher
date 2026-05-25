@@ -7,6 +7,7 @@ public class MoneyMuncherGameManager : MonoBehaviour
     [Header("Round")]
     public int levelNumber = 1;
     public string levelName = "Treasure Island";
+    public bool unlocksLevel2OnComplete = true;
     public float roundDuration = 90f;
     public bool roundActive = true;
 
@@ -144,7 +145,7 @@ public class MoneyMuncherGameManager : MonoBehaviour
         SaveBestScore();
         AddSavedCoins(Mathf.Max(0, NetWorth));
 
-        if (levelNumber == 1)
+        if (unlocksLevel2OnComplete)
         {
             PlayerPrefs.SetInt("MoneyMuncher.Level2Unlocked", 1);
             PlayerPrefs.Save();
