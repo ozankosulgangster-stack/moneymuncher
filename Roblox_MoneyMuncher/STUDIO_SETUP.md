@@ -18,13 +18,16 @@ Use the Roblox Explorer panel.
 Create these objects:
 
 - `ReplicatedStorage > ModuleScript` named `MoneyQuestions`
+- `ReplicatedStorage > ModuleScript` named `BuildCatalog`
 - `ServerScriptService > Script` named `MapBuilder`
 - `ServerScriptService > Script` named `PlayerProgress`
+- `ServerScriptService > Script` named `PlayerPlots`
 - `ServerScriptService > Script` named `CoinPickup`
 - `ServerScriptService > Script` named `DebtHazard`
 - `ServerScriptService > Script` named `QuestionGate`
 - `ServerScriptService > Script` named `FinishTrail`
 - `StarterPlayer > StarterPlayerScripts > LocalScript` named `LearningTrailClient`
+- `StarterPlayer > StarterPlayerScripts > LocalScript` named `BuildParkClient`
 
 Copy the matching source file contents from `Roblox_MoneyMuncher/src`.
 
@@ -40,6 +43,8 @@ You should see:
 - Three question gates
 - A UI question prompt when you reach a gate
 - Gates opening when you answer correctly
+- A personal Money Park plot for each online player
+- A Build Park button with safe preset build items
 
 ## 4. Publish
 
