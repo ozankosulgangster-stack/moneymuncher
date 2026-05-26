@@ -26,3 +26,23 @@
   from = "/kids/play/"
   to = "/kids/play/index.html"
   status = 200
+
+[[redirects]]
+  from = "/kids/community"
+  to = "/kids/community.html"
+  status = 200
+
+[[redirects]]
+  from = "/kids/community/"
+  to = "/kids/community.html"
+  status = 200
+
+[[redirects]]
+  from = "/kids/blog"
+  to = "/kids/blog.html"
+  status = 200
+
+[[redirects]]
+  from = "/kids/blog/"
+  to = "/kids/blog.html"
+  status = 200
