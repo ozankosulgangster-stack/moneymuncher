@@ -15,6 +15,12 @@ const defaultProgress = () => ({
 });
 const sanitize = (value) => String(value || "").trim().slice(0, 80);
 const sanitizeEmail = (value) => String(value || "").trim().toLowerCase().slice(0, 160);
+const roles = ["Kid Explorer", "Parent Guide", "Teacher Captain", "Family Team", "Kid", "Parent", "Teacher"];
+const normalizeRole = (role) => ({
+  Kid: "Kid Explorer",
+  Parent: "Parent Guide",
+  Teacher: "Teacher Captain"
+}[role] || role);
 const headers = { "Content-Type": "application/json" };
 
 function response(statusCode, payload) {
@@ -40,7 +46,7 @@ exports.handler = async (event) => {
       const body = JSON.parse(event.body || "{}");
       const name = sanitize(body.name);
       const email = sanitizeEmail(body.email);
-      const role = ["Kid", "Parent", "Teacher"].includes(body.role) ? body.role : "Kid";
+      const role = roles.includes(body.role) ? normalizeRole(body.role) : "Kid Explorer";
       if (!name && !email) return response(400, { error: "Name or email is required" });
 
       const { store, users } = await readUsers();
@@ -84,9 +90,9 @@ exports.handler = async (event) => {
         wisdom: Math.max(0, Number(incoming.wisdom) || 0),
         level: Math.max(1, Number(incoming.level) || 1),
         badges: Array.from(new Set(incoming.badges || [])),
-        currentLevel: Math.max(0, Math.min(4, Number(incoming.currentLevel) || 0)),
-        unlockedLevel: Math.max(0, Math.min(4, Number(incoming.unlockedLevel) || 0)),
-        completedLevels: Array.from(new Set((incoming.completedLevels || []).map(Number).filter((n) => n >= 0 && n <= 4))),
+        currentLevel: Math.max(0, Math.min(7, Number(incoming.currentLevel) || 0)),
+        unlockedLevel: Math.max(0, Math.min(7, Number(incoming.unlockedLevel) || 0)),
+        completedLevels: Array.from(new Set((incoming.completedLevels || []).map(Number).filter((n) => n >= 0 && n <= 7))),
         completedLessons: Array.from(new Set(incoming.completedLessons || []))
       };
       user.updatedAt = new Date().toISOString();

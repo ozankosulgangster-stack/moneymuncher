@@ -22,6 +22,12 @@ const defaultProgress = () => ({
 });
 const sanitize = (value) => String(value || "").trim().slice(0, 80);
 const sanitizeEmail = (value) => String(value || "").trim().toLowerCase().slice(0, 160);
+const roles = ["Kid Explorer", "Parent Guide", "Teacher Captain", "Family Team", "Kid", "Parent", "Teacher"];
+const normalizeRole = (role) => ({
+  Kid: "Kid Explorer",
+  Parent: "Parent Guide",
+  Teacher: "Teacher Captain"
+}[role] || role);
 
 async function readDb() {
   await fs.mkdir(dataDir, { recursive: true });
@@ -59,7 +65,7 @@ async function handleApi(req, res) {
     const body = await readBody(req);
     const name = sanitize(body.name);
     const email = sanitizeEmail(body.email);
-    const role = ["Kid", "Parent", "Teacher"].includes(body.role) ? body.role : "Kid";
+    const role = roles.includes(body.role) ? normalizeRole(body.role) : "Kid Explorer";
     if (!name && !email) return sendJson(res, 400, { error: "Name or email is required" });
 
     const db = await readDb();
@@ -103,9 +109,9 @@ async function handleApi(req, res) {
       wisdom: Math.max(0, Number(incoming.wisdom) || 0),
       level: Math.max(1, Number(incoming.level) || 1),
       badges: Array.from(new Set(incoming.badges || [])),
-      currentLevel: Math.max(0, Math.min(4, Number(incoming.currentLevel) || 0)),
-      unlockedLevel: Math.max(0, Math.min(4, Number(incoming.unlockedLevel) || 0)),
-      completedLevels: Array.from(new Set((incoming.completedLevels || []).map(Number).filter((n) => n >= 0 && n <= 4))),
+        currentLevel: Math.max(0, Math.min(7, Number(incoming.currentLevel) || 0)),
+        unlockedLevel: Math.max(0, Math.min(7, Number(incoming.unlockedLevel) || 0)),
+        completedLevels: Array.from(new Set((incoming.completedLevels || []).map(Number).filter((n) => n >= 0 && n <= 7))),
       completedLessons: Array.from(new Set(incoming.completedLessons || []))
     };
     user.updatedAt = new Date().toISOString();
@@ -119,16 +125,35 @@ async function handleApi(req, res) {
 async function serveStatic(req, res) {
   const url = new URL(req.url, `http://${req.headers.host}`);
   const requested = url.pathname === "/" ? "/index.html" : decodeURIComponent(url.pathname);
-  const filePath = path.normalize(path.join(root, requested));
+  let filePath = path.normalize(path.join(root, requested));
   if (!filePath.startsWith(root)) {
     res.writeHead(403);
     return res.end("Forbidden");
   }
   try {
+    const stat = await fs.stat(filePath);
+    if (stat.isDirectory()) filePath = path.join(filePath, "index.html");
     const data = await fs.readFile(filePath);
+    const lowerPath = filePath.toLowerCase();
     const ext = path.extname(filePath).toLowerCase();
-    const types = { ".html": "text/html", ".css": "text/css", ".js": "text/javascript", ".json": "application/json" };
-    res.writeHead(200, { "Content-Type": types[ext] || "application/octet-stream" });
+    const types = {
+      ".html": "text/html",
+      ".css": "text/css",
+      ".js": "text/javascript",
+      ".json": "application/json",
+      ".mp4": "video/mp4",
+      ".wasm": "application/wasm",
+      ".data": "application/octet-stream",
+      ".br": "application/octet-stream"
+    };
+    const headers = { "Content-Type": types[ext] || "application/octet-stream" };
+    if (ext === ".br") {
+      headers["Content-Encoding"] = "br";
+      if (lowerPath.endsWith(".wasm.br")) headers["Content-Type"] = "application/wasm";
+      if (lowerPath.endsWith(".js.br")) headers["Content-Type"] = "text/javascript";
+      if (lowerPath.endsWith(".data.br")) headers["Content-Type"] = "application/octet-stream";
+    }
+    res.writeHead(200, headers);
     res.end(data);
   } catch {
     res.writeHead(404);

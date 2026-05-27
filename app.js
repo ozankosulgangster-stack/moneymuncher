@@ -13,6 +13,106 @@ const defaultState = { coins: 30, saved: 0, joy: 50, wisdom: 0, currentLevel: 0 
 let state   = { ...defaultState };
 let progress = { unlockedLevel: 0, completedLevels: [] };
 let account = { id: "", name: "", role: "" };
+let selectedRole = localStorage.getItem('moneymuncherRole') || 'Kid Explorer';
+let selectedAgePath = localStorage.getItem('moneymuncherAgePath') || 'coin-collectors';
+
+const experienceModes = [
+  {
+    id: 'Kid Explorer',
+    icon: 'KE',
+    title: 'Kid Explorer',
+    hint: 'Kids get games, tiny quests, and quick wins.',
+    badge: 'Kid Explorer mode',
+    startLabel: 'Start Game Quest'
+  },
+  {
+    id: 'Parent Guide',
+    icon: 'PG',
+    title: 'Parent Guide',
+    hint: 'Parents get conversation prompts, grocery moments, and no-lecture scripts.',
+    badge: 'Parent Guide mode',
+    startLabel: 'Open Family Quest'
+  },
+  {
+    id: 'Teacher Captain',
+    icon: 'TC',
+    title: 'Teacher Captain',
+    hint: 'Teachers get classroom quests, team challenges, and discussion-ready prompts.',
+    badge: 'Teacher Captain mode',
+    startLabel: 'Launch Class Quest'
+  },
+  {
+    id: 'Family Team',
+    icon: 'FT',
+    title: 'Family Team',
+    hint: 'Families get shared challenges that turn everyday choices into teamwork.',
+    badge: 'Family Team mode',
+    startLabel: 'Start Team Challenge'
+  }
+];
+
+const agePaths = [
+  {
+    id: 'coin-collectors',
+    icon: '6-8',
+    name: 'Coin Collectors',
+    ages: 'Ages 6-8',
+    summary: 'Needs vs. wants, saving jars, chores, and sharing.',
+    topics: ['Needs vs. wants', 'Saving jars', 'Chores', 'Sharing']
+  },
+  {
+    id: 'budget-builders',
+    icon: '9-12',
+    name: 'Budget Builders',
+    ages: 'Ages 9-12',
+    summary: 'Allowance planning, goal setting, and comparison shopping.',
+    topics: ['Allowance plans', 'Goals', 'Price checks', 'Tradeoffs']
+  },
+  {
+    id: 'money-masters',
+    icon: '13-16',
+    name: 'Money Masters',
+    ages: 'Ages 13-16',
+    summary: 'Bank accounts, investing basics, subscriptions, scams, and long-term goals.',
+    topics: ['Banking', 'Investing basics', 'Subscriptions', 'Scams']
+  }
+];
+
+const miniGames = [
+  {
+    id: 'grocery-dash',
+    icon: 'GD',
+    title: 'The Grocery Dash',
+    audience: ['Kid Explorer', 'Parent Guide', 'Family Team'],
+    ages: ['coin-collectors', 'budget-builders'],
+    duration: '2-3 min',
+    skill: 'Budget choices',
+    summary: 'Pick dinner items under a budget and see how smart swaps save coins.',
+    levelIndex: 5
+  },
+  {
+    id: 'subscription-sneak',
+    icon: 'SS',
+    title: 'Subscription Sneak',
+    audience: ['Kid Explorer', 'Parent Guide', 'Teacher Captain', 'Family Team'],
+    ages: ['money-masters'],
+    duration: '3 min',
+    skill: 'Recurring costs',
+    summary: 'Spot sneaky monthly charges before they munch the whole allowance.',
+    levelIndex: 6
+  },
+  {
+    id: 'classroom-market',
+    icon: 'CM',
+    title: 'Classroom Market',
+    audience: ['Teacher Captain', 'Family Team'],
+    ages: ['coin-collectors', 'budget-builders', 'money-masters'],
+    duration: '2 min',
+    skill: 'Compare value',
+    summary: 'Teams compare prices, quality, and needs before spending class coins.',
+    levelIndex: 7
+  }
+];
 
 // --- 2. Load from MoneyMuncher (or keep local defaults) ---
 function loadFromManager() {
@@ -111,6 +211,39 @@ const levels = [
       { label: "Buy random snacks", detail: "Fun but risky.", coins: -24, saved: 0, joy: 14, wisdom: 5, feedback: "Random can be fun, but budgets protect the whole week." },
       { label: "Let kids vote", detail: "Community choice.", coins: -16, saved: 6, joy: 16, wisdom: 18, feedback: "Great family move: shared choices build money confidence and trust." }
     ]
+  },
+  {
+    icon: "$", name: "Grocery Dash", skill: "Budget shopping",
+    eyebrow: "Mini-Game: The Grocery Dash",
+    title: "Can you build dinner under 20 coins?",
+    text: "Choose dinner items for the table. You need a main, a veggie, and a treat without blowing the budget.",
+    choices: [
+      { label: "Rice, beans, apples", detail: "Filling, balanced, under budget.", coins: -14, saved: 6, joy: 9, wisdom: 20, feedback: "Grocery dash win. You fed the team and kept coins for later." },
+      { label: "Pizza, soda, cookies", detail: "Fun, but budget-busting.", coins: -25, saved: 0, joy: 18, wisdom: 6, feedback: "Tasty, but the budget got munched. What one swap could save coins?" },
+      { label: "Pasta, carrots, frozen fruit", detail: "Smart swaps, happy table.", coins: -18, saved: 3, joy: 13, wisdom: 18, feedback: "Smart shopping. You compared choices and made the budget stretch." }
+    ]
+  },
+  {
+    icon: "$", name: "Subscription Sneak", skill: "Recurring costs",
+    eyebrow: "Mini-Game: Subscription Sneak",
+    title: "A free trial is about to renew.",
+    text: "The app looked free, but tomorrow it starts costing 8 coins every month. What do you do?",
+    choices: [
+      { label: "Cancel before renewal", detail: "Keep the coins for your goal.", coins: 0, saved: 8, joy: 3, wisdom: 20, feedback: "Sharp eye. Subscriptions are small bites that add up." },
+      { label: "Ignore it", detail: "Future coins disappear.", coins: -8, saved: 0, joy: -2, wisdom: 5, feedback: "That is how sneaky costs work. Calendar reminders protect your money." },
+      { label: "Ask if it is worth it", detail: "Review value first.", coins: -4, saved: 4, joy: 5, wisdom: 16, feedback: "Good review. A subscription should earn its place every month." }
+    ]
+  },
+  {
+    icon: "$", name: "Classroom Market", skill: "Compare value",
+    eyebrow: "Mini-Game: Classroom Market",
+    title: "Your team has 40 class coins.",
+    text: "Pick supplies for a class celebration. The goal is value, not just the lowest price.",
+    choices: [
+      { label: "Compare three options", detail: "Price, quality, quantity.", coins: -24, saved: 10, joy: 12, wisdom: 22, feedback: "Captain move. Comparing value beats guessing." },
+      { label: "Buy the first bundle", detail: "Fast, but unknown value.", coins: -34, saved: 0, joy: 8, wisdom: 7, feedback: "Fast choices can cost more. A quick comparison would help the team." },
+      { label: "Vote, then budget", detail: "Shared plan before spending.", coins: -28, saved: 6, joy: 16, wisdom: 18, feedback: "Nice team process. Shared choices build trust and better budgets." }
+    ]
   }
 ];
 
@@ -123,12 +256,22 @@ document.addEventListener('DOMContentLoaded', function() {
   var emailIn    = $('emailInput');
   var passIn     = $('passInput');
 
+  if (roleIn) {
+    roleIn.value = selectedRole;
+    roleIn.addEventListener('change', function() {
+      selectedRole = roleIn.value;
+      localStorage.setItem('moneymuncherRole', selectedRole);
+      renderPlaySetup();
+      renderMiniGames();
+    });
+  }
+
   if (signUpBtn && emailIn && passIn) {
     signUpBtn.addEventListener('click', function() {
       var em = emailIn.value.trim(), pw = passIn.value;
       var profile = {
         name: (nameIn && nameIn.value.trim()) || em.split('@')[0],
-        role: (roleIn && roleIn.value) || 'Player'
+        role: (roleIn && roleIn.value) || selectedRole || 'Kid Explorer'
       };
       if (!em || !pw) return alert('Enter email and password');
       MoneyMuncher.signUp(em, pw, profile).then(function(u) {
@@ -145,7 +288,7 @@ document.addEventListener('DOMContentLoaded', function() {
     signInBtn.addEventListener('click', function() {
       var em = emailIn.value.trim(), pw = passIn.value;
       var signInName = nameIn && nameIn.value.trim();
-      var profile = signInName ? { name: signInName, role: roleIn && roleIn.value } : null;
+      var profile = signInName ? { name: signInName, role: (roleIn && roleIn.value) || selectedRole } : null;
       if (!em || !pw) return alert('Enter email and password');
       MoneyMuncher.signIn(em, pw, profile).then(function(u) {
         var saved = (hasMM && MoneyMuncher.getUser && MoneyMuncher.getUser()) || {};
@@ -197,6 +340,112 @@ function renderAccount() {
     : 'Guest explorer';
   $('loginOpenBtn').classList.toggle('hidden', loggedIn);
   $('logoutBtn').classList.toggle('hidden', !loggedIn);
+}
+
+function getSelectedMode() {
+  selectedRole = normalizeRole(selectedRole);
+  return experienceModes.find(function(mode) { return mode.id === selectedRole; }) || experienceModes[0];
+}
+
+function normalizeRole(role) {
+  if (role === 'Kid') return 'Kid Explorer';
+  if (role === 'Parent') return 'Parent Guide';
+  if (role === 'Teacher') return 'Teacher Captain';
+  return experienceModes.some(function(mode) { return mode.id === role; }) ? role : 'Kid Explorer';
+}
+
+function getSelectedAgePath() {
+  return agePaths.find(function(path) { return path.id === selectedAgePath; }) || agePaths[0];
+}
+
+function renderPlaySetup() {
+  var mode = getSelectedMode();
+  $('experienceBadge').textContent = mode.badge;
+  $('experienceHint').textContent = mode.hint;
+  $('startBtn').textContent = mode.startLabel;
+
+  var roleInput = $('roleInput');
+  if (roleInput) roleInput.value = mode.id;
+
+  var roleCards = $('roleCards');
+  roleCards.innerHTML = '';
+  experienceModes.forEach(function(item) {
+    var card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'role-card' + (item.id === selectedRole ? ' active' : '');
+    card.innerHTML =
+      '<span class="card-icon">' + item.icon + '</span>' +
+      '<strong>' + item.title + '</strong>' +
+      '<small>' + item.hint + '</small>';
+    card.addEventListener('click', function() {
+      selectedRole = item.id;
+      localStorage.setItem('moneymuncherRole', selectedRole);
+      if (account.name) {
+        account.role = selectedRole;
+        saveSession();
+      }
+      renderPlaySetup();
+      renderMiniGames();
+      renderAcademy();
+    });
+    roleCards.appendChild(card);
+  });
+}
+
+function renderAgePaths() {
+  var active = getSelectedAgePath();
+  $('ageBadge').textContent = active.ages;
+
+  var grid = $('agePathCards');
+  grid.innerHTML = '';
+  agePaths.forEach(function(path) {
+    var card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'age-card' + (path.id === selectedAgePath ? ' active' : '');
+    card.innerHTML =
+      '<span class="card-icon">' + path.icon + '</span>' +
+      '<strong>' + path.name + '</strong>' +
+      '<small>' + path.ages + ': ' + path.summary + '</small>' +
+      '<div class="age-topics">' + path.topics.map(function(topic) { return '<span>' + topic + '</span>'; }).join('') + '</div>';
+    card.addEventListener('click', function() {
+      selectedAgePath = path.id;
+      localStorage.setItem('moneymuncherAgePath', selectedAgePath);
+      renderAgePaths();
+      renderMiniGames();
+      renderAcademy();
+    });
+    grid.appendChild(card);
+  });
+}
+
+function renderMiniGames() {
+  var mode = getSelectedMode();
+  var path = getSelectedAgePath();
+  $('miniGameBadge').textContent = mode.title + ' - ' + path.name;
+
+  var grid = $('miniGameGrid');
+  grid.innerHTML = '';
+  var matches = miniGames.filter(function(game) {
+    return game.audience.includes(mode.id) && game.ages.includes(path.id);
+  });
+  if (!matches.length) matches = miniGames.filter(function(game) { return game.audience.includes(mode.id); });
+  if (!matches.length) matches = miniGames;
+
+  matches.forEach(function(game) {
+    var card = document.createElement('article');
+    card.className = 'mini-game-card';
+    card.innerHTML =
+      '<span class="card-icon">' + game.icon + '</span>' +
+      '<strong>' + game.title + '</strong>' +
+      '<p>' + game.summary + '</p>' +
+      '<div class="mini-game-meta"><span>' + game.duration + '</span><span>' + game.skill + '</span></div>' +
+      '<button class="primary" type="button">Play mini-game</button>';
+    card.querySelector('button').addEventListener('click', function() {
+      if (game.levelIndex > progress.unlockedLevel) progress.unlockedLevel = game.levelIndex;
+      startLevel(game.levelIndex);
+    });
+    grid.appendChild(card);
+  });
 }
 
 function renderMap() {
@@ -326,6 +575,8 @@ $('loginForm').addEventListener('submit', function(ev) {
   var email = $('emailInput').value.trim();
   if (!name && !email) return;
   account = { id: 'local_' + Date.now(), email: email, name: name || email.split('@')[0], role: role };
+  selectedRole = role;
+  localStorage.setItem('moneymuncherRole', selectedRole);
   saveSession();
   $('loginDialog').close();
   $('feedback').textContent = 'Welcome, ' + account.name + '. Your progress is saved on this device.';
@@ -346,6 +597,11 @@ $('questForm').addEventListener('submit', function(ev) {
 (function init() {
   restoreSession();
   loadFromManager();
+  selectedRole = normalizeRole(account.role || selectedRole);
+  localStorage.setItem('moneymuncherRole', selectedRole);
+  renderPlaySetup();
+  renderAgePaths();
+  renderMiniGames();
   renderAccount();
   renderStats();
   renderMap();
@@ -541,15 +797,25 @@ const lessons = [
 let academyMode = 'kid'; // 'kid' or 'parent'
 let currentLessonId = null;
 
+function lessonMatchesAge(lesson) {
+  var byPath = {
+    'coin-collectors': ['what-is-money', 'needs-vs-wants', 'saving-superpower', 'giving-sharing', 'family-budgets'],
+    'budget-builders': ['what-is-money', 'needs-vs-wants', 'saving-superpower', 'smart-spending', 'giving-sharing', 'family-budgets'],
+    'money-masters': ['saving-superpower', 'smart-spending', 'family-budgets']
+  };
+  return (byPath[selectedAgePath] || byPath['coin-collectors']).includes(lesson.id);
+}
+
 function renderAcademy() {
   var completed = hasMM ? (MoneyMuncher.get().completedLessons || []) : [];
   var grid = $('lessonGrid');
   var reader = $('lessonReader');
+  var path = getSelectedAgePath();
   grid.classList.remove('hidden');
   reader.classList.add('hidden');
 
   grid.innerHTML = '';
-  lessons.forEach(function(lesson) {
+  lessons.filter(lessonMatchesAge).forEach(function(lesson) {
     var isDone = completed.includes(lesson.id);
     var card = document.createElement('article');
     card.className = 'lesson-card' + (isDone ? ' completed' : '');
@@ -557,7 +823,7 @@ function renderAcademy() {
       (isDone ? '<span class="lesson-badge-earned">✓ Done</span>' : '') +
       '<span class="lesson-icon">' + lesson.icon + '</span>' +
       '<h4>' + lesson.title + '</h4>' +
-      '<small>' + (isDone ? 'Completed +5 wisdom' : 'Tap to read') + '</small>' +
+      '<small>' + path.name + ' - ' + (isDone ? 'Completed +5 wisdom' : 'Tap to read') + '</small>' +
       '<div class="lesson-progress"><div style="width:' + (isDone ? 100 : 0) + '%"></div></div>';
     card.addEventListener('click', function() { openLesson(lesson.id); });
     grid.appendChild(card);

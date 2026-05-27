@@ -46,3 +46,21 @@
   from = "/kids/blog/"
   to = "/kids/blog.html"
   status = 200
+
+[[headers]]
+  for = "/kids/play/Build/*.wasm.br"
+  [headers.values]
+    Content-Type = "application/wasm"
+    Content-Encoding = "br"
+
+[[headers]]
+  for = "/kids/play/Build/*.js.br"
+  [headers.values]
+    Content-Type = "text/javascript"
+    Content-Encoding = "br"
+
+[[headers]]
+  for = "/kids/play/Build/*.data.br"
+  [headers.values]
+    Content-Type = "application/octet-stream"
+    Content-Encoding = "br"
