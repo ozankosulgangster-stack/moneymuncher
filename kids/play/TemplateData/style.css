@@ -1,16 +1,164 @@
-body { padding: 0; margin: 0 }
-#unity-container { position: absolute }
-#unity-container.unity-desktop { left: 50%; top: 50%; transform: translate(-50%, -50%) }
-#unity-container.unity-mobile { position: fixed; width: 100%; height: 100% }
-#unity-canvas { background: #231F20 }
-.unity-mobile #unity-canvas { width: 100%; height: 100% }
-#unity-loading-bar { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: none }
-#unity-logo { width: 154px; height: 130px; background: url('unity-logo-dark.png') no-repeat center }
-#unity-progress-bar-empty { width: 141px; height: 18px; margin-top: 10px; margin-left: 6.5px; background: url('progress-bar-empty-dark.png') no-repeat center }
-#unity-progress-bar-full { width: 0%; height: 18px; margin-top: 10px; background: url('progress-bar-full-dark.png') no-repeat center }
-#unity-footer { position: relative }
-.unity-mobile #unity-footer { display: none }
-#unity-logo-title-footer { float:left; width: 102px; height: 38px; background: url('unity-logo-title-footer.png') no-repeat center }
-#unity-build-title { float: right; margin-right: 10px; line-height: 38px; font-family: arial; font-size: 18px }
-#unity-fullscreen-button { cursor:pointer; float: right; width: 38px; height: 38px; background: url('fullscreen-button.png') no-repeat center }
-#unity-warning { position: absolute; left: 50%; top: 5%; transform: translate(-50%); background: white; padding: 10px; display: none }
+:root {
+  --ink: #17202a;
+  --muted: #5d6d7e;
+  --gold: #ffc83d;
+  --mint: #7ee6b8;
+  --bg: #fff7df;
+  --panel: rgba(255,255,255,.9);
+  --shadow: 0 24px 60px rgba(74, 47, 0, .18);
+}
+
+* { box-sizing: border-box; }
+
+html, body { min-height: 100%; }
+
+body {
+  margin: 0;
+  color: var(--ink);
+  font-family: Inter, Arial, sans-serif;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(255,200,61,.5), transparent 28%),
+    radial-gradient(circle at 85% 16%, rgba(126,230,184,.5), transparent 28%),
+    linear-gradient(135deg, #fff8dd, #ffe8ef 52%, #e5f3ff);
+}
+
+.game-shell {
+  width: min(1180px, calc(100% - 28px));
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 22px 0 28px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 14px;
+}
+
+.game-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 18px;
+  background: var(--panel);
+  border: 3px solid rgba(255,255,255,.75);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+}
+
+.back-link {
+  color: var(--ink);
+  background: white;
+  border: 2px solid rgba(23,32,42,.1);
+  border-radius: 999px;
+  padding: 10px 14px;
+  text-decoration: none;
+  font-weight: 900;
+}
+
+.eyebrow {
+  margin: 0 0 4px;
+  color: #d99000;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-size: .78rem;
+  font-weight: 900;
+  text-align: right;
+}
+
+h1 {
+  margin: 0;
+  font-family: "Baloo 2", Inter, Arial, sans-serif;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  line-height: 1;
+}
+
+.game-stage {
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(255,255,255,.78);
+  border: 3px solid rgba(255,255,255,.75);
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+}
+
+#unity-container {
+  position: relative;
+  width: min(100%, calc((100vh - 180px) * 1.6));
+  aspect-ratio: 16 / 10;
+  min-height: 320px;
+  max-height: calc(100vh - 180px);
+  background: #231f20;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 16px 34px rgba(23,32,42,.18);
+}
+
+#unity-container.unity-mobile {
+  width: 100%;
+  max-height: calc(100vh - 150px);
+  min-height: 360px;
+}
+
+#unity-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  background: #231f20;
+}
+
+.unity-mobile #unity-canvas { width: 100%; height: 100%; }
+
+#unity-loading-bar {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: none;
+}
+
+#unity-logo { width: 154px; height: 130px; background: url('unity-logo-dark.png') no-repeat center; }
+#unity-progress-bar-empty { width: 141px; height: 18px; margin-top: 10px; margin-left: 6.5px; background: url('progress-bar-empty-dark.png') no-repeat center; }
+#unity-progress-bar-full { width: 0%; height: 18px; margin-top: 10px; background: url('progress-bar-full-dark.png') no-repeat center; }
+
+#unity-footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 0 10px;
+  background: linear-gradient(180deg, transparent, rgba(0,0,0,.55));
+  color: white;
+}
+
+.unity-mobile #unity-footer { display: none; }
+
+#unity-build-title {
+  line-height: 38px;
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+#unity-fullscreen-button { cursor: pointer; width: 38px; height: 38px; background: url('fullscreen-button.png') no-repeat center; }
+#unity-warning { position: absolute; left: 50%; top: 16px; transform: translateX(-50%); background: white; padding: 10px; display: none; z-index: 2; }
+
+.game-note {
+  margin: 0;
+  color: var(--muted);
+  text-align: center;
+  font-weight: 800;
+}
+
+@media (max-width: 760px) {
+  .game-shell { width: min(100% - 16px, 1180px); padding: 8px 0 14px; gap: 8px; }
+  .game-header { align-items: flex-start; flex-direction: column; border-radius: 18px; }
+  .eyebrow { text-align: left; }
+  .game-stage { padding: 8px; border-radius: 18px; }
+  #unity-container { width: 100%; min-height: 300px; max-height: calc(100vh - 210px); border-radius: 12px; }
+}

@@ -3,26 +3,38 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Unity Web Player | Money Muncher</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Money Muncher Trail Game</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
   </head>
   <body>
-    <div id="unity-container" class="unity-desktop">
-      <canvas id="unity-canvas" width=960 height=600 tabindex="-1"></canvas>
-      <div id="unity-loading-bar">
-        <div id="unity-logo"></div>
-        <div id="unity-progress-bar-empty">
-          <div id="unity-progress-bar-full"></div>
+    <main class="game-shell">
+      <header class="game-header">
+        <a href="/kids/" class="back-link">Kids Arcade</a>
+        <div>
+          <p class="eyebrow">Money Learning Trail</p>
+          <h1>Money Muncher</h1>
         </div>
-      </div>
-      <div id="unity-warning"> </div>
-      <div id="unity-footer">
-        <div id="unity-logo-title-footer"></div>
-        <div id="unity-fullscreen-button"></div>
-        <div id="unity-build-title">Money Muncher</div>
-      </div>
-    </div>
+      </header>
+      <section class="game-stage" aria-label="Money Muncher game">
+        <div id="unity-container" class="unity-desktop">
+          <canvas id="unity-canvas" width=960 height=600 tabindex="-1"></canvas>
+          <div id="unity-loading-bar">
+            <div id="unity-logo"></div>
+            <div id="unity-progress-bar-empty">
+              <div id="unity-progress-bar-full"></div>
+            </div>
+          </div>
+          <div id="unity-warning"> </div>
+          <div id="unity-footer">
+            <div id="unity-build-title">Money Muncher</div>
+            <div id="unity-fullscreen-button" aria-label="Full screen"></div>
+          </div>
+        </div>
+      </section>
+      <p class="game-note">Use the game in full screen for the best trail view.</p>
+    </main>
     <script>
       var canvas = document.querySelector("#unity-canvas");
 
@@ -88,14 +100,8 @@
       // expected to change.
 
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        // Mobile device style: fill the whole browser client area with the game canvas:
-
-        var meta = document.createElement('meta');
-        meta.name = 'viewport';
-        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
-        document.getElementsByTagName('head')[0].appendChild(meta);
-        document.querySelector("#unity-container").className = "unity-mobile";
-        canvas.className = "unity-mobile";
+        document.querySelector("#unity-container").classList.add("unity-mobile");
+        canvas.classList.add("unity-mobile");
 
         // To lower canvas resolution on mobile devices to gain some
         // performance, uncomment the following line:
@@ -104,8 +110,8 @@
 
       } else {
         // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
-        canvas.style.width = "960px";
-        canvas.style.height = "600px";
+        canvas.style.width = "100%";
+        canvas.style.height = "100%";
       }
 
       document.querySelector("#unity-loading-bar").style.display = "block";
