@@ -17,21 +17,31 @@
           <h1>Money Muncher</h1>
         </div>
       </header>
-      <section class="game-stage" aria-label="Money Muncher game">
-        <div id="unity-container" class="unity-desktop">
-          <canvas id="unity-canvas" width=960 height=600 tabindex="-1"></canvas>
-          <div id="unity-loading-bar">
-            <div id="unity-logo"></div>
-            <div id="unity-progress-bar-empty">
-              <div id="unity-progress-bar-full"></div>
+      <section class="trail-layout" aria-label="Money Muncher trail game with Dino Munch guide">
+        <aside class="dino-guide">
+          <img src="/kids/classroom-market/dino-munch.png" alt="Dino Munch guide">
+          <div>
+            <p class="eyebrow">Dino Munch Says</p>
+            <h2>Collect coins, choose wisely.</h2>
+            <p>Look for smart money gates on the trail. Good choices help Dino Munch grow stronger.</p>
+          </div>
+        </aside>
+        <section class="game-stage" aria-label="Money Muncher game">
+          <div id="unity-container" class="unity-desktop">
+            <canvas id="unity-canvas" width=960 height=600 tabindex="-1"></canvas>
+            <div id="unity-loading-bar">
+              <div id="unity-logo"></div>
+              <div id="unity-progress-bar-empty">
+                <div id="unity-progress-bar-full"></div>
+              </div>
+            </div>
+            <div id="unity-warning"> </div>
+            <div id="unity-footer">
+              <div id="unity-build-title">Money Muncher</div>
+              <div id="unity-fullscreen-button" aria-label="Full screen"></div>
             </div>
           </div>
-          <div id="unity-warning"> </div>
-          <div id="unity-footer">
-            <div id="unity-build-title">Money Muncher</div>
-            <div id="unity-fullscreen-button" aria-label="Full screen"></div>
-          </div>
-        </div>
+        </section>
       </section>
       <p class="game-note">Use the game in full screen for the best trail view.</p>
     </main>
