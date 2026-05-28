@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Classroom Market | Money Muncher Kids</title>
+  <meta name="description" content="A Money Muncher classroom game where teams compare prices, quality, and needs before spending class coins.">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="market-header">
+    <a class="brand" href="/kids/">Money Muncher Kids</a>
+    <nav aria-label="Classroom Market navigation">
+      <a href="/kids/play/">Trail Game</a>
+      <a href="/kids/">Kids Arcade</a>
+    </nav>
+  </header>
+
+  <main class="market-shell">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Classroom Market</p>
+        <h1>Spend class coins like a smart team.</h1>
+        <p>Compare price, quality, and need before buying supplies for your classroom. Dino Munch will help your team spot the best value.</p>
+        <div class="hero-actions">
+          <button id="startGameBtn" class="primary">Start Market</button>
+          <button id="resetGameBtn" class="secondary">Reset</button>
+        </div>
+      </div>
+      <figure class="dino-card">
+        <img src="./dino-munch.png" alt="Dino Munch character guide">
+        <figcaption>Dino Munch checks every deal twice.</figcaption>
+      </figure>
+    </section>
+
+    <section class="scoreboard" aria-label="Classroom Market score">
+      <article>
+        <span id="coinsLeft">40</span>
+        <small>class coins left</small>
+      </article>
+      <article>
+        <span id="needScore">0</span>
+        <small>need points</small>
+      </article>
+      <article>
+        <span id="qualityScore">0</span>
+        <small>quality points</small>
+      </article>
+      <article>
+        <span id="valueScore">0</span>
+        <small>value points</small>
+      </article>
+    </section>
+
+    <section class="market-board" aria-live="polite">
+      <div class="round-panel">
+        <p id="roundEyebrow" class="eyebrow">Round 1 of 3</p>
+        <h2 id="roundTitle">Art Cart Restock</h2>
+        <p id="roundPrompt">Your class needs supplies for a poster project. Pick one bundle.</p>
+      </div>
+      <div id="choiceGrid" class="choice-grid"></div>
+      <div id="feedback" class="feedback">Press Start Market when your team is ready.</div>
+    </section>
+
+    <section class="team-log">
+      <div>
+        <p class="eyebrow">Team Picks</p>
+        <h2>Shopping receipt</h2>
+      </div>
+      <ul id="receiptList"></ul>
+    </section>
+  </main>
+
+  <script src="./market.js"></script>
+</body>
+</html>

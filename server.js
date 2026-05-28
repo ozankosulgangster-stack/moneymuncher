@@ -142,6 +142,8 @@ async function serveStatic(req, res) {
       ".js": "text/javascript",
       ".json": "application/json",
       ".mp4": "video/mp4",
+      ".png": "image/png",
+      ".ico": "image/x-icon",
       ".wasm": "application/wasm",
       ".data": "application/octet-stream",
       ".br": "application/octet-stream"

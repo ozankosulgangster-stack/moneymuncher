@@ -47,6 +47,16 @@
   to = "/kids/blog.html"
   status = 200
 
+[[redirects]]
+  from = "/kids/classroom-market"
+  to = "/kids/classroom-market/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/kids/classroom-market/"
+  to = "/kids/classroom-market/index.html"
+  status = 200
+
 [[headers]]
   for = "/kids/play/Build/*.wasm.br"
   [headers.values]

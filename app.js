@@ -110,7 +110,8 @@ const miniGames = [
     duration: '2 min',
     skill: 'Compare value',
     summary: 'Teams compare prices, quality, and needs before spending class coins.',
-    levelIndex: 7
+    levelIndex: 7,
+    href: '/kids/classroom-market/'
   }
 ];
 
@@ -441,6 +442,10 @@ function renderMiniGames() {
       '<div class="mini-game-meta"><span>' + game.duration + '</span><span>' + game.skill + '</span></div>' +
       '<button class="primary" type="button">Play mini-game</button>';
     card.querySelector('button').addEventListener('click', function() {
+      if (game.href) {
+        window.location.href = game.href;
+        return;
+      }
       if (game.levelIndex > progress.unlockedLevel) progress.unlockedLevel = game.levelIndex;
       startLevel(game.levelIndex);
     });
