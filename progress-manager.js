@@ -20,7 +20,9 @@
     currentLevel: 0,
     unlockedLevel: 0,
     completedLevels: [],
-    completedLessons: []
+    completedLessons: [],
+    shopBadges: [],
+    transactions: []
   };
 
   function clone(obj) {
@@ -31,7 +33,7 @@
     try {
       var raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return clone(DEFAULT_PROGRESS);
-      return JSON.parse(raw);
+      return Object.assign({}, clone(DEFAULT_PROGRESS), JSON.parse(raw));
     } catch (e) {
       console.error("[MM] localStorage read failed", e);
       return clone(DEFAULT_PROGRESS);
@@ -213,7 +215,9 @@
           currentLevel: Math.max(local.currentLevel || 0, data.currentLevel || 0),
           unlockedLevel: Math.max(local.unlockedLevel || 0, data.unlockedLevel || 0),
           completedLevels: union(local.completedLevels || [], data.completedLevels || []),
-          completedLessons: union(local.completedLessons || [], data.completedLessons || [])
+          completedLessons: union(local.completedLessons || [], data.completedLessons || []),
+          shopBadges: union(local.shopBadges || [], data.shopBadges || []),
+          transactions: (local.transactions || []).concat(data.transactions || []).slice(-80)
         };
         setLocal(merged);
         if (data.email || data.name || data.role) {
@@ -291,6 +295,83 @@
     addWisdom: function (n) { var p = this.get(); this.set({ wisdom: p.wisdom + n }); },
     levelUp:   function ()  { var p = this.get(); this.set({ level: p.level + 1 }); },
     addBadge:  function (b) { var p = this.get(); this.set({ badges: union(p.badges, [b]) }); },
+
+    addTransaction: function (type, amount, source, reason) {
+      var p = this.get();
+      var tx = {
+        id: "tx_" + Date.now() + "_" + Math.random().toString(16).slice(2),
+        type: type,
+        amount: Number(amount) || 0,
+        source: source || "money-muncher",
+        reason: reason || "",
+        createdAt: new Date().toISOString()
+      };
+      this.set({ transactions: (p.transactions || []).concat([tx]).slice(-80) });
+      return tx;
+    },
+
+    earnCoins: function (amount, source, reason) {
+      var n = Math.max(0, Math.round(Number(amount) || 0));
+      if (!n) return false;
+      var p = this.get();
+      this.set({
+        coins: (p.coins || 0) + n,
+        lifetimeCoinsEarned: (p.lifetimeCoinsEarned || 0) + n,
+        transactions: (p.transactions || []).concat([{
+          id: "tx_" + Date.now() + "_" + Math.random().toString(16).slice(2),
+          type: "earn",
+          amount: n,
+          source: source || "quest",
+          reason: reason || "Coins earned",
+          createdAt: new Date().toISOString()
+        }]).slice(-80)
+      });
+      return true;
+    },
+
+    spendCoins: function (amount, source, reason) {
+      var n = Math.max(0, Math.round(Number(amount) || 0));
+      var p = this.get();
+      if (!n || (p.coins || 0) < n) return false;
+      this.set({
+        coins: (p.coins || 0) - n,
+        lifetimeCoinsSpent: (p.lifetimeCoinsSpent || 0) + n,
+        transactions: (p.transactions || []).concat([{
+          id: "tx_" + Date.now() + "_" + Math.random().toString(16).slice(2),
+          type: "spend",
+          amount: n,
+          source: source || "shop",
+          reason: reason || "Coins spent",
+          createdAt: new Date().toISOString()
+        }]).slice(-80)
+      });
+      return true;
+    },
+
+    buyBadge: function (badge) {
+      if (!badge || !badge.id) return { ok: false, message: "Badge not found." };
+      var p = this.get();
+      var owned = union(p.shopBadges || [], p.badges || []);
+      if (owned.indexOf(badge.id) !== -1) return { ok: false, message: "You already own this badge." };
+      if ((p.coins || 0) < badge.price) return { ok: false, message: "Save more coins for this badge." };
+      var nextShopBadges = union(p.shopBadges || [], [badge.id]);
+      var nextBadges = union(p.badges || [], [badge.id]);
+      this.set({
+        coins: (p.coins || 0) - badge.price,
+        lifetimeCoinsSpent: (p.lifetimeCoinsSpent || 0) + badge.price,
+        shopBadges: nextShopBadges,
+        badges: nextBadges,
+        transactions: (p.transactions || []).concat([{
+          id: "tx_" + Date.now() + "_" + Math.random().toString(16).slice(2),
+          type: "spend",
+          amount: badge.price,
+          source: "badge-shop",
+          reason: "Bought " + badge.name,
+          createdAt: new Date().toISOString()
+        }]).slice(-80)
+      });
+      return { ok: true, message: badge.name + " added to your badge board." };
+    },
 
     // ---- Save Codes ----
     exportCode: function () { return exportSaveCode(this.get()); },

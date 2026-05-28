@@ -201,14 +201,21 @@ function finishGame() {
   state.active = false;
   const total = state.need + state.quality + state.value + state.coins;
   let title = "Smart Team Shopper";
+  let reward = 12;
   if (total >= 92) title = "Classroom Market Captain";
+  if (total >= 92) reward = 25;
+  else if (total >= 82) reward = 18;
   else if (total < 75) title = "Budget Builder In Training";
+
+  if (window.MoneyMuncher && window.MoneyMuncher.earnCoins) {
+    window.MoneyMuncher.earnCoins(reward, "classroom-market", title + " reward");
+  }
 
   $("roundEyebrow").textContent = "Market complete";
   $("roundTitle").textContent = title;
-  $("roundPrompt").textContent = `Your team kept ${state.coins} coins and scored ${state.need} need, ${state.quality} quality, and ${state.value} value points.`;
+  $("roundPrompt").textContent = `Your team kept ${state.coins} coins and scored ${state.need} need, ${state.quality} quality, and ${state.value} value points. You earned ${reward} wallet coins.`;
   $("choiceGrid").innerHTML = "";
-  $("feedback").textContent = "Dino Munch says: the best class purchase is not always the cheapest one. Compare price, quality, and who really needs it.";
+  $("feedback").textContent = "Dino Munch says: the best class purchase is not always the cheapest one. Compare price, quality, and who really needs it. Visit Rewards to spend your coins on badges.";
 }
 
 function startGame() {

@@ -11,7 +11,11 @@ const defaultProgress = () => ({
   currentLevel: 0,
   unlockedLevel: 0,
   completedLevels: [],
-  completedLessons: []
+  completedLessons: [],
+  shopBadges: [],
+  transactions: [],
+  lifetimeCoinsEarned: 0,
+  lifetimeCoinsSpent: 0
 });
 const sanitize = (value) => String(value || "").trim().slice(0, 80);
 const sanitizeEmail = (value) => String(value || "").trim().toLowerCase().slice(0, 160);
@@ -93,7 +97,11 @@ exports.handler = async (event) => {
         currentLevel: Math.max(0, Math.min(7, Number(incoming.currentLevel) || 0)),
         unlockedLevel: Math.max(0, Math.min(7, Number(incoming.unlockedLevel) || 0)),
         completedLevels: Array.from(new Set((incoming.completedLevels || []).map(Number).filter((n) => n >= 0 && n <= 7))),
-        completedLessons: Array.from(new Set(incoming.completedLessons || []))
+        completedLessons: Array.from(new Set(incoming.completedLessons || [])),
+        shopBadges: Array.from(new Set(incoming.shopBadges || [])),
+        transactions: Array.isArray(incoming.transactions) ? incoming.transactions.slice(-80) : [],
+        lifetimeCoinsEarned: Math.max(0, Number(incoming.lifetimeCoinsEarned) || 0),
+        lifetimeCoinsSpent: Math.max(0, Number(incoming.lifetimeCoinsSpent) || 0)
       };
       user.updatedAt = new Date().toISOString();
       await store.setJSON("users", users);

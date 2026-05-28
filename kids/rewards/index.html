@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rewards | Money Muncher Kids</title>
+  <meta name="description" content="Spend practice coins on Money Muncher learning badges.">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="rewards-header">
+    <a class="brand" href="/kids/">Money Muncher Kids</a>
+    <nav aria-label="Rewards navigation">
+      <a href="/kids/play/">Trail Game</a>
+      <a href="/kids/classroom-market/">Classroom Market</a>
+      <a href="/kids/">Kids Arcade</a>
+    </nav>
+  </header>
+
+  <main class="rewards-shell">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">Badge Shop</p>
+        <h1>Spend practice coins on learning badges.</h1>
+        <p>Coins are practice money. Badges show the money skills you are building.</p>
+      </div>
+      <div class="wallet-card">
+        <span id="coinBalance">0</span>
+        <small>coins available</small>
+        <button id="starterCoinsBtn" class="secondary" type="button">Claim starter coins</button>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Shop Badges</p>
+          <h2>Pick a badge for your board</h2>
+        </div>
+        <span id="ownedCount" class="pill">0 owned</span>
+      </div>
+      <div id="badgeGrid" class="badge-grid"></div>
+    </section>
+
+    <section class="ledger">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Coin History</p>
+          <h2>Recent wallet activity</h2>
+        </div>
+      </div>
+      <ul id="transactionList"></ul>
+    </section>
+  </main>
+
+  <script src="/progress-manager.js"></script>
+  <script src="./rewards.js"></script>
+</body>
+</html>
