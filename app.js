@@ -252,6 +252,7 @@ const levels = [
 document.addEventListener('DOMContentLoaded', function() {
   var signUpBtn  = $('signUpBtn');
   var signInBtn  = $('signInBtn');
+  var forgotPasswordBtn = $('forgotPasswordBtn');
   var nameIn     = $('nameInput');
   var roleIn     = $('roleInput');
   var emailIn    = $('emailInput');
@@ -281,6 +282,16 @@ document.addEventListener('DOMContentLoaded', function() {
         $('loginDialog').close();
         $('feedback').textContent = 'Account created! Cloud save active.';
         renderAccount(); renderStats(); renderMap();
+      }).catch(function(e) { alert(e.message); });
+    });
+  }
+
+  if (forgotPasswordBtn && emailIn) {
+    forgotPasswordBtn.addEventListener('click', function() {
+      var em = emailIn.value.trim();
+      if (!em) return alert('Enter your email first, then tap Forgot password.');
+      MoneyMuncher.resetPassword(em).then(function() {
+        alert('Password reset email sent. Please check your inbox.');
       }).catch(function(e) { alert(e.message); });
     });
   }

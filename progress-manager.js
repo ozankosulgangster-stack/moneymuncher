@@ -442,6 +442,15 @@
       });
     },
 
+    resetPassword: function (email) {
+      return new Promise(function (resolve, reject) {
+        if (!cloud.ready) return reject(new Error("Cloud not initialized"));
+        cloud.auth.sendPasswordResetEmail(email)
+          .then(resolve)
+          .catch(reject);
+      });
+    },
+
     signOut: function () {
       if (!cloud.ready) return Promise.resolve();
       return cloud.auth.signOut();
