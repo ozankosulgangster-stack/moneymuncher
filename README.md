@@ -15,6 +15,8 @@ The original app includes:
 - Interactive financial choices game
 - Stats: coins, saved, joy, wisdom
 - Login with server-side user records
+- Member-only Market Lab teaser on the homepage
+- Market Lab at `/market-lab/` with Firebase-authenticated virtual stock/ETF simulation
 - Money World Map with level nodes
 - Locked/unlocked level progression saved to `data/db.json`
 - 5 prototype levels:
@@ -37,6 +39,20 @@ Then open:
 ```text
 http://127.0.0.1:4173
 ```
+
+Market Lab:
+
+```text
+http://127.0.0.1:4173/market-lab/
+```
+
+Market Lab saves virtual portfolio data in Firestore under:
+
+```text
+players/{uid}/marketLab/portfolio
+```
+
+It uses virtual coins only. It does not place trades, connect to a brokerage, or provide financial advice.
 
 ## Unity Kids Game
 

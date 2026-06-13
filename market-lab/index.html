@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MoneyMuncher Market Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Inter:wght@500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/market-lab/market-lab.css" />
+</head>
+<body>
+  <main class="lab-shell">
+    <nav class="lab-topbar panel">
+      <a class="brand" href="/" aria-label="MoneyMuncher home">
+        <span class="brand-mark" aria-hidden="true">M</span>
+        <span>MoneyMuncher</span>
+      </a>
+      <div class="nav-actions">
+        <a href="/" class="secondary small button-link">Home</a>
+        <span id="memberStatus" class="account-status">Checking membership...</span>
+        <button id="signOutBtn" class="secondary small hidden" type="button">Log out</button>
+      </div>
+    </nav>
+
+    <section id="gate" class="gate panel">
+      <div>
+        <p class="eyebrow">Members only</p>
+        <h1>Market Lab</h1>
+        <p class="subtitle">Practice building a virtual stock and ETF portfolio with MoneyMuncher coins. No real money, no trading links, just learning.</p>
+      </div>
+      <form id="memberForm" class="auth-card">
+        <label>Email
+          <input id="memberEmail" type="email" autocomplete="email" required placeholder="parent@email.com" />
+        </label>
+        <label>Password
+          <input id="memberPassword" type="password" autocomplete="current-password" required placeholder="At least 6 characters" />
+        </label>
+        <div class="auth-actions">
+          <button id="memberSignInBtn" class="primary" type="button">Sign in</button>
+          <button id="memberSignUpBtn" class="secondary" type="button">Create account</button>
+        </div>
+        <p id="authMessage" class="fine-print">Kids should ask a parent to help with email sign-in.</p>
+      </form>
+    </section>
+
+    <section id="labApp" class="hidden">
+      <section class="hero panel">
+        <div>
+          <p class="eyebrow">Virtual market simulator</p>
+          <h1 id="totalValue">0 coins</h1>
+          <p id="statusLine" class="subtitle">Loading saved choices from Firebase...</p>
+        </div>
+        <div class="outlook-card">
+          <span>Portfolio outlook</span>
+          <strong id="portfolioOutlook">Mixed</strong>
+          <div class="meter"><div id="meterFill"></div></div>
+        </div>
+      </section>
+
+      <section class="chart-panel panel">
+        <canvas id="portfolioChart" width="1000" height="260" aria-label="Portfolio value chart"></canvas>
+      </section>
+
+      <section class="grid two">
+        <section class="panel" id="market">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Market shelf</p>
+              <h2>Pick stocks or ETFs</h2>
+            </div>
+            <span class="badge">Seeded demo feed</span>
+          </div>
+          <div class="trade-box">
+            <label>Asset
+              <select id="assetSelect"></select>
+            </label>
+            <label>Coins
+              <input id="coinInput" type="number" min="10" step="10" value="500" />
+            </label>
+            <button id="buyBtn" class="primary" type="button">Buy</button>
+          </div>
+          <div id="assetList" class="asset-list"></div>
+        </section>
+
+        <section class="panel">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Learning lens</p>
+              <h2>Probability, not prophecy</h2>
+            </div>
+          </div>
+          <div id="learningCards" class="learning-cards"></div>
+        </section>
+      </section>
+
+      <section class="panel">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Saved choices</p>
+            <h2>My virtual holdings</h2>
+          </div>
+          <strong id="walletBalance">0 coins wallet</strong>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Asset</th>
+                <th>Type</th>
+                <th>Coins in</th>
+                <th>Current value</th>
+                <th>Gain/loss</th>
+                <th>Outlook</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="holdingsBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel report-panel">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Weekly report</p>
+            <h2>Parent-ready summary</h2>
+          </div>
+        </div>
+        <pre id="weeklyReport"></pre>
+      </section>
+    </section>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="/progress-manager.js"></script>
+  <script>
+    MoneyMuncher.init({
+      firebaseConfig: {
+        apiKey: "AIzaSyBdfx_DSFz6d8zy7RdHUczyt95n0wQElbc",
+        authDomain: "money-muncher-kids.firebaseapp.com",
+        projectId: "money-muncher-kids",
+        storageBucket: "money-muncher-kids.firebasestorage.app",
+        messagingSenderId: "762747678860",
+        appId: "1:762747678860:web:c02a85bb9c2520d2170ba9"
+      }
+    });
+  </script>
+  <script src="/market-lab/market-lab.js"></script>
+</body>
+</html>

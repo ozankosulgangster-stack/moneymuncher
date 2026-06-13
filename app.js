@@ -574,6 +574,10 @@ $('teacherBtn').addEventListener('click', function() {
   $('hub').scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
 
+$('marketLabLoginBtn').addEventListener('click', function() {
+  openDialog('loginDialog');
+});
+
 $('loginOpenBtn').addEventListener('click', function() { openDialog('loginDialog'); });
 
 $('logoutBtn').addEventListener('click', function() {

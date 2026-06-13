@@ -67,6 +67,16 @@
   to = "/kids/rewards/index.html"
   status = 200
 
+[[redirects]]
+  from = "/market-lab"
+  to = "/market-lab/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/market-lab/"
+  to = "/market-lab/index.html"
+  status = 200
+
 [[headers]]
   for = "/kids/play/Build/*.wasm.br"
   [headers.values]

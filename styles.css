@@ -224,6 +224,62 @@ button:disabled { cursor: not-allowed; opacity: .65; transform: none; }
 }
 .kids-copy p:not(.eyebrow) { color: var(--muted); font-size: 1.05rem; line-height: 1.5; margin: 12px 0 0; max-width: 650px; }
 .kids-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; }
+.market-lab-teaser {
+  margin-top: 22px;
+  padding: 30px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 380px) auto;
+  gap: 20px;
+  align-items: center;
+  background: linear-gradient(135deg, rgba(255,255,255,.9), rgba(255,247,208,.92));
+}
+.market-lab-copy p:not(.eyebrow) {
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.5;
+  margin: 12px 0 0;
+  max-width: 650px;
+}
+.market-lab-preview {
+  padding: 16px;
+  border-radius: 22px;
+  background: white;
+  box-shadow: 0 12px 24px rgba(23,32,42,.08);
+}
+.preview-bars {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  align-items: end;
+  gap: 8px;
+  height: 110px;
+  margin: 14px 0;
+}
+.preview-bars span {
+  display: block;
+  border-radius: 12px 12px 6px 6px;
+  background: linear-gradient(180deg, var(--gold), var(--mint));
+}
+.preview-bars span:nth-child(1) { height: 42%; }
+.preview-bars span:nth-child(2) { height: 68%; }
+.preview-bars span:nth-child(3) { height: 55%; }
+.preview-bars span:nth-child(4) { height: 80%; }
+.preview-bars span:nth-child(5) { height: 92%; }
+.preview-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 0;
+  border-top: 2px solid rgba(23,32,42,.08);
+}
+.preview-row span {
+  color: #08744d;
+  font-weight: 900;
+}
+.market-lab-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 .stats { margin: 22px 0; padding: 18px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
 .stats div { background: white; border-radius: 22px; padding: 18px; text-align: center; }
 .stats span { display: block; font-family: "Baloo 2"; font-size: 2.4rem; font-weight: 800; }
@@ -462,7 +518,9 @@ input, select { width: 100%; margin-top: 8px; border: 2px solid #f0d98f; border-
   .stats { grid-template-columns: repeat(2,1fr); }
   .game-header, .section-heading, .quest-form { flex-direction: column; }
   .kids-arcade { grid-template-columns: 1fr; }
+  .market-lab-teaser { grid-template-columns: 1fr; }
   .kids-actions { justify-content: flex-start; }
+  .market-lab-actions { align-items: flex-start; }
   .video-caption { align-items: flex-start; flex-direction: column; }
 }
 @media (max-width: 560px) {
