@@ -15,6 +15,9 @@ let progress = { unlockedLevel: 0, completedLevels: [] };
 let account = { id: "", name: "", role: "" };
 let selectedRole = localStorage.getItem('moneymuncherRole') || 'Kid Explorer';
 let selectedAgePath = localStorage.getItem('moneymuncherAgePath') || 'coin-collectors';
+let activeGeneratedQuest = null;
+let generatedQuestHistory = loadGeneratedQuestHistory();
+let currentGeneratedQuest = generatedQuestHistory[0] || null;
 
 const experienceModes = [
   {
@@ -113,6 +116,152 @@ const miniGames = [
     levelIndex: 7,
     href: '/kids/classroom-market/'
   }
+];
+
+const questContextTemplates = {
+  grocery: {
+    icon: 'GQ',
+    label: 'Groceries',
+    name: 'Grocery Quest',
+    skill: 'Budget choices',
+    example: 'Buying snacks for a road trip',
+    title: function() { return 'Build a snack plan'; },
+    text: function(moment, coins) {
+      return 'Your family is thinking about "' + moment + '". You have ' + coins + ' quest coins. What plan keeps today fun and leaves room for later?';
+    },
+    prompt: function() { return 'Which choice gave us fun today and choices tomorrow?'; },
+    choices: function(coins) {
+      return [
+        { label: 'Make a mini list', detail: 'Pick favorites before spending.', coins: -scaledCoins(coins, .45, 6), saved: scaledCoins(coins, .2, 3), joy: 9, wisdom: 18, feedback: 'A list turns a store moment into a plan. You kept the fun and protected the coins.' },
+        { label: 'Grab every treat', detail: 'Maximum fun, fast coin drain.', coins: -scaledCoins(coins, .9, 12), saved: 0, joy: 17, wisdom: 5, feedback: 'Big treat energy is real. Now the budget has less space for the next family want.' },
+        { label: 'One treat, one swap', detail: 'Choose a favorite and a smarter buy.', coins: -scaledCoins(coins, .6, 8), saved: scaledCoins(coins, .15, 2), joy: 13, wisdom: 16, feedback: 'Nice balance. A smart swap keeps the favorite without letting the budget get munched.' }
+      ];
+    }
+  },
+  toy: {
+    icon: 'TQ',
+    label: 'Toy',
+    name: 'Toy Quest',
+    skill: 'Impulse control',
+    example: 'Choosing whether to buy a new game',
+    title: function() { return 'The want-it-now test'; },
+    text: function(moment, coins) {
+      return 'A tempting choice shows up: "' + moment + '". You have ' + coins + ' quest coins. What should Future You think about first?';
+    },
+    prompt: function() { return 'Would this still feel exciting next week?'; },
+    choices: function(coins) {
+      return [
+        { label: 'Wait one day', detail: 'Let the want cool down.', coins: 0, saved: scaledCoins(coins, .25, 4), joy: -1, wisdom: 20, feedback: 'Waiting is a quiet superpower. Some wants shrink when they get a little space.' },
+        { label: 'Buy it right now', detail: 'Fast joy, fewer options later.', coins: -scaledCoins(coins, .85, 10), saved: 0, joy: 18, wisdom: 5, feedback: 'Instant joy can be fun. The learning is noticing which future goal moved farther away.' },
+        { label: 'Compare first', detail: 'Check price, use, and timing.', coins: -scaledCoins(coins, .55, 7), saved: scaledCoins(coins, .18, 3), joy: 11, wisdom: 17, feedback: 'Detective move. Comparing gives your brain time to catch up with your excitement.' }
+      ];
+    }
+  },
+  allowance: {
+    icon: 'AQ',
+    label: 'Allowance',
+    name: 'Allowance Quest',
+    skill: 'Spend-save-share',
+    example: 'Deciding what to do with chore money',
+    title: function() { return 'New coins, new choices'; },
+    text: function(moment, coins) {
+      return 'New coins arrive from "' + moment + '". You have ' + coins + ' quest coins. How should they split between now, later, and kindness?';
+    },
+    prompt: function() { return 'What would you put in Spend, Save, and Share jars?'; },
+    choices: function(coins) {
+      return [
+        { label: 'Use three jars', detail: 'Spend, save, and share.', coins: -scaledCoins(coins, .35, 5), saved: scaledCoins(coins, .35, 5), joy: 12, wisdom: 19, feedback: 'Three-jar thinking is strong. You gave every coin a job instead of letting it wander.' },
+        { label: 'Spend it all', detail: 'All fun, no future plan.', coins: -scaledCoins(coins, .95, 12), saved: 0, joy: 18, wisdom: 5, feedback: 'All-spend choices can feel exciting. The question is whether Future You still gets a vote.' },
+        { label: 'Name one goal', detail: 'Save for something specific.', coins: -scaledCoins(coins, .25, 4), saved: scaledCoins(coins, .5, 8), joy: 7, wisdom: 18, feedback: 'Named goals are powerful. Saving for a real thing feels much easier than saving for nothing.' }
+      ];
+    }
+  },
+  birthday: {
+    icon: 'BQ',
+    label: 'Birthday',
+    name: 'Birthday Quest',
+    skill: 'Planning ahead',
+    example: 'Planning a birthday gift budget',
+    title: function() { return 'The celebration budget'; },
+    text: function(moment, coins) {
+      return 'A celebration is coming: "' + moment + '". You have ' + coins + ' quest coins for the plan. How can you make it thoughtful without overspending?';
+    },
+    prompt: function() { return 'What part of a gift makes someone feel cared for besides the price?'; },
+    choices: function(coins) {
+      return [
+        { label: 'Plan the budget', detail: 'Gift, card, and coins left over.', coins: -scaledCoins(coins, .5, 7), saved: scaledCoins(coins, .2, 3), joy: 13, wisdom: 18, feedback: 'Thoughtful and planned. A budget can make a celebration calmer, not smaller.' },
+        { label: 'Buy the flashiest gift', detail: 'Big wow, tight coins.', coins: -scaledCoins(coins, .95, 12), saved: 0, joy: 17, wisdom: 6, feedback: 'A flashy gift can sparkle, but price is only one kind of caring.' },
+        { label: 'Make part of it', detail: 'Mix creativity with spending.', coins: -scaledCoins(coins, .35, 5), saved: scaledCoins(coins, .3, 4), joy: 15, wisdom: 17, feedback: 'Creative spending unlocked. Time, care, and coins can work together.' }
+      ];
+    }
+  },
+  trip: {
+    icon: 'FQ',
+    label: 'Family Trip',
+    name: 'Trip Quest',
+    skill: 'Tradeoffs',
+    example: 'Choosing road trip treats and souvenirs',
+    title: function() { return 'The trip tradeoff'; },
+    text: function(moment, coins) {
+      return 'Your family is planning "' + moment + '". You have ' + coins + ' quest coins. What choice makes the trip fun without eating the whole budget?';
+    },
+    prompt: function() { return 'Which trip memory matters more than buying something?'; },
+    choices: function(coins) {
+      return [
+        { label: 'Pick a trip budget', detail: 'Fun money with a clear limit.', coins: -scaledCoins(coins, .5, 8), saved: scaledCoins(coins, .22, 3), joy: 14, wisdom: 18, feedback: 'A trip budget is freedom with guardrails. Everyone knows where the coins can go.' },
+        { label: 'Buy at every stop', detail: 'Many treats, money fades.', coins: -scaledCoins(coins, .9, 12), saved: 0, joy: 18, wisdom: 5, feedback: 'Every-stop spending feels fun until the bigger choice disappears.' },
+        { label: 'Choose one memory item', detail: 'One buy, more room for experiences.', coins: -scaledCoins(coins, .4, 6), saved: scaledCoins(coins, .25, 4), joy: 13, wisdom: 17, feedback: 'Strong travel choice. A single memory item can mean more than a bag of random stuff.' }
+      ];
+    }
+  },
+  giving: {
+    icon: 'SQ',
+    label: 'Sharing',
+    name: 'Sharing Quest',
+    skill: 'Generosity',
+    example: 'Helping a fundraiser while saving for a goal',
+    title: function() { return 'The generous choice'; },
+    text: function(moment, coins) {
+      return 'A kindness moment appears: "' + moment + '". You have ' + coins + ' quest coins. How can you help and keep your own plan healthy?';
+    },
+    prompt: function() { return 'How can we be generous in money, time, or effort?'; },
+    choices: function(coins) {
+      return [
+        { label: 'Give a little', detail: 'Kind and sustainable.', coins: -scaledCoins(coins, .25, 4), saved: scaledCoins(coins, .15, 2), joy: 14, wisdom: 17, feedback: 'Sustainable generosity keeps your heart open and your plan steady.' },
+        { label: 'Give everything', detail: 'Huge heart, empty jar.', coins: -scaledCoins(coins, .9, 12), saved: 0, joy: 18, wisdom: 7, feedback: 'That is a kind heart. The next lesson is keeping enough strength to help again later.' },
+        { label: 'Give time too', detail: 'Money is not the only help.', coins: -scaledCoins(coins, .15, 2), saved: scaledCoins(coins, .2, 3), joy: 15, wisdom: 19, feedback: 'Beautiful. Time and effort can be just as valuable as coins.' }
+      ];
+    }
+  },
+  subscription: {
+    icon: 'SQ',
+    label: 'Subscription',
+    name: 'Subscription Quest',
+    skill: 'Recurring costs',
+    example: 'A free app trial is about to renew',
+    title: function() { return 'The sneaky monthly bite'; },
+    text: function(moment, coins) {
+      return 'A recurring cost shows up: "' + moment + '". You have ' + coins + ' quest coins. What keeps tiny charges from munching a big goal?';
+    },
+    prompt: function() { return 'What reminders or rules help us notice recurring costs?'; },
+    choices: function(coins) {
+      return [
+        { label: 'Check the renewal', detail: 'Know the date and cost.', coins: 0, saved: scaledCoins(coins, .25, 4), joy: 4, wisdom: 20, feedback: 'Sharp eye. Recurring costs are easier to handle when they stop being invisible.' },
+        { label: 'Ignore it', detail: 'Small charge, repeated bite.', coins: -scaledCoins(coins, .35, 5), saved: 0, joy: -2, wisdom: 5, feedback: 'That little charge can become a big bite over time. A reminder would protect the goal.' },
+        { label: 'Ask if it earns a spot', detail: 'Keep it only if it is worth it.', coins: -scaledCoins(coins, .2, 3), saved: scaledCoins(coins, .2, 3), joy: 8, wisdom: 17, feedback: 'Good value check. Every subscription should earn its place again and again.' }
+      ];
+    }
+  }
+};
+
+const surpriseQuestMoments = [
+  { context: 'grocery', prompt: 'Picking snacks for a family movie night' },
+  { context: 'toy', prompt: 'Choosing whether to buy a shiny toy today' },
+  { context: 'allowance', prompt: 'Splitting allowance after finishing weekend chores' },
+  { context: 'birthday', prompt: 'Planning a birthday gift for a friend' },
+  { context: 'trip', prompt: 'Choosing souvenirs during a family day trip' },
+  { context: 'giving', prompt: 'Helping a school fundraiser' },
+  { context: 'subscription', prompt: 'A free app trial is about to renew' }
 ];
 
 // --- 2. Load from MoneyMuncher (or keep local defaults) ---
@@ -265,6 +414,7 @@ document.addEventListener('DOMContentLoaded', function() {
       localStorage.setItem('moneymuncherRole', selectedRole);
       renderPlaySetup();
       renderMiniGames();
+      renderQuestGeneratorBadge();
     });
   }
 
@@ -328,7 +478,8 @@ function renderStats() {
   $('saved').textContent   = clamp(state.saved);
   $('joy').textContent     = clamp(state.joy);
   $('wisdom').textContent  = clamp(state.wisdom);
-  $('badge').textContent    = state.wisdom >= 60 ? "Map Master"
+  $('badge').textContent    = activeGeneratedQuest ? "Everyday Quest"
+                           : state.wisdom >= 60 ? "Map Master"
                            : state.wisdom >= 40 ? "Coin Commander"
                            : state.wisdom >= 20 ? "Smart Saver"
                            : "Beginner Saver";
@@ -399,9 +550,11 @@ function renderPlaySetup() {
       renderPlaySetup();
       renderMiniGames();
       renderAcademy();
+      renderQuestGeneratorBadge();
     });
     roleCards.appendChild(card);
   });
+  renderQuestGeneratorBadge();
 }
 
 function renderAgePaths() {
@@ -425,9 +578,11 @@ function renderAgePaths() {
       renderAgePaths();
       renderMiniGames();
       renderAcademy();
+      renderQuestGeneratorBadge();
     });
     grid.appendChild(card);
   });
+  renderQuestGeneratorBadge();
 }
 
 function renderMiniGames() {
@@ -464,6 +619,204 @@ function renderMiniGames() {
   });
 }
 
+function renderQuestGeneratorBadge() {
+  var badge = $('questGeneratorBadge');
+  if (!badge) return;
+  badge.textContent = getSelectedMode().title + ' - ' + getSelectedAgePath().ages;
+}
+
+function scaledCoins(coins, ratio, minimum) {
+  return Math.min(coins, Math.max(minimum, Math.round(coins * ratio)));
+}
+
+function loadGeneratedQuestHistory() {
+  try {
+    var saved = JSON.parse(localStorage.getItem('moneymuncherGeneratedQuests') || '[]');
+    if (!Array.isArray(saved)) return [];
+    return saved.filter(isGeneratedQuest).slice(0, 6);
+  } catch (e) {
+    return [];
+  }
+}
+
+function isGeneratedQuest(quest) {
+  return Boolean(
+    quest &&
+    typeof quest.title === 'string' &&
+    typeof quest.text === 'string' &&
+    Array.isArray(quest.choices) &&
+    quest.choices.length === 3
+  );
+}
+
+function saveGeneratedQuestHistory() {
+  localStorage.setItem('moneymuncherGeneratedQuests', JSON.stringify(generatedQuestHistory.slice(0, 6)));
+}
+
+function getQuestCoinBudget() {
+  var input = $('generatorCoins');
+  var value = input ? parseInt(input.value, 10) : 30;
+  if (!Number.isFinite(value)) value = 30;
+  value = Math.min(100, Math.max(5, Math.round(value / 5) * 5));
+  if (input) input.value = value;
+  return value;
+}
+
+function inferQuestContext(prompt, selectedContext) {
+  if (selectedContext && selectedContext !== 'auto' && questContextTemplates[selectedContext]) {
+    return selectedContext;
+  }
+
+  var text = (prompt || '').toLowerCase();
+  var keywordGroups = [
+    { id: 'subscription', words: ['subscription', 'trial', 'renew', 'monthly', 'app', 'streaming'] },
+    { id: 'birthday', words: ['birthday', 'gift', 'party', 'present', 'celebration'] },
+    { id: 'trip', words: ['trip', 'travel', 'vacation', 'road', 'souvenir', 'airport'] },
+    { id: 'giving', words: ['donate', 'fundraiser', 'charity', 'help', 'share', 'giving'] },
+    { id: 'allowance', words: ['allowance', 'chore', 'earned', 'paid', 'payday', 'income'] },
+    { id: 'toy', words: ['toy', 'game', 'lego', 'skin', 'robux', 'book', 'bike'] },
+    { id: 'grocery', words: ['grocery', 'snack', 'food', 'meal', 'dinner', 'lunch', 'store', 'treat'] }
+  ];
+
+  for (var i = 0; i < keywordGroups.length; i++) {
+    if (keywordGroups[i].words.some(function(word) { return text.includes(word); })) {
+      return keywordGroups[i].id;
+    }
+  }
+
+  return 'grocery';
+}
+
+function normalizeQuestMoment(prompt, contextId) {
+  var template = questContextTemplates[contextId] || questContextTemplates.grocery;
+  var moment = (prompt || '').trim().replace(/\s+/g, ' ');
+  if (!moment) moment = template.example;
+  if (moment.length > 160) moment = moment.slice(0, 157) + '...';
+  return moment;
+}
+
+function makeGeneratedQuest(prompt, selectedContext, coins) {
+  var contextId = inferQuestContext(prompt, selectedContext);
+  var template = questContextTemplates[contextId] || questContextTemplates.grocery;
+  var moment = normalizeQuestMoment(prompt, contextId);
+  var path = getSelectedAgePath();
+  var mode = getSelectedMode();
+
+  return {
+    id: 'everyday-' + Date.now(),
+    generated: true,
+    createdAt: new Date().toISOString(),
+    icon: template.icon,
+    name: template.name,
+    skill: template.skill,
+    eyebrow: 'Everyday Quest: ' + template.label,
+    title: template.title(moment, coins, path, mode),
+    text: template.text(moment, coins, path, mode),
+    parentPrompt: template.prompt(moment, path, mode),
+    choices: template.choices(coins, path, mode)
+  };
+}
+
+function storeGeneratedQuest(quest) {
+  generatedQuestHistory = [quest].concat(generatedQuestHistory.filter(function(item) {
+    return item.id !== quest.id;
+  })).slice(0, 6);
+  saveGeneratedQuestHistory();
+  renderGeneratedQuestHistory();
+}
+
+function renderGeneratedQuest(quest) {
+  if (!isGeneratedQuest(quest)) return;
+  currentGeneratedQuest = quest;
+
+  $('generatedQuestCard').classList.remove('hidden');
+  $('generatedQuestIcon').textContent = quest.icon || 'EQ';
+  $('generatedQuestSkill').textContent = quest.skill || 'Money choices';
+  $('generatedQuestTitle').textContent = quest.title;
+  $('generatedQuestText').textContent = quest.text;
+  $('generatedQuestPrompt').textContent = 'Family talk: ' + (quest.parentPrompt || 'What felt smart, tempting, or kind?');
+
+  var choices = $('generatedQuestChoices');
+  choices.innerHTML = '';
+  quest.choices.forEach(function(choice) {
+    var item = document.createElement('div');
+    item.className = 'generated-choice';
+
+    var title = document.createElement('strong');
+    title.textContent = choice.label;
+
+    var detail = document.createElement('span');
+    detail.textContent = choice.detail;
+
+    item.appendChild(title);
+    item.appendChild(detail);
+    choices.appendChild(item);
+  });
+
+  $('playGeneratedQuestBtn').onclick = function() {
+    startGeneratedQuest(quest);
+  };
+}
+
+function renderGeneratedQuestHistory() {
+  var list = $('generatedQuestHistory');
+  if (!list) return;
+  list.innerHTML = '';
+
+  if (!generatedQuestHistory.length) {
+    var empty = document.createElement('p');
+    empty.className = 'history-empty';
+    empty.textContent = 'No family quests yet.';
+    list.appendChild(empty);
+    return;
+  }
+
+  generatedQuestHistory.forEach(function(quest) {
+    var card = document.createElement('article');
+    card.className = 'history-card';
+
+    var title = document.createElement('strong');
+    title.textContent = quest.title;
+
+    var detail = document.createElement('span');
+    detail.textContent = quest.skill + ' - ' + quest.name;
+
+    var replay = document.createElement('button');
+    replay.type = 'button';
+    replay.className = 'secondary small';
+    replay.textContent = 'Replay';
+    replay.addEventListener('click', function() {
+      renderGeneratedQuest(quest);
+      startGeneratedQuest(quest);
+    });
+
+    card.appendChild(title);
+    card.appendChild(detail);
+    card.appendChild(replay);
+    list.appendChild(card);
+  });
+}
+
+function generateQuestFromForm() {
+  var prompt = $('generatorPrompt').value;
+  var context = $('generatorContext').value;
+  var quest = makeGeneratedQuest(prompt, context, getQuestCoinBudget());
+  renderGeneratedQuest(quest);
+  storeGeneratedQuest(quest);
+  return quest;
+}
+
+function startGeneratedQuest(quest) {
+  if (!isGeneratedQuest(quest)) return;
+  activeGeneratedQuest = quest;
+  $('worldMap').classList.add('hidden');
+  $('game').classList.remove('hidden');
+  $('feedback').textContent = 'Pick a choice together. Every choice teaches something.';
+  renderStats();
+  renderScenario();
+  $('game').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
 function renderMap() {
   $('mapProgress').textContent = 'Level ' + Math.min(progress.unlockedLevel + 1, levels.length) + ' / ' + levels.length;
   $('mapPath').innerHTML = '';
@@ -489,7 +842,7 @@ function renderMap() {
 }
 
 function renderScenario() {
-  var level = levels[state.currentLevel];
+  var level = activeGeneratedQuest || levels[state.currentLevel];
   if (!level) return;
   $('levelEyebrow').textContent   = level.eyebrow;
   $('scenarioTitle').textContent  = level.title;
@@ -512,10 +865,12 @@ function openDialog(id) {
 
 function startLevel(index) {
   if (!levelAccessible(index)) return;
+  activeGeneratedQuest = null;
   state.currentLevel = index;
   $('worldMap').classList.remove('hidden');
   $('game').classList.remove('hidden');
   sync();
+  renderStats();
   renderMap();
   renderScenario();
   $('game').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -539,6 +894,19 @@ function choose(choice) {
   state.wisdom += choice.wisdom || 0;
 
   $('feedback').textContent = choice.feedback;
+
+  if (activeGeneratedQuest) {
+    $('feedback').textContent += ' Family talk: ' + (activeGeneratedQuest.parentPrompt || 'What felt smart, tempting, or kind?');
+    if (hasMM && MoneyMuncher.isLoggedIn()) {
+      $('feedback').textContent += ' Cloud saved.';
+    } else if (hasMM) {
+      $('feedback').textContent += ' Saved on this device.';
+    }
+    sync();
+    renderStats();
+    return;
+  }
+
   completeCurrentLevel();
 
   if (hasMM && MoneyMuncher.isLoggedIn()) {
@@ -562,6 +930,10 @@ function choose(choice) {
 
 // --- 8. UI Event wiring ---
 $('startBtn').addEventListener('click', function() { startLevel(progress.unlockedLevel); });
+
+$('generatorBtn').addEventListener('click', function() {
+  $('questGenerator').scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
 
 $('mapBtn').addEventListener('click', function() {
   $('worldMap').classList.remove('hidden');
@@ -613,6 +985,26 @@ $('questForm').addEventListener('submit', function(ev) {
   $('questInput').value = '';
 });
 
+$('generatorForm').addEventListener('submit', function(ev) {
+  ev.preventDefault();
+  generateQuestFromForm();
+});
+
+$('surpriseQuestBtn').addEventListener('click', function() {
+  var sample = surpriseQuestMoments[Math.floor(Math.random() * surpriseQuestMoments.length)];
+  $('generatorPrompt').value = sample.prompt;
+  $('generatorContext').value = sample.context;
+  generateQuestFromForm();
+});
+
+$('clearGeneratedQuestsBtn').addEventListener('click', function() {
+  generatedQuestHistory = [];
+  currentGeneratedQuest = null;
+  saveGeneratedQuestHistory();
+  renderGeneratedQuestHistory();
+  $('generatedQuestCard').classList.add('hidden');
+});
+
 // --- 9. Boot ---
 (function init() {
   restoreSession();
@@ -622,6 +1014,8 @@ $('questForm').addEventListener('submit', function(ev) {
   renderPlaySetup();
   renderAgePaths();
   renderMiniGames();
+  renderQuestGeneratorBadge();
+  renderGeneratedQuestHistory();
   renderAccount();
   renderStats();
   renderMap();

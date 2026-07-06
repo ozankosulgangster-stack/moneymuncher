@@ -179,7 +179,7 @@ button:disabled { cursor: not-allowed; opacity: .65; transform: none; }
 .jar-face .coin-eye { top: 42px; }
 .jar-face .coin-eye.left { left: 22px; } .jar-face .coin-eye.right { right: 22px; }
 .jar-smile { bottom: 32px; width: 30px; }
-.play-setup, .age-paths, .mini-games { padding: 30px; margin-top: 22px; }
+.play-setup, .age-paths, .mini-games, .quest-generator { padding: 30px; margin-top: 22px; }
 .role-grid, .age-grid, .mini-game-grid { display: grid; gap: 14px; margin-top: 20px; }
 .role-grid { grid-template-columns: repeat(4, 1fr); }
 .age-grid, .mini-game-grid { grid-template-columns: repeat(3, 1fr); }
@@ -213,6 +213,148 @@ button:disabled { cursor: not-allowed; opacity: .65; transform: none; }
 .mini-game-meta { display: flex; flex-wrap: wrap; gap: 7px; }
 .mini-game-meta span { background: #edf7ff; color: #1d5b91; border-radius: 999px; padding: 6px 9px; font-size: .78rem; font-weight: 900; }
 .mini-game-card button { width: 100%; padding: 11px 12px; }
+.quest-generator {
+  background: linear-gradient(135deg, rgba(255,255,255,.9), rgba(237,247,255,.92));
+}
+.generator-layout {
+  display: grid;
+  grid-template-columns: .9fr 1.1fr;
+  gap: 18px;
+  margin-top: 22px;
+  align-items: start;
+}
+.generator-form,
+.generated-quest-card {
+  background: white;
+  border: 3px solid rgba(255,255,255,.85);
+  border-radius: 24px;
+  box-shadow: 0 14px 30px rgba(23,32,42,.1);
+  padding: 22px;
+}
+.generator-form {
+  display: grid;
+  gap: 14px;
+}
+.generator-form label {
+  color: var(--ink);
+  font-weight: 900;
+}
+.generator-form textarea {
+  width: 100%;
+  min-height: 124px;
+  margin-top: 8px;
+  border: 2px solid #f0d98f;
+  border-radius: 16px;
+  padding: 14px;
+  font: inherit;
+  resize: vertical;
+  background: white;
+}
+.generator-controls {
+  display: grid;
+  grid-template-columns: 1.3fr .7fr;
+  gap: 12px;
+}
+.generator-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.generated-quest-card {
+  display: grid;
+  gap: 16px;
+}
+.generated-quest-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.generated-quest-icon {
+  width: 56px;
+  height: 56px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 18px;
+  background: #dff8ec;
+  color: #0c704d;
+  font-family: "Baloo 2", Inter, sans-serif;
+  font-size: 1.3rem;
+  font-weight: 900;
+}
+.generated-quest-card h3 {
+  font-size: 2rem;
+}
+.generated-quest-text,
+.parent-prompt {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+.generated-choice-list {
+  display: grid;
+  gap: 10px;
+}
+.generated-choice {
+  border: 2px solid #d8edff;
+  border-radius: 16px;
+  background: #f7fbff;
+  padding: 13px;
+}
+.generated-choice strong,
+.generated-choice span {
+  display: block;
+}
+.generated-choice span {
+  margin-top: 4px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+.parent-prompt {
+  border-left: 8px solid var(--mint);
+  border-radius: 16px;
+  background: #f0fff8;
+  padding: 14px;
+  font-weight: 800;
+}
+.generated-history {
+  margin-top: 18px;
+}
+.generated-history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.generated-history-header h3 {
+  font-size: 1.6rem;
+}
+.generated-history-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.history-card,
+.history-empty {
+  background: rgba(255,255,255,.85);
+  border-radius: 18px;
+  padding: 14px;
+}
+.history-card {
+  display: grid;
+  gap: 8px;
+}
+.history-card strong {
+  font-family: "Baloo 2", Inter, sans-serif;
+  font-size: 1.15rem;
+  line-height: 1;
+}
+.history-card span,
+.history-empty {
+  color: var(--muted);
+  line-height: 1.4;
+}
 .kids-arcade {
   margin-top: 22px;
   padding: 30px;
@@ -509,7 +651,7 @@ input, select { width: 100%; margin-top: 8px; border: 2px solid #f0d98f; border-
 }
 .hidden { display: none; }
 @keyframes bob { 50% { transform: translateY(-10px) rotate(4deg); } }
-@media (max-width: 1000px) { .role-grid { grid-template-columns: repeat(2, 1fr); } .age-grid, .mini-game-grid { grid-template-columns: 1fr; } }
+@media (max-width: 1000px) { .role-grid { grid-template-columns: repeat(2, 1fr); } .age-grid, .mini-game-grid, .generated-history-list { grid-template-columns: 1fr; } .generator-layout, .generator-controls { grid-template-columns: 1fr; } }
 @media (max-width: 900px) { .map-path { grid-template-columns: 1fr; } .map-path::before { left: 50%; right: auto; top: 8%; bottom: 8%; width: 10px; height: auto; } }
 @media (max-width: 800px) {
   .topbar, .hero, .choices, .hub-grid { grid-template-columns: 1fr; }
@@ -525,5 +667,5 @@ input, select { width: 100%; margin-top: 8px; border: 2px solid #f0d98f; border-
 }
 @media (max-width: 560px) {
   .role-grid { grid-template-columns: 1fr; }
-  .play-setup, .age-paths, .mini-games { padding: 22px; }
+  .play-setup, .age-paths, .mini-games, .quest-generator { padding: 22px; }
 }
