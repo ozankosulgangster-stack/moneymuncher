@@ -36,6 +36,7 @@
         <div class="hero-actions">
           <button id="startBtn" class="primary">Start Quest</button>
           <a href="/kids/play/" class="primary button-link">Play Trail Game</a>
+          <button id="generatorBtn" class="secondary">Everyday Quest</button>
           <button id="mapBtn" class="secondary">Open Map</button>
           <button id="teacherBtn" class="secondary">Teacher / Parent Hub</button>
         </div>
@@ -115,6 +116,67 @@
         <span id="miniGameBadge" class="badge">Games for Kid Explorers</span>
       </div>
       <div id="miniGameGrid" class="mini-game-grid"></div>
+    </section>
+
+    <section id="questGenerator" class="quest-generator panel" aria-labelledby="questGeneratorTitle">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Everyday Quest Generator</p>
+          <h2 id="questGeneratorTitle">Turn today into a money quest</h2>
+        </div>
+        <span id="questGeneratorBadge" class="badge">Family Team starter</span>
+      </div>
+
+      <div class="generator-layout">
+        <form id="generatorForm" class="generator-form">
+          <label>Everyday moment
+            <textarea id="generatorPrompt" maxlength="160" rows="4" placeholder="Buying snacks for a road trip"></textarea>
+          </label>
+          <div class="generator-controls">
+            <label>Money moment
+              <select id="generatorContext">
+                <option value="auto">Auto-pick</option>
+                <option value="grocery">Groceries or snacks</option>
+                <option value="toy">Toy or game</option>
+                <option value="allowance">Allowance or chores</option>
+                <option value="birthday">Birthday or gift</option>
+                <option value="trip">Family trip</option>
+                <option value="giving">Giving or sharing</option>
+                <option value="subscription">App or subscription</option>
+              </select>
+            </label>
+            <label>Quest coins
+              <input id="generatorCoins" type="number" min="5" max="100" step="5" value="30" />
+            </label>
+          </div>
+          <div class="generator-actions">
+            <button class="primary" type="submit">Generate Quest</button>
+            <button id="surpriseQuestBtn" class="secondary" type="button">Surprise Me</button>
+          </div>
+        </form>
+
+        <article id="generatedQuestCard" class="generated-quest-card hidden" aria-live="polite">
+          <div class="generated-quest-top">
+            <span id="generatedQuestIcon" class="generated-quest-icon">EQ</span>
+            <div>
+              <p id="generatedQuestSkill" class="eyebrow">Budget choices</p>
+              <h3 id="generatedQuestTitle">Quest title</h3>
+            </div>
+          </div>
+          <p id="generatedQuestText" class="generated-quest-text"></p>
+          <div id="generatedQuestChoices" class="generated-choice-list"></div>
+          <p id="generatedQuestPrompt" class="parent-prompt"></p>
+          <button id="playGeneratedQuestBtn" class="primary" type="button">Play This Quest</button>
+        </article>
+      </div>
+
+      <div class="generated-history">
+        <div class="generated-history-header">
+          <h3>Recent family quests</h3>
+          <button id="clearGeneratedQuestsBtn" class="secondary small" type="button">Clear</button>
+        </div>
+        <div id="generatedQuestHistory" class="generated-history-list"></div>
+      </div>
     </section>
 
     <section id="kids" class="kids-arcade panel">
