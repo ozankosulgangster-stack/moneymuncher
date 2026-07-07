@@ -60,6 +60,29 @@
       </article>
     </section>
 
+    <section class="quest-generator" aria-labelledby="questGeneratorTitle">
+      <div class="quest-generator-copy">
+        <span class="level-number">Family Quest</span>
+        <h2 id="questGeneratorTitle">Turn Today Into A Money Quest</h2>
+        <p>Type an everyday family moment and Money Muncher will turn it into a quick kid-friendly choice game.</p>
+      </div>
+      <form class="quest-form" id="questForm">
+        <label for="questMoment">Everyday moment</label>
+        <textarea id="questMoment" maxlength="140" rows="3" placeholder="Buying snacks for a road trip"></textarea>
+        <div class="quest-actions">
+          <button class="play-button" type="submit">Generate Quest</button>
+          <button class="secondary-button" id="surpriseQuest" type="button">Surprise Me</button>
+        </div>
+      </form>
+      <article class="quest-result" id="questResult" aria-live="polite">
+        <span class="level-number" id="questSkill">Budget choices</span>
+        <h3 id="questTitle">Snack Plan Quest</h3>
+        <p id="questText">Try a moment like grocery shopping, allowance, birthdays, subscriptions, or family trips.</p>
+        <div class="quest-choices" id="questChoices"></div>
+        <p class="quest-prompt" id="questPrompt">Family talk: Which choice gives us joy today and choices tomorrow?</p>
+      </article>
+    </section>
+
     <section class="safety-note">
       <h2>Built For A Safer First Launch</h2>
       <p>No accounts, no chat, no ads, no public leaderboard, and no personal information collection. Scores and gear stay on the device.</p>
@@ -77,5 +100,84 @@
       </div>
     </section>
   </main>
+  <script>
+    const questTemplates = {
+      grocery: {
+        title: 'Snack Plan Quest',
+        skill: 'Budget choices',
+        text: (moment) => `Your family is thinking about "${moment}". What plan keeps today fun and leaves room for later?`,
+        prompt: 'Which choice gives us joy today and choices tomorrow?',
+        choices: ['Make a mini list', 'Grab every treat', 'Pick one treat and one smart swap']
+      },
+      toy: {
+        title: 'Want-It-Now Quest',
+        skill: 'Impulse control',
+        text: (moment) => `A tempting choice shows up: "${moment}". What should Future You think about first?`,
+        prompt: 'Would this still feel exciting next week?',
+        choices: ['Wait one day', 'Buy it right now', 'Compare price and use first']
+      },
+      allowance: {
+        title: 'New Coins Quest',
+        skill: 'Spend-save-share',
+        text: (moment) => `New coins arrive from "${moment}". How should they split between now, later, and kindness?`,
+        prompt: 'What would you put in Spend, Save, and Share jars?',
+        choices: ['Use three jars', 'Spend it all', 'Name one saving goal']
+      },
+      birthday: {
+        title: 'Celebration Budget Quest',
+        skill: 'Planning ahead',
+        text: (moment) => `A celebration is coming: "${moment}". How can you make it thoughtful without overspending?`,
+        prompt: 'What makes a gift feel caring besides the price?',
+        choices: ['Plan the budget', 'Buy the flashiest gift', 'Make part of it']
+      },
+      subscription: {
+        title: 'Sneaky Monthly Bite Quest',
+        skill: 'Recurring costs',
+        text: (moment) => `A recurring cost shows up: "${moment}". What keeps tiny charges from munching a big goal?`,
+        prompt: 'What reminder helps us notice recurring costs?',
+        choices: ['Check the renewal date', 'Ignore it', 'Ask if it earns a spot']
+      }
+    };
+
+    const surpriseMoments = [
+      'Buying snacks for a road trip',
+      'Choosing whether to buy a new game today',
+      'Splitting allowance after weekend chores',
+      'Planning a birthday gift for a friend',
+      'A free app trial is about to renew'
+    ];
+
+    function pickQuestTemplate(moment) {
+      const text = moment.toLowerCase();
+      if (text.includes('subscription') || text.includes('trial') || text.includes('app')) return questTemplates.subscription;
+      if (text.includes('birthday') || text.includes('gift') || text.includes('party')) return questTemplates.birthday;
+      if (text.includes('allowance') || text.includes('chore') || text.includes('earned')) return questTemplates.allowance;
+      if (text.includes('toy') || text.includes('game') || text.includes('buy')) return questTemplates.toy;
+      return questTemplates.grocery;
+    }
+
+    function renderQuest(moment) {
+      const cleanMoment = (moment || '').trim().replace(/\s+/g, ' ') || 'Buying snacks for a road trip';
+      const quest = pickQuestTemplate(cleanMoment);
+      document.getElementById('questSkill').textContent = quest.skill;
+      document.getElementById('questTitle').textContent = quest.title;
+      document.getElementById('questText').textContent = quest.text(cleanMoment);
+      document.getElementById('questPrompt').textContent = 'Family talk: ' + quest.prompt;
+      document.getElementById('questChoices').innerHTML = quest.choices.map((choice) => `<button type="button">${choice}</button>`).join('');
+    }
+
+    document.getElementById('questForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      renderQuest(document.getElementById('questMoment').value);
+    });
+
+    document.getElementById('surpriseQuest').addEventListener('click', () => {
+      const moment = surpriseMoments[Math.floor(Math.random() * surpriseMoments.length)];
+      document.getElementById('questMoment').value = moment;
+      renderQuest(moment);
+    });
+
+    renderQuest('Buying snacks for a road trip');
+  </script>
 </body>
 </html>
