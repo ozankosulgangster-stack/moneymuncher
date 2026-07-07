@@ -3,28 +3,158 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Unity Web Player | Money Muncher</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Money Muncher Cup Rush</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
   </head>
   <body>
-    <div id="unity-container" class="unity-desktop">
-      <canvas id="unity-canvas" width=960 height=600 tabindex="-1"></canvas>
-      <div id="unity-loading-bar">
-        <div id="unity-logo"></div>
-        <div id="unity-progress-bar-empty">
-          <div id="unity-progress-bar-full"></div>
+    <main class="game-shell">
+      <header class="game-header">
+        <nav class="game-nav" aria-label="Game links">
+          <a href="/kids/" class="back-link">Kids Arcade</a>
+          <a href="/kids/rewards/" class="back-link">Rewards</a>
+        </nav>
+        <div>
+          <p class="eyebrow">Cup Finals Mode</p>
+          <h1>Money Muncher Cup Rush</h1>
         </div>
-      </div>
-      <div id="unity-warning"> </div>
-      <div id="unity-footer">
-        <div id="unity-logo-title-footer"></div>
-        <div id="unity-fullscreen-button"></div>
-        <div id="unity-build-title">Money Muncher</div>
-      </div>
-    </div>
+      </header>
+
+      <section class="cup-scoreboard" aria-label="Cup challenge scoreboard">
+        <div class="score-tile">
+          <span>Match</span>
+          <strong>Coin Cup</strong>
+        </div>
+        <div class="score-tile">
+          <span>Goals</span>
+          <strong id="cupGoals">0</strong>
+        </div>
+        <div class="score-tile">
+          <span>Crowd Boost</span>
+          <strong id="crowdBoost">0%</strong>
+        </div>
+        <div class="score-tile">
+          <span>Money Move</span>
+          <strong id="moneyMove">Kickoff</strong>
+        </div>
+      </section>
+
+      <section class="trail-layout" aria-label="Money Muncher trail game with Dino Munch guide">
+        <aside class="dino-guide">
+          <img src="/kids/classroom-market/dino-munch.png" alt="Dino Munch guide">
+          <div>
+            <p class="eyebrow">Dino Coach Says</p>
+            <h2>Kick off the Money Cup.</h2>
+            <p>Build a coin streak, dodge debt cards, answer gate questions, and chase trophy badges with every smart money move.</p>
+          </div>
+        </aside>
+        <section class="game-stage" aria-label="Money Muncher game">
+          <div class="stadium-banner" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <div id="unity-container" class="unity-desktop">
+            <canvas id="unity-canvas" width=960 height=600 tabindex="-1"></canvas>
+            <div id="unity-loading-bar">
+              <div id="unity-logo"></div>
+              <div id="unity-progress-bar-empty">
+                <div id="unity-progress-bar-full"></div>
+              </div>
+            </div>
+            <div id="unity-warning"> </div>
+            <div id="unity-footer">
+              <div id="unity-build-title">Money Muncher</div>
+              <div id="unity-fullscreen-button" aria-label="Full screen"></div>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section class="cup-challenge" aria-label="Cup side quests">
+        <article class="mission-board">
+          <div>
+            <p class="eyebrow">Kickoff Missions</p>
+            <h2>Make the round feel like a final</h2>
+          </div>
+          <div class="mission-grid">
+            <button type="button" class="mission-card" data-cup-mission="Coin Streak" data-boost="25">
+              <strong>Coin Streak</strong>
+              <span>Collect 15 coins before a debt trap catches you.</span>
+            </button>
+            <button type="button" class="mission-card" data-cup-mission="Smart Save" data-boost="35">
+              <strong>Smart Save</strong>
+              <span>Reach a gate with coins left for your next goal.</span>
+            </button>
+            <button type="button" class="mission-card" data-cup-mission="Trophy Finish" data-boost="40">
+              <strong>Trophy Finish</strong>
+              <span>Finish a round and visit Rewards for a badge.</span>
+            </button>
+          </div>
+        </article>
+
+        <article class="halftime-quiz">
+          <p class="eyebrow">Halftime Money Play</p>
+          <h2>30 coins before the final. What is the strongest strategy?</h2>
+          <div class="quiz-actions">
+            <button type="button" data-cup-answer="wrong">Spend all 30 on one treat</button>
+            <button type="button" data-cup-answer="right">Save 10, spend 10, keep 10 flexible</button>
+            <button type="button" data-cup-answer="almost">Hide the coins and make no plan</button>
+          </div>
+          <p id="cupFeedback" class="cup-feedback">Pick a money play to wake up the crowd.</p>
+        </article>
+      </section>
+    </main>
     <script>
       var canvas = document.querySelector("#unity-canvas");
+      var cupGoals = 0;
+      var crowdBoost = 0;
+      var currentMoneyMove = "Kickoff";
+
+      function updateCupScoreboard() {
+        document.querySelector("#cupGoals").textContent = cupGoals;
+        document.querySelector("#crowdBoost").textContent = Math.min(crowdBoost, 100) + "%";
+        document.querySelector("#moneyMove").textContent = currentMoneyMove;
+      }
+
+      document.querySelectorAll("[data-cup-mission]").forEach(function(button) {
+        button.addEventListener("click", function() {
+          if (!button.classList.contains("complete")) {
+            button.classList.add("complete");
+            cupGoals += 1;
+            crowdBoost += parseInt(button.dataset.boost, 10) || 20;
+          }
+          currentMoneyMove = button.dataset.cupMission;
+          updateCupScoreboard();
+        });
+      });
+
+      document.querySelectorAll("[data-cup-answer]").forEach(function(button) {
+        button.addEventListener("click", function() {
+          var feedback = document.querySelector("#cupFeedback");
+          document.querySelectorAll("[data-cup-answer]").forEach(function(item) {
+            item.classList.remove("selected");
+          });
+          button.classList.add("selected");
+
+          if (button.dataset.cupAnswer === "right") {
+            feedback.textContent = "Goal! That balanced plan keeps joy, savings, and options on the field.";
+            currentMoneyMove = "Balanced Plan";
+            crowdBoost += 20;
+            cupGoals += 1;
+          } else if (button.dataset.cupAnswer === "almost") {
+            feedback.textContent = "Almost. Keeping coins is useful, but a named plan makes them stronger.";
+            currentMoneyMove = "Needs A Plan";
+            crowdBoost += 8;
+          } else {
+            feedback.textContent = "Tough turnover. All-spend choices can be fun, but they leave no defense.";
+            currentMoneyMove = "Try Again";
+          }
+
+          updateCupScoreboard();
+        });
+      });
+
+      updateCupScoreboard();
 
       // Shows a temporary message banner/ribbon for a few seconds, or
       // a permanent error message on top of the canvas if type=='error'.
@@ -88,14 +218,8 @@
       // expected to change.
 
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        // Mobile device style: fill the whole browser client area with the game canvas:
-
-        var meta = document.createElement('meta');
-        meta.name = 'viewport';
-        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
-        document.getElementsByTagName('head')[0].appendChild(meta);
-        document.querySelector("#unity-container").className = "unity-mobile";
-        canvas.className = "unity-mobile";
+        document.querySelector("#unity-container").classList.add("unity-mobile");
+        canvas.classList.add("unity-mobile");
 
         // To lower canvas resolution on mobile devices to gain some
         // performance, uncomment the following line:
@@ -104,8 +228,8 @@
 
       } else {
         // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
-        canvas.style.width = "960px";
-        canvas.style.height = "600px";
+        canvas.style.width = "100%";
+        canvas.style.height = "100%";
       }
 
       document.querySelector("#unity-loading-bar").style.display = "block";

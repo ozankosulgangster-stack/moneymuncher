@@ -3,9 +3,13 @@
   --muted: #5d6d7e;
   --gold: #ffc83d;
   --mint: #7ee6b8;
+  --cup-red: #ff4d5e;
+  --cup-blue: #2277ff;
+  --field: #0e7d43;
+  --field-light: #39c36d;
   --bg: #fff7df;
   --panel: rgba(255,255,255,.9);
-  --shadow: 0 24px 60px rgba(74, 47, 0, .18);
+  --shadow: 0 24px 60px rgba(3, 42, 24, .2);
 }
 
 * { box-sizing: border-box; }
@@ -17,9 +21,8 @@ body {
   color: var(--ink);
   font-family: Inter, Arial, sans-serif;
   background:
-    radial-gradient(circle at 15% 10%, rgba(255,200,61,.5), transparent 28%),
-    radial-gradient(circle at 85% 16%, rgba(126,230,184,.5), transparent 28%),
-    linear-gradient(135deg, #fff8dd, #ffe8ef 52%, #e5f3ff);
+    linear-gradient(90deg, rgba(255,77,94,.16) 0 8%, transparent 8% 18%, rgba(34,119,255,.16) 18% 26%, transparent 26% 40%, rgba(255,200,61,.18) 40% 50%, transparent 50% 64%, rgba(126,230,184,.18) 64% 74%, transparent 74%),
+    linear-gradient(180deg, #dff8ff 0 22%, #def3d3 22% 100%);
 }
 
 .game-shell {
@@ -42,6 +45,24 @@ body {
   border: 3px solid rgba(255,255,255,.75);
   border-radius: 24px;
   box-shadow: var(--shadow);
+  overflow: hidden;
+  position: relative;
+}
+
+.game-header::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 8px;
+  background: repeating-linear-gradient(90deg, var(--cup-red) 0 40px, var(--gold) 40px 80px, var(--cup-blue) 80px 120px, var(--field-light) 120px 160px);
+}
+
+.game-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .back-link {
@@ -56,7 +77,7 @@ body {
 
 .eyebrow {
   margin: 0 0 4px;
-  color: #d99000;
+  color: #b35f00;
   text-transform: uppercase;
   letter-spacing: .08em;
   font-size: .78rem;
@@ -71,15 +92,76 @@ h1 {
   line-height: 1;
 }
 
+.cup-scoreboard {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.score-tile {
+  min-height: 86px;
+  display: grid;
+  align-content: center;
+  gap: 5px;
+  padding: 14px;
+  color: white;
+  background: linear-gradient(135deg, #14233a, #0e6b3e);
+  border: 3px solid rgba(255,255,255,.85);
+  border-radius: 18px;
+  box-shadow: 0 14px 30px rgba(3,42,24,.18);
+}
+
+.score-tile span {
+  font-size: .78rem;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  opacity: .82;
+}
+
+.score-tile strong {
+  min-height: 30px;
+  font-family: "Baloo 2", Inter, Arial, sans-serif;
+  font-size: clamp(1.35rem, 3vw, 2rem);
+  line-height: 1;
+}
+
 .game-stage {
   min-height: 0;
   display: grid;
   place-items: center;
   padding: 16px;
-  background: rgba(255,255,255,.78);
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.12) 49%, rgba(255,255,255,.6) 49% 51%, rgba(255,255,255,.12) 51%),
+    repeating-linear-gradient(90deg, var(--field) 0 70px, #128c4c 70px 140px);
   border: 3px solid rgba(255,255,255,.75);
   border-radius: 28px;
   box-shadow: var(--shadow);
+  overflow: hidden;
+  position: relative;
+}
+
+.game-stage::before,
+.game-stage::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.game-stage::before {
+  inset: 18px;
+  border: 3px solid rgba(255,255,255,.45);
+  border-radius: 22px;
+}
+
+.game-stage::after {
+  left: 50%;
+  top: 50%;
+  width: 140px;
+  height: 140px;
+  border: 3px solid rgba(255,255,255,.45);
+  border-radius: 999px;
+  transform: translate(-50%, -50%);
 }
 
 .trail-layout {
@@ -132,6 +214,7 @@ h1 {
 
 #unity-container {
   position: relative;
+  z-index: 1;
   width: min(100%, calc((100vh - 180px) * 1.6));
   aspect-ratio: 16 / 10;
   min-height: 320px;
@@ -141,6 +224,31 @@ h1 {
   overflow: hidden;
   box-shadow: 0 16px 34px rgba(23,32,42,.18);
 }
+
+.stadium-banner {
+  position: absolute;
+  z-index: 0;
+  top: 12px;
+  left: 24px;
+  right: 24px;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.stadium-banner span {
+  width: 54px;
+  height: 20px;
+  border-radius: 3px 3px 10px 10px;
+  background: var(--gold);
+  box-shadow: 0 5px 0 rgba(23,32,42,.18);
+}
+
+.stadium-banner span:nth-child(2) { background: var(--cup-red); }
+.stadium-banner span:nth-child(3) { background: white; }
+.stadium-banner span:nth-child(4) { background: var(--cup-blue); }
+.stadium-banner span:nth-child(5) { background: var(--mint); }
 
 #unity-container.unity-mobile {
   width: 100%;
@@ -203,10 +311,102 @@ h1 {
   font-weight: 800;
 }
 
+.cup-challenge {
+  display: grid;
+  grid-template-columns: 1.25fr .75fr;
+  gap: 14px;
+}
+
+.mission-board,
+.halftime-quiz {
+  background: var(--panel);
+  border: 3px solid rgba(255,255,255,.78);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+  padding: 18px;
+}
+
+.mission-board h2,
+.halftime-quiz h2 {
+  margin: 0;
+  font-family: "Baloo 2", Inter, Arial, sans-serif;
+  line-height: 1;
+}
+
+.mission-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.mission-card,
+.quiz-actions button {
+  min-height: 96px;
+  padding: 14px;
+  color: var(--ink);
+  background: white;
+  border: 3px solid rgba(23,32,42,.14);
+  border-radius: 16px;
+  font: inherit;
+  font-weight: 900;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 6px 0 rgba(23,32,42,.16);
+  transition: transform .15s ease, border-color .15s ease, background .15s ease;
+}
+
+.mission-card:hover,
+.quiz-actions button:hover {
+  transform: translateY(-2px);
+  border-color: var(--gold);
+}
+
+.mission-card.complete,
+.quiz-actions button.selected {
+  background: #effff6;
+  border-color: var(--field-light);
+}
+
+.mission-card strong,
+.mission-card span {
+  display: block;
+}
+
+.mission-card span {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: .92rem;
+  line-height: 1.3;
+}
+
+.quiz-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.quiz-actions button {
+  min-height: 58px;
+}
+
+.cup-feedback {
+  margin: 14px 0 0;
+  padding: 12px;
+  color: #0d5e35;
+  background: #effff6;
+  border-left: 6px solid var(--field-light);
+  border-radius: 12px;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
 @media (max-width: 760px) {
   .game-shell { width: min(100% - 16px, 1180px); padding: 8px 0 14px; gap: 8px; }
   .game-header { align-items: flex-start; flex-direction: column; border-radius: 18px; }
   .eyebrow { text-align: left; }
+  .cup-scoreboard, .cup-challenge, .mission-grid { grid-template-columns: 1fr; }
+  .score-tile { min-height: 72px; }
   .trail-layout { grid-template-columns: 1fr; }
   .dino-guide { grid-template-columns: 118px 1fr; grid-template-rows: auto; border-radius: 18px; }
   .dino-guide img { min-height: 142px; object-position: 18% 68%; }
