@@ -6,6 +6,7 @@ This repository now contains two tracks:
 
 - The existing MoneyMuncher Alpha web prototype on `main`.
 - A new Unity WebGL kids game prototype under `Unity_MoneyMuncher`, with a GitHub Pages-ready website package under `Website`.
+- A lightweight iOS MVP shell under `ios/MoneyMuncher` for TestFlight and App Store preparation.
 
 ## Existing Alpha App
 
@@ -105,3 +106,18 @@ See:
 
 - `Docs/MoneyMuncherKidsLaunch.md`
 - `Docs/GitHubPagesDeployment.md`
+
+## iOS MVP
+
+The first iOS publishing path is a native SwiftUI shell around the live Money Muncher experiences, with parent-gated family areas and first-party web navigation.
+
+Open on a Mac:
+
+```text
+ios/MoneyMuncher/MoneyMuncher.xcodeproj
+```
+
+See:
+
+- `Docs/iOSPublishingPlan.md`
+- `ios/MoneyMuncher/APP_STORE_SUBMISSION.md`

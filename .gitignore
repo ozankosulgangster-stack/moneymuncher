@@ -35,3 +35,7 @@ Unity_MoneyMuncher/MemoryCaptures/
 Thumbs.db
 .vscode/
 .idea/
+
+# Xcode local state
+*.xcuserdata/
+ios/**/DerivedData/
