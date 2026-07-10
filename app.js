@@ -18,6 +18,7 @@ let selectedAgePath = localStorage.getItem('moneymuncherAgePath') || 'coin-colle
 let activeGeneratedQuest = null;
 let generatedQuestHistory = loadGeneratedQuestHistory();
 let currentGeneratedQuest = generatedQuestHistory[0] || null;
+let betaSignupIntent = false;
 
 const experienceModes = [
   {
@@ -423,14 +424,30 @@ document.addEventListener('DOMContentLoaded', function() {
       var em = emailIn.value.trim(), pw = passIn.value;
       var profile = {
         name: (nameIn && nameIn.value.trim()) || em.split('@')[0],
-        role: (roleIn && roleIn.value) || selectedRole || 'Kid Explorer'
+        role: (roleIn && roleIn.value) || selectedRole || 'Kid Explorer',
+        betaInterest: betaSignupIntent,
+        signupSource: betaSignupIntent ? 'ios-beta-banner' : 'homepage-account',
+        platformInterest: betaSignupIntent ? 'ios' : '',
+        betaJoinedAt: betaSignupIntent ? new Date().toISOString() : ''
       };
       if (!em || !pw) return alert('Enter email and password');
       MoneyMuncher.signUp(em, pw, profile).then(function(u) {
-        account = { id: u.uid, email: u.email, name: profile.name, role: profile.role };
+        account = {
+          id: u.uid,
+          email: u.email,
+          name: profile.name,
+          role: profile.role,
+          betaInterest: profile.betaInterest,
+          signupSource: profile.signupSource,
+          platformInterest: profile.platformInterest,
+          betaJoinedAt: profile.betaJoinedAt
+        };
         saveSession(); sync();
         $('loginDialog').close();
-        $('feedback').textContent = 'Account created! Cloud save active.';
+        $('feedback').textContent = betaSignupIntent
+          ? 'You are on the iOS beta list. Cloud save active.'
+          : 'Account created! Cloud save active.';
+        betaSignupIntent = false;
         renderAccount(); renderStats(); renderMap();
       }).catch(function(e) { alert(e.message); });
     });
@@ -450,7 +467,14 @@ document.addEventListener('DOMContentLoaded', function() {
     signInBtn.addEventListener('click', function() {
       var em = emailIn.value.trim(), pw = passIn.value;
       var signInName = nameIn && nameIn.value.trim();
-      var profile = signInName ? { name: signInName, role: (roleIn && roleIn.value) || selectedRole } : null;
+      var profile = signInName || betaSignupIntent ? {
+        name: signInName || '',
+        role: (roleIn && roleIn.value) || selectedRole,
+        betaInterest: betaSignupIntent,
+        signupSource: betaSignupIntent ? 'ios-beta-banner' : '',
+        platformInterest: betaSignupIntent ? 'ios' : '',
+        betaJoinedAt: betaSignupIntent ? new Date().toISOString() : ''
+      } : null;
       if (!em || !pw) return alert('Enter email and password');
       MoneyMuncher.signIn(em, pw, profile).then(function(u) {
         var saved = (hasMM && MoneyMuncher.getUser && MoneyMuncher.getUser()) || {};
@@ -458,11 +482,16 @@ document.addEventListener('DOMContentLoaded', function() {
           id: u.uid,
           email: u.email,
           name: (profile && profile.name) || saved.name || em.split('@')[0],
-          role: (profile && profile.role) || saved.role || 'Player'
+          role: (profile && profile.role) || saved.role || 'Player',
+          betaInterest: (profile && profile.betaInterest) || saved.betaInterest || false,
+          signupSource: (profile && profile.signupSource) || saved.signupSource || '',
+          platformInterest: (profile && profile.platformInterest) || saved.platformInterest || '',
+          betaJoinedAt: (profile && profile.betaJoinedAt) || saved.betaJoinedAt || ''
         };
         saveSession();
         $('loginDialog').close();
-        $('feedback').textContent = 'Welcome back!';
+        $('feedback').textContent = betaSignupIntent ? 'Thanks. Your account is marked for iOS beta interest.' : 'Welcome back!';
+        betaSignupIntent = false;
         renderAccount(); renderStats(); renderMap();
       }).catch(function(e) { alert(e.message); });
     });
@@ -948,6 +977,19 @@ $('teacherBtn').addEventListener('click', function() {
 
 $('marketLabLoginBtn').addEventListener('click', function() {
   openDialog('loginDialog');
+});
+
+$('betaSignupOpenBtn').addEventListener('click', function() {
+  betaSignupIntent = true;
+  selectedRole = 'Family Team';
+  localStorage.setItem('moneymuncherRole', selectedRole);
+  var roleInput = $('roleInput');
+  if (roleInput) roleInput.value = selectedRole;
+  openDialog('loginDialog');
+  setTimeout(function() {
+    var emailInput = $('emailInput');
+    if (emailInput) emailInput.focus();
+  }, 0);
 });
 
 $('loginOpenBtn').addEventListener('click', function() { openDialog('loginDialog'); });

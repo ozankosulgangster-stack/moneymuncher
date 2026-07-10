@@ -69,6 +69,55 @@ body {
 }
 .account-area { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
 .account-status { background: #fff7d0; border-radius: 999px; color: #7a5200; font-size: .9rem; font-weight: 900; padding: 9px 12px; }
+.ios-beta-banner {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 18px;
+  align-items: center;
+  padding: 20px;
+  margin-bottom: 18px;
+  color: white;
+  background: linear-gradient(135deg, #102029, #176145 62%, #8abf43);
+  border-color: rgba(255,255,255,.86);
+}
+.ios-beta-icon {
+  width: 66px;
+  height: 66px;
+  display: grid;
+  place-items: center;
+  border-radius: 22px;
+  background: rgba(255,255,255,.16);
+  border: 2px solid rgba(255,255,255,.42);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.2);
+  font-family: "Baloo 2", Inter, sans-serif;
+  font-size: 1.35rem;
+  font-weight: 900;
+}
+.ios-beta-copy .eyebrow { color: #ffe58a; }
+.ios-beta-copy h2 { font-size: clamp(1.6rem, 3vw, 2.6rem); }
+.ios-beta-copy p:not(.eyebrow) {
+  max-width: 660px;
+  margin: 9px 0 0;
+  color: rgba(255,255,255,.86);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+.ios-beta-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.ios-beta-banner .primary {
+  background: white;
+  color: var(--ink);
+  box-shadow: 0 12px 22px rgba(0,0,0,.18);
+}
+.ios-beta-banner .secondary {
+  color: white;
+  background: rgba(255,255,255,.12);
+  border-color: rgba(255,255,255,.36);
+}
 .hero { display: grid; grid-template-columns: 1.2fr .8fr; gap: 28px; padding: 42px; align-items: center; }
 .eyebrow { margin: 0 0 10px; color: var(--gold-dark); text-transform: uppercase; letter-spacing: .12em; font-size: .8rem; font-weight: 800; }
 h1, h2, h3 { font-family: "Baloo 2", Inter, sans-serif; line-height: .96; margin: 0; }
@@ -657,6 +706,8 @@ input, select { width: 100%; margin-top: 8px; border: 2px solid #f0d98f; border-
   .topbar, .hero, .choices, .hub-grid { grid-template-columns: 1fr; }
   .topbar { display: grid; }
   .account-area { justify-content: flex-start; }
+  .ios-beta-banner { grid-template-columns: 1fr; }
+  .ios-beta-actions { justify-content: flex-start; }
   .stats { grid-template-columns: repeat(2,1fr); }
   .game-header, .section-heading, .quest-form { flex-direction: column; }
   .kids-arcade { grid-template-columns: 1fr; }

@@ -187,6 +187,10 @@
       email: cloud.user.email || profile.email || "",
       name: profile.name || (cloud.user.email ? cloud.user.email.split("@")[0] : ""),
       role: profile.role || "Player",
+      betaInterest: Boolean(profile.betaInterest),
+      signupSource: profile.signupSource || "",
+      platformInterest: profile.platformInterest || "",
+      betaJoinedAt: profile.betaJoinedAt || "",
       authProvider: cloud.user.isAnonymous ? "anonymous" : "password",
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
@@ -225,7 +229,11 @@
             id: cloud.user.uid,
             email: data.email || cloud.user.email || "",
             name: data.name || (cloud.user.email ? cloud.user.email.split("@")[0] : "Player"),
-            role: data.role || "Player"
+            role: data.role || "Player",
+            betaInterest: Boolean(data.betaInterest),
+            signupSource: data.signupSource || "",
+            platformInterest: data.platformInterest || "",
+            betaJoinedAt: data.betaJoinedAt || ""
           }));
         }
         console.log("[MM] Cloud progress merged into local");
@@ -268,11 +276,16 @@
 
     setProfile: function (profile) {
       profile = profile || {};
+      var existing = getProfile();
       var next = {
-        id: profile.id || (cloud.user && cloud.user.uid) || "",
-        email: profile.email || (cloud.user && cloud.user.email) || "",
-        name: profile.name || "",
-        role: profile.role || "Player"
+        id: profile.id || existing.id || (cloud.user && cloud.user.uid) || "",
+        email: profile.email || existing.email || (cloud.user && cloud.user.email) || "",
+        name: profile.name || existing.name || "",
+        role: profile.role || existing.role || "Player",
+        betaInterest: (typeof profile.betaInterest === "boolean") ? profile.betaInterest : Boolean(existing.betaInterest),
+        signupSource: profile.signupSource || existing.signupSource || "",
+        platformInterest: profile.platformInterest || existing.platformInterest || "",
+        betaJoinedAt: profile.betaJoinedAt || existing.betaJoinedAt || ""
       };
       localStorage.setItem("moneymuncherSession", JSON.stringify(next));
       if (cloud.ready && cloud.user) pushCloud();
@@ -286,7 +299,11 @@
         uid: cloud.user.uid,
         email: cloud.user.email || profile.email || "",
         name: profile.name || "",
-        role: profile.role || "Player"
+        role: profile.role || "Player",
+        betaInterest: Boolean(profile.betaInterest),
+        signupSource: profile.signupSource || "",
+        platformInterest: profile.platformInterest || "",
+        betaJoinedAt: profile.betaJoinedAt || ""
       };
     },
     addCoins:  function (n) { var p = this.get(); this.set({ coins: p.coins + n }); },
@@ -403,7 +420,11 @@
               id: cred.user.uid,
               email: cred.user.email,
               name: profile && profile.name ? profile.name : cred.user.email.split("@")[0],
-              role: profile && profile.role ? profile.role : "Player"
+              role: profile && profile.role ? profile.role : "Player",
+              betaInterest: Boolean(profile && profile.betaInterest),
+              signupSource: profile && profile.signupSource ? profile.signupSource : "",
+              platformInterest: profile && profile.platformInterest ? profile.platformInterest : "",
+              betaJoinedAt: profile && profile.betaJoinedAt ? profile.betaJoinedAt : ""
             });
             pushCloud(); // push current local progress immediately
             resolve({ uid: cred.user.uid, email: cred.user.email });
@@ -423,7 +444,11 @@
                 id: cred.user.uid,
                 email: cred.user.email,
                 name: profile.name || cred.user.email.split("@")[0],
-                role: profile.role || "Player"
+                role: profile.role || "Player",
+                betaInterest: Boolean(profile.betaInterest),
+                signupSource: profile.signupSource || "",
+                platformInterest: profile.platformInterest || "",
+                betaJoinedAt: profile.betaJoinedAt || ""
               });
             }
             resolve({ uid: cred.user.uid, email: cred.user.email });
