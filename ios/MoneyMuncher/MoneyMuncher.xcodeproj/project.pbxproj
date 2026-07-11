@@ -12,6 +12,9 @@
 		A4F7D1136D9148B5902A0015 /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0014 /* WebView.swift */; };
 		A4F7D1136D9148B5902A0018 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0017 /* Assets.xcassets */; };
 		A4F7D1136D9148B5902A0020 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0019 /* PrivacyInfo.xcprivacy */; };
+		A4F7D1136D9148B5902A0031 /* SubscriptionProducts.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0030 /* SubscriptionProducts.swift */; };
+		A4F7D1136D9148B5902A0033 /* PurchaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0032 /* PurchaseManager.swift */; };
+		A4F7D1136D9148B5902A0035 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0034 /* PaywallView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +25,9 @@
 		A4F7D1136D9148B5902A0016 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A4F7D1136D9148B5902A0017 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A4F7D1136D9148B5902A0019 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		A4F7D1136D9148B5902A0030 /* SubscriptionProducts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionProducts.swift; sourceTree = "<group>"; };
+		A4F7D1136D9148B5902A0032 /* PurchaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseManager.swift; sourceTree = "<group>"; };
+		A4F7D1136D9148B5902A0034 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,6 +63,9 @@
 				A4F7D1136D9148B5902A0010 /* MoneyMuncherApp.swift */,
 				A4F7D1136D9148B5902A0012 /* ContentView.swift */,
 				A4F7D1136D9148B5902A0014 /* WebView.swift */,
+				A4F7D1136D9148B5902A0030 /* SubscriptionProducts.swift */,
+				A4F7D1136D9148B5902A0032 /* PurchaseManager.swift */,
+				A4F7D1136D9148B5902A0034 /* PaywallView.swift */,
 				A4F7D1136D9148B5902A0016 /* Info.plist */,
 				A4F7D1136D9148B5902A0017 /* Assets.xcassets */,
 				A4F7D1136D9148B5902A0019 /* PrivacyInfo.xcprivacy */,
@@ -137,6 +146,9 @@
 				A4F7D1136D9148B5902A0011 /* MoneyMuncherApp.swift in Sources */,
 				A4F7D1136D9148B5902A0013 /* ContentView.swift in Sources */,
 				A4F7D1136D9148B5902A0015 /* WebView.swift in Sources */,
+				A4F7D1136D9148B5902A0031 /* SubscriptionProducts.swift in Sources */,
+				A4F7D1136D9148B5902A0033 /* PurchaseManager.swift in Sources */,
+				A4F7D1136D9148B5902A0035 /* PaywallView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -264,7 +276,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = A2TAG4GHM2;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = MoneyMuncher/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
@@ -290,7 +302,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = A2TAG4GHM2;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = MoneyMuncher/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;

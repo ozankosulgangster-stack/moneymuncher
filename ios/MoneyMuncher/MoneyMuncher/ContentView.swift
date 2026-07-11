@@ -50,6 +50,15 @@ enum AppDestination: Identifiable {
             return false
         }
     }
+
+    var requiresPremium: Bool {
+        switch self {
+        case .questGenerator:
+            return true
+        case .play, .familySignup, .parentGuide, .privacy:
+            return false
+        }
+    }
 }
 
 private struct FeatureCard: Identifiable {
@@ -58,12 +67,32 @@ private struct FeatureCard: Identifiable {
     let subtitle: String
     let systemImage: String
     let destination: AppDestination
+    let requiresPremium: Bool
+
+    init(
+        title: String,
+        subtitle: String,
+        systemImage: String,
+        destination: AppDestination,
+        requiresPremium: Bool = false
+    ) {
+        self.title = title
+        self.subtitle = subtitle
+        self.systemImage = systemImage
+        self.destination = destination
+        self.requiresPremium = requiresPremium
+    }
 }
 
 struct ContentView: View {
+    @EnvironmentObject private var purchaseManager: PurchaseManager
+
     @State private var activeDestination: AppDestination?
     @State private var gatedDestination: AppDestination?
+    @State private var premiumDestination: AppDestination?
     @State private var isShowingParentGate = false
+    @State private var isPaywallPending = false
+    @State private var isShowingPaywall = false
 
     private let kidCards = [
         FeatureCard(
@@ -74,9 +103,10 @@ struct ContentView: View {
         ),
         FeatureCard(
             title: "Everyday Quest",
-            subtitle: "Turn snack runs, birthdays, and allowance moments into quick money choices.",
+            subtitle: "Plus unlocks snack runs, birthdays, and allowance moments as quick money choices.",
             systemImage: "sparkles",
-            destination: .questGenerator
+            destination: .questGenerator,
+            requiresPremium: true
         )
     ]
 
@@ -100,6 +130,7 @@ struct ContentView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
                     hero
+                    premiumStatus
                     section(title: "Kid Missions", cards: kidCards)
                     section(title: "Family Area", cards: familyCards)
                 }
@@ -122,18 +153,36 @@ struct ContentView: View {
         .sheet(item: $activeDestination) { destination in
             WebExperienceView(destination: destination)
         }
+        .sheet(isPresented: $isShowingPaywall, onDismiss: openPremiumDestinationIfUnlocked) {
+            PaywallView {
+                isShowingPaywall = false
+            }
+            .environmentObject(purchaseManager)
+        }
         .sheet(isPresented: $isShowingParentGate) {
             ParentGateView(
                 onUnlock: {
-                    if let destination = gatedDestination {
-                        activeDestination = destination
-                    }
+                    let destination = gatedDestination
+                    let shouldShowPaywall = isPaywallPending
 
                     gatedDestination = nil
+                    isPaywallPending = false
                     isShowingParentGate = false
+
+                    if let destination {
+                        DispatchQueue.main.async {
+                            activeDestination = destination
+                        }
+                    } else if shouldShowPaywall {
+                        DispatchQueue.main.async {
+                            isShowingPaywall = true
+                        }
+                    }
                 },
                 onCancel: {
                     gatedDestination = nil
+                    premiumDestination = nil
+                    isPaywallPending = false
                     isShowingParentGate = false
                 }
             )
@@ -182,6 +231,43 @@ struct ContentView: View {
         .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
     }
 
+    private var premiumStatus: some View {
+        Button {
+            requestPaywall()
+        } label: {
+            HStack(spacing: 14) {
+                Image(systemName: purchaseManager.hasPremiumAccess ? "checkmark.seal.fill" : "crown.fill")
+                    .font(.title2.weight(.bold))
+                    .frame(width: 44, height: 44)
+                    .foregroundStyle(Color(red: 0.05, green: 0.46, blue: 0.39))
+                    .background(Color(red: 0.88, green: 0.96, blue: 0.89))
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(purchaseManager.hasPremiumAccess ? "Plus Active" : "Money Muncher Plus")
+                        .font(.headline)
+                        .foregroundStyle(.primary)
+
+                    Text(purchaseManager.hasPremiumAccess ? "Premium quests are unlocked." : "Unlock level paths, quest packs, and richer family progress.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 10)
+
+                Image(systemName: purchaseManager.hasPremiumAccess ? "checkmark" : "chevron.right")
+                    .foregroundStyle(.tertiary)
+            }
+            .padding(16)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color(uiColor: .secondarySystemGroupedBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .accessibilityHint(purchaseManager.hasPremiumAccess ? "Premium access is active" : "Parent gate required before purchase options")
+    }
+
     private func section(title: String, cards: [FeatureCard]) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(title)
@@ -213,7 +299,7 @@ struct ContentView: View {
 
                         Spacer(minLength: 10)
 
-                        Image(systemName: card.destination.requiresParentGate ? "lock.fill" : "chevron.right")
+                        Image(systemName: trailingIcon(for: card))
                             .foregroundStyle(.tertiary)
                     }
                     .padding(16)
@@ -222,18 +308,64 @@ struct ContentView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                 }
                 .buttonStyle(.plain)
-                .accessibilityHint(card.destination.requiresParentGate ? "Parent gate required" : "Opens Money Muncher")
+                .accessibilityHint(accessibilityHint(for: card))
             }
         }
     }
 
     private func open(_ destination: AppDestination) {
+        if destination.requiresPremium && !purchaseManager.hasPremiumAccess {
+            requestPaywall(for: destination)
+            return
+        }
+
         if destination.requiresParentGate {
             gatedDestination = destination
             isShowingParentGate = true
         } else {
             activeDestination = destination
         }
+    }
+
+    private func requestPaywall(for destination: AppDestination? = nil) {
+        premiumDestination = destination
+        gatedDestination = nil
+        isPaywallPending = true
+        isShowingParentGate = true
+    }
+
+    private func openPremiumDestinationIfUnlocked() {
+        guard purchaseManager.hasPremiumAccess, let destination = premiumDestination else {
+            premiumDestination = nil
+            return
+        }
+
+        premiumDestination = nil
+        activeDestination = destination
+    }
+
+    private func trailingIcon(for card: FeatureCard) -> String {
+        if card.destination.requiresParentGate {
+            return "lock.fill"
+        }
+
+        if card.requiresPremium && !purchaseManager.hasPremiumAccess {
+            return "crown.fill"
+        }
+
+        return "chevron.right"
+    }
+
+    private func accessibilityHint(for card: FeatureCard) -> String {
+        if card.destination.requiresParentGate {
+            return "Parent gate required"
+        }
+
+        if card.requiresPremium && !purchaseManager.hasPremiumAccess {
+            return "Plus subscription required"
+        }
+
+        return "Opens Money Muncher"
     }
 }
 
@@ -275,7 +407,7 @@ private struct ParentGateView: View {
                 Text("Parent Check")
                     .font(.largeTitle.bold())
 
-                Text("Grown-up areas can include account setup or guidance links. Enter the answer to continue.")
+                Text("Grown-up areas can include account setup, purchases, or guidance links. Enter the answer to continue.")
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
 
@@ -322,7 +454,7 @@ private struct ParentGateView: View {
     }
 }
 
-private struct PrimaryActionButtonStyle: ButtonStyle {
+struct PrimaryActionButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.headline)
@@ -334,7 +466,7 @@ private struct PrimaryActionButtonStyle: ButtonStyle {
     }
 }
 
-private struct SecondaryActionButtonStyle: ButtonStyle {
+struct SecondaryActionButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.headline)
