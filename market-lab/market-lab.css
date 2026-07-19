@@ -170,6 +170,11 @@ input, select {
   gap: 10px;
 }
 
+.auth-secondary-actions {
+  display: flex;
+  justify-content: flex-start;
+}
+
 .trade-box {
   grid-template-columns: 1fr 150px 100px;
   align-items: end;
