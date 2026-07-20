@@ -4,7 +4,9 @@ enum AppDestination: Identifiable {
     case play
     case questGenerator
     case familySignup
+    case account
     case parentGuide
+    case support
     case privacy
 
     var id: String {
@@ -12,7 +14,9 @@ enum AppDestination: Identifiable {
         case .play: return "play"
         case .questGenerator: return "quest-generator"
         case .familySignup: return "family-signup"
+        case .account: return "account"
         case .parentGuide: return "parent-guide"
+        case .support: return "support"
         case .privacy: return "privacy"
         }
     }
@@ -22,7 +26,9 @@ enum AppDestination: Identifiable {
         case .play: return "Cup Rush"
         case .questGenerator: return "Everyday Quest"
         case .familySignup: return "Family Sign Up"
+        case .account: return "Account & Data"
         case .parentGuide: return "Parent Guide"
+        case .support: return "Help & Support"
         case .privacy: return "Privacy"
         }
     }
@@ -35,8 +41,12 @@ enum AppDestination: Identifiable {
             return URL(string: "https://moneymuncher.ca/kids/?source=ios-app#questGeneratorTitle")!
         case .familySignup:
             return URL(string: "https://moneymuncher.ca/?source=ios-app")!
+        case .account:
+            return URL(string: "https://moneymuncher.ca/?source=ios-app#account")!
         case .parentGuide:
             return URL(string: "https://moneymuncher.ca/kids/parent-guide.html?source=ios-app")!
+        case .support:
+            return URL(string: "https://moneymuncher.ca/support.html?source=ios-app")!
         case .privacy:
             return URL(string: "https://moneymuncher.ca/kids/privacy.html?source=ios-app")!
         }
@@ -44,7 +54,7 @@ enum AppDestination: Identifiable {
 
     var requiresParentGate: Bool {
         switch self {
-        case .familySignup, .parentGuide:
+        case .familySignup, .account, .parentGuide, .support:
             return true
         case .play, .questGenerator, .privacy:
             return false
@@ -88,10 +98,22 @@ struct ContentView: View {
             destination: .familySignup
         ),
         FeatureCard(
+            title: "Account & Data",
+            subtitle: "Sign in, sign out, or permanently delete an account and its cloud-saved data.",
+            systemImage: "person.crop.circle.badge.checkmark",
+            destination: .account
+        ),
+        FeatureCard(
             title: "Parent Guide",
             subtitle: "Review the learning approach, privacy notes, and family play ideas.",
             systemImage: "checklist.checked",
             destination: .parentGuide
+        ),
+        FeatureCard(
+            title: "Help & Support",
+            subtitle: "Get answers or contact Money Muncher support.",
+            systemImage: "questionmark.bubble",
+            destination: .support
         )
     ]
 

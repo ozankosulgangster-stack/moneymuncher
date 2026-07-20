@@ -532,6 +532,7 @@ function renderAccount() {
     : 'Guest explorer';
   $('loginOpenBtn').classList.toggle('hidden', loggedIn);
   $('logoutBtn').classList.toggle('hidden', !loggedIn);
+  $('deleteAccountOpenBtn').classList.toggle('hidden', !loggedIn || !(hasMM && MoneyMuncher.isLoggedIn()));
 }
 
 function getSelectedMode() {
@@ -999,6 +1000,34 @@ $('logoutBtn').addEventListener('click', function() {
   clearSession();
   if (hasMM) MoneyMuncher.signOut();
   renderAccount(); renderStats(); renderMap(); renderScenario();
+});
+
+$('deleteAccountOpenBtn').addEventListener('click', function() {
+  $('deleteAccountStatus').textContent = '';
+  openDialog('deleteAccountDialog');
+});
+
+$('confirmDeleteAccountBtn').addEventListener('click', function() {
+  var button = $('confirmDeleteAccountBtn');
+  var status = $('deleteAccountStatus');
+  button.disabled = true;
+  status.textContent = 'Deleting account and cloud data…';
+
+  MoneyMuncher.deleteAccount().then(function() {
+    account = { id: "", email: "", name: "", role: "" };
+    clearSession();
+    state = MoneyMuncher.get();
+    progress = normalizeProgress(state);
+    $('deleteAccountDialog').close();
+    $('feedback').textContent = 'Your account and cloud-saved data were permanently deleted.';
+    renderAccount(); renderStats(); renderMap(); renderScenario();
+  }).catch(function(error) {
+    status.textContent = error && error.code === 'auth/requires-recent-login'
+      ? 'For security, sign out, sign in again, and then retry account deletion.'
+      : 'Account deletion failed: ' + (error.message || 'Please try again.');
+  }).finally(function() {
+    button.disabled = false;
+  });
 });
 
 // Original name/role form (local-only login)

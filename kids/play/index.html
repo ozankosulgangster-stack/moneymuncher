@@ -76,6 +76,13 @@
               <div id="unity-fullscreen-button" aria-label="Full screen"></div>
             </div>
           </div>
+          <div id="touch-controls" class="touch-controls" aria-label="Game movement controls">
+            <button type="button" class="touch-control touch-up" data-unity-key="ArrowUp" aria-label="Move forward">▲</button>
+            <button type="button" class="touch-control touch-left" data-unity-key="ArrowLeft" aria-label="Move left">◀</button>
+            <button type="button" class="touch-control touch-down" data-unity-key="ArrowDown" aria-label="Move backward">▼</button>
+            <button type="button" class="touch-control touch-right" data-unity-key="ArrowRight" aria-label="Move right">▶</button>
+          </div>
+          <p class="touch-help">Use the arrows to run the trail. Tap the answer buttons in the game at each gate.</p>
         </section>
       </section>
 
@@ -165,6 +172,39 @@
 
       updateCupScoreboard();
 
+      function sendUnityKey(key, type) {
+        var keyCode = { ArrowLeft: 37, ArrowUp: 38, ArrowRight: 39, ArrowDown: 40 }[key];
+        canvas.focus({ preventScroll: true });
+        canvas.dispatchEvent(new KeyboardEvent(type, {
+          key: key, code: key, keyCode: keyCode, which: keyCode,
+          bubbles: true, cancelable: true
+        }));
+      }
+
+      document.querySelectorAll("[data-unity-key]").forEach(function(button) {
+        var key = button.dataset.unityKey;
+        var release = function(event) {
+          event.preventDefault();
+          button.classList.remove("pressed");
+          sendUnityKey(key, "keyup");
+        };
+
+        button.addEventListener("pointerdown", function(event) {
+          event.preventDefault();
+          button.setPointerCapture(event.pointerId);
+          button.classList.add("pressed");
+          sendUnityKey(key, "keydown");
+        });
+        button.addEventListener("pointerup", release);
+        button.addEventListener("pointercancel", release);
+        button.addEventListener("lostpointercapture", function() {
+          if (button.classList.contains("pressed")) {
+            button.classList.remove("pressed");
+            sendUnityKey(key, "keyup");
+          }
+        });
+      });
+
       // Shows a temporary message banner/ribbon for a few seconds, or
       // a permanent error message on top of the canvas if type=='error'.
       // If type=='warning', a yellow highlight color is used.
@@ -232,7 +272,7 @@
 
         // To lower canvas resolution on mobile devices to gain some
         // performance, uncomment the following line:
-        // config.devicePixelRatio = 1;
+        config.devicePixelRatio = 1;
 
 
       } else {

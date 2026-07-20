@@ -481,6 +481,33 @@
       return cloud.auth.signOut();
     },
 
+    deleteAccount: function () {
+      return new Promise(function (resolve, reject) {
+        if (!cloud.ready || !cloud.user) {
+          return reject(new Error("Sign in before deleting your account."));
+        }
+
+        var user = cloud.user;
+        var userId = user.uid;
+
+        // Remove the user's saved profile/progress before deleting authentication.
+        // Firebase may require a recent sign-in for the final step.
+        var playerDocument = cloud.db.collection("players").doc(userId);
+        Promise.all([
+          playerDocument.collection("marketLab").doc("portfolio").delete(),
+          playerDocument.delete()
+        ])
+          .then(function () { return user.delete(); })
+          .then(function () {
+            cloud.user = null;
+            setLocal(clone(DEFAULT_PROGRESS));
+            localStorage.removeItem("moneymuncherSession");
+            resolve();
+          })
+          .catch(reject);
+      });
+    },
+
     isLoggedIn: function () { return !!(cloud.ready && cloud.user); }
   };
 
