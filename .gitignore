@@ -38,4 +38,6 @@ Thumbs.db
 
 # Xcode local state
 *.xcuserdata/
+xcuserdata/
+*.xcuserstate
 ios/**/DerivedData/

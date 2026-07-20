@@ -31,11 +31,31 @@ This folder contains a lightweight iOS app shell for Money Muncher. It is built 
 
 ## Build For TestFlight
 
+App Store Connect requires uploads to be built with Xcode 26 or later. Xcode 16.3 can build the app locally, but App Store Connect rejects uploads built with the iOS 18.4 SDK.
+
 1. In Xcode, choose **Any iOS Device**.
 2. Select **Product > Archive**.
 3. In Organizer, validate the archive.
 4. Distribute to App Store Connect.
 5. Add the build to TestFlight for internal testing.
+
+For a repeatable command-line upload after the signing team is selected:
+
+```bash
+xcodebuild archive \
+  -project MoneyMuncher.xcodeproj \
+  -scheme MoneyMuncher \
+  -configuration Release \
+  -destination "generic/platform=iOS" \
+  -archivePath build/MoneyMuncher.xcarchive \
+  -allowProvisioningUpdates
+
+xcodebuild -exportArchive \
+  -archivePath build/MoneyMuncher.xcarchive \
+  -exportPath build/TestFlight \
+  -exportOptionsPlist ExportOptions-TestFlight.plist \
+  -allowProvisioningUpdates
+```
 
 ## App Review Notes
 
