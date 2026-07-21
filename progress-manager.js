@@ -141,7 +141,8 @@
     ready: false,
     user: null,
     auth: null,
-    db: null
+    db: null,
+    config: null
   };
 
   function initCloud(config) {
@@ -152,6 +153,7 @@
     try {
       if (!firebase.apps.length) firebase.initializeApp(config);
       cloud.ready = true;
+      cloud.config = config;
       cloud.auth = firebase.auth();
       cloud.db = firebase.firestore();
 
@@ -481,7 +483,7 @@
       return cloud.auth.signOut();
     },
 
-    deleteAccount: function () {
+    deleteAccount: function (onProgress) {
       return new Promise(function (resolve, reject) {
         if (!cloud.ready || !cloud.user) {
           return reject(new Error("Sign in before deleting your account."));
@@ -490,31 +492,70 @@
         var user = cloud.user;
         var userId = user.uid;
 
-        // Remove the user's saved profile/progress before deleting authentication.
-        // Firebase may require a recent sign-in for the final step.
-        var playerDocument = cloud.db.collection("players").doc(userId);
-        var cleanup = Promise.all([
-          playerDocument.collection("marketLab").doc("portfolio").delete(),
-          playerDocument.delete()
-        ]).catch(function (error) {
-          console.warn("[MM] Cloud document cleanup did not complete before account deletion", error);
-        });
+        function report(message) {
+          if (typeof onProgress === "function") onProgress(message);
+        }
 
-        // Firestore's web SDK can keep an offline write pending indefinitely in
-        // WKWebView. Give cleanup a bounded window, then continue deleting the
-        // Firebase Authentication account so the user is never trapped in the
-        // deletion screen. Pending authenticated writes can still complete.
-        var cleanupDeadline = new Promise(function (finish) {
-          setTimeout(finish, 8000);
-        });
+        function deadline(milliseconds) {
+          return new Promise(function (finish) { setTimeout(finish, milliseconds); });
+        }
 
-        Promise.race([cleanup, cleanupDeadline])
-          .then(function () { return user.delete(); })
+        function parseFirebaseError(response) {
+          return response.json().catch(function () { return {}; }).then(function (body) {
+            var message = body && body.error && body.error.message
+              ? body.error.message
+              : "Firebase request failed (" + response.status + ")";
+            var error = new Error(message);
+            if (message.indexOf("TOKEN_EXPIRED") !== -1 || message.indexOf("CREDENTIAL_TOO_OLD_LOGIN_AGAIN") !== -1) {
+              error.code = "auth/requires-recent-login";
+            }
+            throw error;
+          });
+        }
+
+        report("Preparing permanent account deletion…");
+        user.getIdToken(true)
+          .then(function (idToken) {
+            var config = cloud.config || {};
+            if (!config.projectId || !config.apiKey) {
+              throw new Error("Account service configuration is unavailable. Please close and reopen the app.");
+            }
+
+            report("Deleting cloud-saved profile and progress…");
+            var firestoreBase = "https://firestore.googleapis.com/v1/projects/" +
+              encodeURIComponent(config.projectId) + "/databases/(default)/documents/players/" +
+              encodeURIComponent(userId);
+            var requestOptions = {
+              method: "DELETE",
+              headers: { "Authorization": "Bearer " + idToken }
+            };
+            var cleanup = Promise.allSettled([
+              fetch(firestoreBase + "/marketLab/portfolio", requestOptions),
+              fetch(firestoreBase, requestOptions)
+            ]);
+
+            // Never leave the user trapped if Firestore is slow or offline.
+            return Promise.race([cleanup, deadline(6000)]).then(function () {
+              report("Deleting sign-in account…");
+              return fetch(
+                "https://identitytoolkit.googleapis.com/v1/accounts:delete?key=" + encodeURIComponent(config.apiKey),
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ idToken: idToken })
+                }
+              );
+            });
+          })
+          .then(function (response) {
+            if (!response.ok) return parseFirebaseError(response);
+            return response.json();
+          })
           .then(function () {
             cloud.user = null;
             setLocal(clone(DEFAULT_PROGRESS));
             localStorage.removeItem("moneymuncherSession");
-            resolve();
+            return cloud.auth.signOut().catch(function () {}).then(resolve);
           })
           .catch(reject);
       });

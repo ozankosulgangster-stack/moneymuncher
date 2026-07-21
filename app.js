@@ -1027,7 +1027,9 @@ $('confirmDeleteAccountBtn').addEventListener('click', function() {
   button.disabled = true;
   status.textContent = 'Deleting account and cloud data…';
 
-  MoneyMuncher.deleteAccount().then(function() {
+  MoneyMuncher.deleteAccount(function(message) {
+    status.textContent = message;
+  }).then(function() {
     account = { id: "", email: "", name: "", role: "" };
     clearSession();
     state = MoneyMuncher.get();
