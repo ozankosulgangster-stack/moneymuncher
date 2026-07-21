@@ -40,7 +40,7 @@ enum AppDestination: Identifiable {
         case .questGenerator:
             return URL(string: "https://moneymuncher.ca/kids/?source=ios-app#questGeneratorTitle")!
         case .familySignup:
-            return URL(string: "https://moneymuncher.ca/?source=ios-app")!
+            return URL(string: "https://moneymuncher.ca/?source=ios-app&action=signup")!
         case .account:
             return URL(string: "https://moneymuncher.ca/?source=ios-app#account")!
         case .parentGuide:

@@ -493,10 +493,22 @@
         // Remove the user's saved profile/progress before deleting authentication.
         // Firebase may require a recent sign-in for the final step.
         var playerDocument = cloud.db.collection("players").doc(userId);
-        Promise.all([
+        var cleanup = Promise.all([
           playerDocument.collection("marketLab").doc("portfolio").delete(),
           playerDocument.delete()
-        ])
+        ]).catch(function (error) {
+          console.warn("[MM] Cloud document cleanup did not complete before account deletion", error);
+        });
+
+        // Firestore's web SDK can keep an offline write pending indefinitely in
+        // WKWebView. Give cleanup a bounded window, then continue deleting the
+        // Firebase Authentication account so the user is never trapped in the
+        // deletion screen. Pending authenticated writes can still complete.
+        var cleanupDeadline = new Promise(function (finish) {
+          setTimeout(finish, 8000);
+        });
+
+        Promise.race([cleanup, cleanupDeadline])
           .then(function () { return user.delete(); })
           .then(function () {
             cloud.user = null;

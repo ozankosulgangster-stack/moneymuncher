@@ -408,6 +408,20 @@ document.addEventListener('DOMContentLoaded', function() {
   var emailIn    = $('emailInput');
   var passIn     = $('passInput');
 
+  // Native iOS "Family Sign Up" links here with action=signup. Open the
+  // account dialog immediately so reviewers do not have to find Log in first.
+  var requestedAction = new URLSearchParams(window.location.search).get('action');
+  if (requestedAction === 'signup') {
+    betaSignupIntent = true;
+    selectedRole = 'Family Team';
+    localStorage.setItem('moneymuncherRole', selectedRole);
+    if (roleIn) roleIn.value = selectedRole;
+    setTimeout(function() {
+      openDialog('loginDialog');
+      if (nameIn) nameIn.focus();
+    }, 0);
+  }
+
   if (roleIn) {
     roleIn.value = selectedRole;
     roleIn.addEventListener('change', function() {
@@ -1030,20 +1044,11 @@ $('confirmDeleteAccountBtn').addEventListener('click', function() {
   });
 });
 
-// Original name/role form (local-only login)
+// Treat Return/Go from the iOS keyboard as Sign Up. Previously this created a
+// local-only profile that looked like an account but could not be deleted.
 $('loginForm').addEventListener('submit', function(ev) {
   ev.preventDefault();
-  var name = $('nameInput').value.trim();
-  var role = $('roleInput').value;
-  var email = $('emailInput').value.trim();
-  if (!name && !email) return;
-  account = { id: 'local_' + Date.now(), email: email, name: name || email.split('@')[0], role: role };
-  selectedRole = role;
-  localStorage.setItem('moneymuncherRole', selectedRole);
-  saveSession();
-  $('loginDialog').close();
-  $('feedback').textContent = 'Welcome, ' + account.name + '. Your progress is saved on this device.';
-  renderAccount(); renderMap(); renderScenario();
+  $('signUpBtn').click();
 });
 
 $('questForm').addEventListener('submit', function(ev) {
