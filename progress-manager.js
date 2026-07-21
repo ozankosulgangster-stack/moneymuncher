@@ -300,6 +300,7 @@
       return {
         uid: cloud.user.uid,
         email: cloud.user.email || profile.email || "",
+        emailVerified: Boolean(cloud.user.emailVerified),
         name: profile.name || "",
         role: profile.role || "Player",
         betaInterest: Boolean(profile.betaInterest),
@@ -429,7 +430,14 @@
               betaJoinedAt: profile && profile.betaJoinedAt ? profile.betaJoinedAt : ""
             });
             pushCloud(); // push current local progress immediately
-            resolve({ uid: cred.user.uid, email: cred.user.email });
+            return cred.user.sendEmailVerification()
+              .then(function () {
+                resolve({ uid: cred.user.uid, email: cred.user.email, emailVerified: false, verificationSent: true });
+              })
+              .catch(function (error) {
+                console.warn("[MM] Verification email could not be sent", error);
+                resolve({ uid: cred.user.uid, email: cred.user.email, emailVerified: false, verificationSent: false });
+              });
           })
           .catch(reject);
       });
@@ -453,10 +461,25 @@
                 betaJoinedAt: profile.betaJoinedAt || ""
               });
             }
-            resolve({ uid: cred.user.uid, email: cred.user.email });
+            resolve({ uid: cred.user.uid, email: cred.user.email, emailVerified: Boolean(cred.user.emailVerified) });
             // pullCloud() will auto-fire via onAuthStateChanged
           })
           .catch(reject);
+      });
+    },
+
+    resendEmailVerification: function () {
+      if (!cloud.ready || !cloud.user) return Promise.reject(new Error("Sign in before requesting another verification email."));
+      if (cloud.user.emailVerified) return Promise.resolve({ alreadyVerified: true, email: cloud.user.email || "" });
+      return cloud.user.sendEmailVerification().then(function () {
+        return { alreadyVerified: false, email: cloud.user.email || "" };
+      });
+    },
+
+    refreshEmailVerification: function () {
+      if (!cloud.ready || !cloud.user) return Promise.reject(new Error("Sign in to refresh email verification."));
+      return cloud.user.reload().then(function () {
+        return { email: cloud.user.email || "", emailVerified: Boolean(cloud.user.emailVerified) };
       });
     },
 

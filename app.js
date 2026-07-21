@@ -449,6 +449,7 @@ document.addEventListener('DOMContentLoaded', function() {
         account = {
           id: u.uid,
           email: u.email,
+          emailVerified: Boolean(u.emailVerified),
           name: profile.name,
           role: profile.role,
           betaInterest: profile.betaInterest,
@@ -458,9 +459,14 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         saveSession(); sync();
         $('loginDialog').close();
-        $('feedback').textContent = betaSignupIntent
-          ? 'You are on the iOS beta list. Cloud save active.'
-          : 'Account created! Cloud save active.';
+        $('feedback').textContent = u.verificationSent
+          ? 'Account created. Check ' + u.email + ' for the verification link.'
+          : 'Account created, but the verification email could not be sent. Use Resend verification.';
+        $('verificationEmail').textContent = u.email;
+        $('verificationDialogStatus').textContent = u.verificationSent
+          ? 'Verification email sent. Check your inbox and spam folder.'
+          : 'Email was not sent. Tap Resend email to try again.';
+        openDialog('emailVerificationDialog');
         betaSignupIntent = false;
         renderAccount(); renderStats(); renderMap();
       }).catch(function(e) { alert(e.message); });
@@ -495,6 +501,7 @@ document.addEventListener('DOMContentLoaded', function() {
         account = {
           id: u.uid,
           email: u.email,
+          emailVerified: Boolean(u.emailVerified),
           name: (profile && profile.name) || saved.name || em.split('@')[0],
           role: (profile && profile.role) || saved.role || 'Player',
           betaInterest: (profile && profile.betaInterest) || saved.betaInterest || false,
@@ -504,7 +511,9 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         saveSession();
         $('loginDialog').close();
-        $('feedback').textContent = betaSignupIntent ? 'Thanks. Your account is marked for iOS beta interest.' : 'Welcome back!';
+        $('feedback').textContent = !u.emailVerified
+          ? 'Welcome back. Please verify ' + u.email + '.'
+          : (betaSignupIntent ? 'Thanks. Your account is marked for iOS beta interest.' : 'Welcome back!');
         betaSignupIntent = false;
         renderAccount(); renderStats(); renderMap();
       }).catch(function(e) { alert(e.message); });
@@ -530,23 +539,29 @@ function renderStats() {
 
 function renderAccount() {
   var loggedIn = Boolean(account.id) || (hasMM && MoneyMuncher.isLoggedIn());
-  if (loggedIn && hasMM && MoneyMuncher.getUser && !account.id) {
+  if (loggedIn && hasMM && MoneyMuncher.getUser) {
     var user = MoneyMuncher.getUser();
     if (user) {
       account = {
         id: user.uid,
         email: user.email,
+        emailVerified: Boolean(user.emailVerified),
         name: user.name || (user.email ? user.email.split('@')[0] : 'Player'),
         role: user.role || 'Player'
       };
     }
   }
+  var cloudLoggedIn = hasMM && MoneyMuncher.isLoggedIn();
   $('accountStatus').textContent = loggedIn
-    ? (account.name || 'Player') + (hasMM && MoneyMuncher.isLoggedIn() ? ' • cloud saved' : ' • local')
+    ? (account.name || 'Player') + (cloudLoggedIn
+      ? (account.emailVerified ? ' • email verified' : ' • verify ' + (account.email || 'email'))
+      : ' • local')
     : 'Guest explorer';
   $('loginOpenBtn').classList.toggle('hidden', loggedIn);
+  $('resendVerificationBtn').classList.toggle('hidden', !cloudLoggedIn || account.emailVerified);
+  $('refreshVerificationBtn').classList.toggle('hidden', !cloudLoggedIn || account.emailVerified);
   $('logoutBtn').classList.toggle('hidden', !loggedIn);
-  $('deleteAccountOpenBtn').classList.toggle('hidden', !loggedIn || !(hasMM && MoneyMuncher.isLoggedIn()));
+  $('deleteAccountOpenBtn').classList.toggle('hidden', !loggedIn || !cloudLoggedIn);
 }
 
 function getSelectedMode() {
@@ -1008,6 +1023,74 @@ $('betaSignupOpenBtn').addEventListener('click', function() {
 });
 
 $('loginOpenBtn').addEventListener('click', function() { openDialog('loginDialog'); });
+
+var verificationResendPending = false;
+
+function resendVerification(statusElement, button) {
+  if (verificationResendPending) return Promise.resolve();
+  verificationResendPending = true;
+  if (button) button.disabled = true;
+  statusElement.textContent = 'Sending verification email…';
+  return MoneyMuncher.resendEmailVerification().then(function(result) {
+    statusElement.textContent = result.alreadyVerified
+      ? 'This email is already verified.'
+      : 'Verification email sent to ' + result.email + '. Check your inbox and spam folder.';
+    renderAccount();
+  }).catch(function(error) {
+    statusElement.textContent = 'Verification email failed: ' + (error.message || 'Please try again.');
+  }).finally(function() {
+    // Prevent accidental rapid retries and Firebase rate-limit errors.
+    setTimeout(function() {
+      verificationResendPending = false;
+      if (button) button.disabled = false;
+    }, 15000);
+  });
+}
+
+$('resendVerificationBtn').addEventListener('click', function() {
+  $('verificationEmail').textContent = account.email || '';
+  $('verificationDialogStatus').textContent = '';
+  openDialog('emailVerificationDialog');
+  resendVerification($('verificationDialogStatus'), $('verificationDialogResendBtn'));
+});
+
+$('verificationDialogResendBtn').addEventListener('click', function() {
+  resendVerification($('verificationDialogStatus'), $('verificationDialogResendBtn'));
+});
+
+function quietlyRefreshVerification() {
+  if (!(hasMM && MoneyMuncher.isLoggedIn()) || account.emailVerified) return;
+  MoneyMuncher.refreshEmailVerification().then(function(result) {
+    account.emailVerified = result.emailVerified;
+    if (result.emailVerified) {
+      $('feedback').textContent = 'Email verified. Thank you!';
+      renderAccount();
+    }
+  }).catch(function() {});
+}
+
+document.addEventListener('visibilitychange', function() {
+  if (document.visibilityState === 'visible') quietlyRefreshVerification();
+});
+window.addEventListener('pageshow', quietlyRefreshVerification);
+
+$('refreshVerificationBtn').addEventListener('click', function() {
+  var button = $('refreshVerificationBtn');
+  button.disabled = true;
+  button.textContent = 'Checking…';
+  MoneyMuncher.refreshEmailVerification().then(function(result) {
+    account.emailVerified = result.emailVerified;
+    $('feedback').textContent = result.emailVerified
+      ? 'Email verified. Thank you!'
+      : 'Email is not verified yet. Open the link sent to ' + result.email + ', then try again.';
+    renderAccount();
+  }).catch(function(error) {
+    $('feedback').textContent = 'Could not refresh verification: ' + (error.message || 'Please try again.');
+  }).finally(function() {
+    button.disabled = false;
+    button.textContent = "I've verified";
+  });
+});
 
 $('logoutBtn').addEventListener('click', function() {
   account = { id: "", email: "", name: "", role: "" };
