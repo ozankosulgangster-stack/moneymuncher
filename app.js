@@ -1032,8 +1032,9 @@ $('confirmDeleteAccountBtn').addEventListener('click', function() {
   }).then(function() {
     account = { id: "", email: "", name: "", role: "" };
     clearSession();
-    state = MoneyMuncher.get();
-    progress = normalizeProgress(state);
+    state = { ...defaultState };
+    progress = { unlockedLevel: 0, completedLevels: [] };
+    loadFromManager();
     $('deleteAccountDialog').close();
     $('feedback').textContent = 'Your account and cloud-saved data were permanently deleted.';
     renderAccount(); renderStats(); renderMap(); renderScenario();
