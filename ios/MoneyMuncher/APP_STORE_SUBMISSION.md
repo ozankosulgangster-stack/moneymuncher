@@ -3,7 +3,7 @@
 ## App Identity
 
 - App name: Money Muncher
-- Version: `1.0 (2)`
+- Version: `1.0 (6)`
 - Subtitle: Money quests for kids and families
 - Bundle ID: `ca.moneymuncher.app`
 - SKU: `moneymuncher-ios`
@@ -33,7 +33,7 @@ kids money, financial literacy, allowance, saving, budgeting, family learning, e
 
 ## Demo Account
 
-If review needs an account, create a test family login before submission and include it in App Review notes. Do not use a personal account.
+Create a dedicated, verified test family login before submission and include it in App Review notes. Do not use a personal account.
 
 ## Review Notes
 
@@ -41,46 +41,58 @@ Money Muncher is a family-friendly financial education app. The native iOS home 
 
 The app uses no native advertising SDKs, no in-app purchases, and no brokerage or real-money trading features. Learning experiences use virtual coins only.
 
+### Guideline 2.1(a) Sign In review path
+
+Build 6 corrects the iPad Sign In feedback path. Tapping **Sign In** immediately shows an in-dialog signing-in state, prevents duplicate taps, reports credential problems inside the dialog, and reports network timeouts. Pressing Return invokes Sign In. The native WKWebView also presents JavaScript alert and confirmation panels.
+
+1. Open **Family Area > Family Sign Up**.
+2. At **Parent Check**, enter `13` and tap **Unlock**.
+3. The account dialog opens automatically. Enter the review credentials and tap **Sign In**.
+
+- Review account email: `[ADD VERIFIED DEMO EMAIL]`
+- Review account password: `[ADD DEMO PASSWORD]`
+- Clean-install device test: `[ADD EXACT DEVICE AND OS AFTER TESTING BUILD 6]`
+
 ### Guideline 4.7 content index
 
 1. **Money Muncher Cup Rush**
-   - Developer: Money Muncher
-   - URL: `https://moneymuncher.ca/kids/play/`
+   - Developer: Ozan Kosulgan (Money Muncher)
+   - URL: `https://www.moneymuncher.ca/kids/play/`
    - Type: Educational Unity WebGL mini game
    - Description: Players collect virtual coins, avoid debt obstacles, and answer financial-literacy gates.
    - Monetization: None; no purchases, advertising, or real-money activity.
 2. **Everyday Quest Generator**
-   - Developer: Money Muncher
-   - URL: `https://moneymuncher.ca/kids/#questGeneratorTitle`
+   - Developer: Ozan Kosulgan (Money Muncher)
+   - URL: `https://www.moneymuncher.ca/kids/#questGeneratorTitle`
    - Type: Educational interactive software
    - Description: Generates short family financial-literacy scenarios and choices.
    - Monetization: None; no purchases, advertising, or real-money activity.
 3. **Money Muncher Learning Hub**
-   - Developer: Money Muncher
-   - URL: `https://moneymuncher.ca/`
+   - Developer: Ozan Kosulgan (Money Muncher)
+   - URL: `https://www.moneymuncher.ca/`
    - Type: Interactive financial-literacy learning software
    - Description: Guided quests, a learning map, lessons, quizzes, and parent/teacher activities.
    - Monetization: None; no purchases, advertising, or real-money activity.
 4. **Money Muncher Market Lab**
-   - Developer: Money Muncher
-   - URL: `https://moneymuncher.ca/market-lab/`
+   - Developer: Ozan Kosulgan (Money Muncher)
+   - URL: `https://www.moneymuncher.ca/market-lab/`
    - Type: Educational virtual-market simulator
    - Description: Simulated stock and ETF portfolio learning with virtual coins only.
    - Monetization: None; no brokerage activity or real-money trading.
 5. **Money Muncher Classroom Market**
-   - Developer: Money Muncher
-   - URL: `https://moneymuncher.ca/kids/classroom-market/`
+   - Developer: Ozan Kosulgan (Money Muncher)
+   - URL: `https://www.moneymuncher.ca/kids/classroom-market/`
    - Type: Educational browser game
    - Description: Players compare price, quality, value, and need using virtual classroom coins.
    - Monetization: None; no purchases, advertising, or real-money activity.
 6. **Money Muncher Badge Shop**
-   - Developer: Money Muncher
-   - URL: `https://moneymuncher.ca/kids/rewards/`
+   - Developer: Ozan Kosulgan (Money Muncher)
+   - URL: `https://www.moneymuncher.ca/kids/rewards/`
    - Type: Interactive educational rewards software
    - Description: Players use virtual practice coins for learning badges and review virtual coin history.
    - Monetization: None; rewards have no cash value and cannot be purchased.
 
-Public index with complete metadata: `https://moneymuncher.ca/app-review/`
+Public index with complete metadata: `https://www.moneymuncher.ca/app-review/`
 
 ### Account deletion review path
 

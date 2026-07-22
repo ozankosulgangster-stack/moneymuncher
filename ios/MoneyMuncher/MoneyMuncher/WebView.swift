@@ -60,7 +60,12 @@ extension MoneyMuncherWebView {
                         configuration.userContentController.add(ruleList)
                     }
 
-                    webView.load(URLRequest(url: url))
+                    let request = URLRequest(
+                        url: url,
+                        cachePolicy: .reloadIgnoringLocalCacheData,
+                        timeoutInterval: 30
+                    )
+                    webView.load(request)
                 }
             }
         }

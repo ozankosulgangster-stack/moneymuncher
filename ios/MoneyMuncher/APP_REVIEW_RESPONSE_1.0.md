@@ -8,33 +8,41 @@ Thank you for reviewing Money Muncher. We addressed each item as follows.
 
 We corrected the Sign In flow for iPad. Tapping **Sign In** now immediately displays an inline "Signing in" state, prevents duplicate taps, reports missing or incorrect credentials directly inside the account dialog, and displays a clear network-timeout message if the account service does not respond. Pressing Return on the iPad keyboard now invokes Sign In rather than Sign Up. The native WKWebView also implements JavaScript-dialog presentation as a fallback.
 
-The flow was tested from a clean installation on iPad and iPhone with Version 1.0, Build 6.
+Review path:
+
+1. Open **Family Area > Family Sign Up**.
+2. At **Parent Check**, enter `13` and tap **Unlock**.
+3. The account dialog opens automatically. Enter the review credentials and tap **Sign In**.
+
+- Review account email: `[ADD VERIFIED DEMO EMAIL]`
+- Review account password: `[ADD DEMO PASSWORD]`
+- Clean-install device test: `[ADD EXACT DEVICE AND OS AFTER TESTING BUILD 6]`
 
 ## Guideline 4.7.4 — Complete non-embedded software index
 
-Developer and publisher for every item: **Money Muncher**. All items are first-party educational experiences hosted on `moneymuncher.ca`. None has advertising, in-app purchases, monetization, or real-money activity.
+Developer and publisher for every item: **Ozan Kosulgan (Money Muncher)**. All items are first-party educational experiences hosted on `moneymuncher.ca`. They contain no advertising, in-app purchases, brokerage activity, or real-money trading.
 
 1. **Money Muncher Learning Hub**
-   - Developer: Money Muncher
-   - URL: `https://moneymuncher.ca/`
+   - Developer: Ozan Kosulgan (Money Muncher)
+   - URL: `https://www.moneymuncher.ca/`
 2. **Money Muncher Cup Rush**
-   - Developer: Money Muncher
-   - URL: `https://moneymuncher.ca/kids/play/`
+   - Developer: Ozan Kosulgan (Money Muncher)
+   - URL: `https://www.moneymuncher.ca/kids/play/`
 3. **Everyday Quest Generator**
-   - Developer: Money Muncher
-   - URL: `https://moneymuncher.ca/kids/#questGeneratorTitle`
+   - Developer: Ozan Kosulgan (Money Muncher)
+   - URL: `https://www.moneymuncher.ca/kids/#questGeneratorTitle`
 4. **Money Muncher Market Lab**
-   - Developer: Money Muncher
-   - URL: `https://moneymuncher.ca/market-lab/`
+   - Developer: Ozan Kosulgan (Money Muncher)
+   - URL: `https://www.moneymuncher.ca/market-lab/`
 5. **Classroom Market**
-   - Developer: Money Muncher
-   - URL: `https://moneymuncher.ca/kids/classroom-market/`
+   - Developer: Ozan Kosulgan (Money Muncher)
+   - URL: `https://www.moneymuncher.ca/kids/classroom-market/`
 6. **Money Muncher Badge Shop**
-   - Developer: Money Muncher
-   - URL: `https://moneymuncher.ca/kids/rewards/`
+   - Developer: Ozan Kosulgan (Money Muncher)
+   - URL: `https://www.moneymuncher.ca/kids/rewards/`
 
 The same index with descriptions and metadata is publicly available at:
-`https://moneymuncher.ca/app-review/`
+`https://www.moneymuncher.ca/app-review/`
 
 ## Previously addressed items
 

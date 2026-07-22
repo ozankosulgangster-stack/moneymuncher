@@ -180,6 +180,26 @@
     }
   }
 
+  function setProfileLocal(profile) {
+    try {
+      localStorage.setItem("moneymuncherSession", JSON.stringify(profile));
+      return true;
+    } catch (e) {
+      console.error("[MM] Profile storage write failed", e);
+      return false;
+    }
+  }
+
+  function removeProfileLocal() {
+    try {
+      localStorage.removeItem("moneymuncherSession");
+      return true;
+    } catch (e) {
+      console.error("[MM] Profile storage removal failed", e);
+      return false;
+    }
+  }
+
   function pushCloud() {
     if (!cloud.ready || !cloud.user) return;
     var p = getLocal();
@@ -227,7 +247,7 @@
         };
         setLocal(merged);
         if (data.email || data.name || data.role) {
-          localStorage.setItem("moneymuncherSession", JSON.stringify({
+          setProfileLocal({
             id: cloud.user.uid,
             email: data.email || cloud.user.email || "",
             name: data.name || (cloud.user.email ? cloud.user.email.split("@")[0] : "Player"),
@@ -236,7 +256,7 @@
             signupSource: data.signupSource || "",
             platformInterest: data.platformInterest || "",
             betaJoinedAt: data.betaJoinedAt || ""
-          }));
+          });
         }
         console.log("[MM] Cloud progress merged into local");
       } else {
@@ -314,7 +334,7 @@
         platformInterest: profile.platformInterest || existing.platformInterest || "",
         betaJoinedAt: profile.betaJoinedAt || existing.betaJoinedAt || ""
       };
-      localStorage.setItem("moneymuncherSession", JSON.stringify(next));
+      setProfileLocal(next);
       if (cloud.ready && cloud.user) pushCloud();
       return next;
     },
@@ -606,7 +626,7 @@
           .then(function () {
             cloud.user = null;
             setLocal(clone(DEFAULT_PROGRESS));
-            localStorage.removeItem("moneymuncherSession");
+            removeProfileLocal();
             return cloud.auth.signOut().catch(function () {}).then(resolve);
           })
           .catch(reject);

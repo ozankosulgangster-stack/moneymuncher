@@ -6,6 +6,45 @@
 // --- 0. Helpers ---
 function $(id) { return document.getElementById(id); }
 
+function safeStorageGet(key, fallback) {
+  try {
+    var value = localStorage.getItem(key);
+    return value === null ? fallback : value;
+  } catch (error) {
+    console.warn('[MM] Local storage read failed for ' + key, error);
+    return fallback;
+  }
+}
+
+function safeStorageSet(key, value) {
+  try {
+    localStorage.setItem(key, value);
+    return true;
+  } catch (error) {
+    console.warn('[MM] Local storage write failed for ' + key, error);
+    return false;
+  }
+}
+
+function safeStorageRemove(key) {
+  try {
+    localStorage.removeItem(key);
+    return true;
+  } catch (error) {
+    console.warn('[MM] Local storage removal failed for ' + key, error);
+    return false;
+  }
+}
+
+function safeStorageJson(key, fallback) {
+  try {
+    return JSON.parse(safeStorageGet(key, JSON.stringify(fallback)));
+  } catch (error) {
+    console.warn('[MM] Local storage JSON was invalid for ' + key, error);
+    return fallback;
+  }
+}
+
 const hasMM = typeof window.MoneyMuncher !== 'undefined';
 
 // --- 1. Data ---
@@ -13,8 +52,8 @@ const defaultState = { coins: 30, saved: 0, joy: 50, wisdom: 0, currentLevel: 0 
 let state   = { ...defaultState };
 let progress = { unlockedLevel: 0, completedLevels: [] };
 let account = { id: "", name: "", role: "" };
-let selectedRole = localStorage.getItem('moneymuncherRole') || 'Kid Explorer';
-let selectedAgePath = localStorage.getItem('moneymuncherAgePath') || 'coin-collectors';
+let selectedRole = safeStorageGet('moneymuncherRole', 'Kid Explorer') || 'Kid Explorer';
+let selectedAgePath = safeStorageGet('moneymuncherAgePath', 'coin-collectors') || 'coin-collectors';
 let activeGeneratedQuest = null;
 let generatedQuestHistory = loadGeneratedQuestHistory();
 let currentGeneratedQuest = generatedQuestHistory[0] || null;
@@ -280,7 +319,7 @@ function loadFromManager() {
   progress.completedLevels = Array.isArray(p.completedLevels) ? [...p.completedLevels] : [];
 
   // Local name/role display
-  var sess = JSON.parse(localStorage.getItem('moneymuncherSession') || 'null');
+  var sess = safeStorageJson('moneymuncherSession', null);
   if (sess && sess.name) account = sess;
 }
 
@@ -299,10 +338,10 @@ function sync() {
 }
 
 // --- 4. Local session (for name/role display) ---
-function saveSession()  { localStorage.setItem('moneymuncherSession', JSON.stringify(account)); }
-function clearSession() { localStorage.removeItem('moneymuncherSession'); }
+function saveSession()  { safeStorageSet('moneymuncherSession', JSON.stringify(account)); }
+function clearSession() { safeStorageRemove('moneymuncherSession'); }
 function restoreSession() {
-  var s = JSON.parse(localStorage.getItem('moneymuncherSession') || 'null');
+  var s = safeStorageJson('moneymuncherSession', null);
   if (s && s.name) account = s;
 }
 
@@ -441,11 +480,11 @@ document.addEventListener('DOMContentLoaded', function() {
   if (requestedAction === 'signup') {
     betaSignupIntent = true;
     selectedRole = 'Family Team';
-    localStorage.setItem('moneymuncherRole', selectedRole);
+    safeStorageSet('moneymuncherRole', selectedRole);
     if (roleIn) roleIn.value = selectedRole;
     setTimeout(function() {
       openDialog('loginDialog');
-      if (nameIn) nameIn.focus();
+      if (nameIn && window.matchMedia && window.matchMedia('(pointer: fine)').matches) nameIn.focus();
     }, 0);
   }
 
@@ -453,7 +492,7 @@ document.addEventListener('DOMContentLoaded', function() {
     roleIn.value = selectedRole;
     roleIn.addEventListener('change', function() {
       selectedRole = roleIn.value;
-      localStorage.setItem('moneymuncherRole', selectedRole);
+      safeStorageSet('moneymuncherRole', selectedRole);
       renderPlaySetup();
       renderMiniGames();
       renderQuestGeneratorBadge();
@@ -545,6 +584,10 @@ document.addEventListener('DOMContentLoaded', function() {
       if (!em || !pw) {
         setAuthStatus('Enter both an email address and password.');
         (!em ? emailIn : passIn).focus();
+        return;
+      }
+      if (!hasMM || typeof MoneyMuncher.signIn !== 'function') {
+        setAuthStatus('The account service is still loading. Check the internet connection and try again.');
         return;
       }
       setAuthStatus('Signing in securely…');
@@ -658,7 +701,7 @@ function renderPlaySetup() {
       '<small>' + item.hint + '</small>';
     card.addEventListener('click', function() {
       selectedRole = item.id;
-      localStorage.setItem('moneymuncherRole', selectedRole);
+      safeStorageSet('moneymuncherRole', selectedRole);
       if (account.name) {
         account.role = selectedRole;
         saveSession();
@@ -690,7 +733,7 @@ function renderAgePaths() {
       '<div class="age-topics">' + path.topics.map(function(topic) { return '<span>' + topic + '</span>'; }).join('') + '</div>';
     card.addEventListener('click', function() {
       selectedAgePath = path.id;
-      localStorage.setItem('moneymuncherAgePath', selectedAgePath);
+      safeStorageSet('moneymuncherAgePath', selectedAgePath);
       renderAgePaths();
       renderMiniGames();
       renderAcademy();
@@ -747,7 +790,7 @@ function scaledCoins(coins, ratio, minimum) {
 
 function loadGeneratedQuestHistory() {
   try {
-    var saved = JSON.parse(localStorage.getItem('moneymuncherGeneratedQuests') || '[]');
+    var saved = safeStorageJson('moneymuncherGeneratedQuests', []);
     if (!Array.isArray(saved)) return [];
     return saved.filter(isGeneratedQuest).slice(0, 6);
   } catch (e) {
@@ -766,7 +809,7 @@ function isGeneratedQuest(quest) {
 }
 
 function saveGeneratedQuestHistory() {
-  localStorage.setItem('moneymuncherGeneratedQuests', JSON.stringify(generatedQuestHistory.slice(0, 6)));
+  safeStorageSet('moneymuncherGeneratedQuests', JSON.stringify(generatedQuestHistory.slice(0, 6)));
 }
 
 function getQuestCoinBudget() {
@@ -975,8 +1018,18 @@ function renderScenario() {
 
 function openDialog(id) {
   var d = $(id);
-  if (typeof d.showModal === 'function') d.showModal();
-  else d.classList.remove('hidden');
+  if (!d || d.open) return Boolean(d);
+  if (typeof d.showModal === 'function') {
+    try {
+      d.showModal();
+      return true;
+    } catch (error) {
+      console.warn('[MM] Native dialog presentation failed for ' + id, error);
+    }
+  }
+  d.classList.remove('hidden');
+  d.setAttribute('open', '');
+  return true;
 }
 
 function startLevel(index) {
@@ -1069,13 +1122,13 @@ $('marketLabLoginBtn').addEventListener('click', function() {
 $('betaSignupOpenBtn').addEventListener('click', function() {
   betaSignupIntent = true;
   selectedRole = 'Family Team';
-  localStorage.setItem('moneymuncherRole', selectedRole);
+  safeStorageSet('moneymuncherRole', selectedRole);
   var roleInput = $('roleInput');
   if (roleInput) roleInput.value = selectedRole;
   openDialog('loginDialog');
   setTimeout(function() {
     var emailInput = $('emailInput');
-    if (emailInput) emailInput.focus();
+    if (emailInput && window.matchMedia && window.matchMedia('(pointer: fine)').matches) emailInput.focus();
   }, 0);
 });
 
@@ -1230,7 +1283,7 @@ $('clearGeneratedQuestsBtn').addEventListener('click', function() {
   restoreSession();
   loadFromManager();
   selectedRole = normalizeRole(account.role || selectedRole);
-  localStorage.setItem('moneymuncherRole', selectedRole);
+  safeStorageSet('moneymuncherRole', selectedRole);
   renderPlaySetup();
   renderAgePaths();
   renderMiniGames();
