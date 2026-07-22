@@ -256,6 +256,31 @@
     return out;
   }
 
+  function withTimeout(promise, milliseconds, message) {
+    return new Promise(function (resolve, reject) {
+      var finished = false;
+      var timer = setTimeout(function () {
+        if (finished) return;
+        finished = true;
+        var error = new Error(message || "The account service took too long to respond.");
+        error.code = "auth/timeout";
+        reject(error);
+      }, milliseconds);
+
+      promise.then(function (value) {
+        if (finished) return;
+        finished = true;
+        clearTimeout(timer);
+        resolve(value);
+      }).catch(function (error) {
+        if (finished) return;
+        finished = true;
+        clearTimeout(timer);
+        reject(error);
+      });
+    });
+  }
+
   /* --- 4. PUBLIC API --- */
   window.MoneyMuncher = {
     // ---- Setup ----
@@ -446,7 +471,11 @@
     signIn: function (email, password, profile) {
       return new Promise(function (resolve, reject) {
         if (!cloud.ready) return reject(new Error("Cloud not initialized"));
-        cloud.auth.signInWithEmailAndPassword(email, password)
+        withTimeout(
+          cloud.auth.signInWithEmailAndPassword(email, password),
+          15000,
+          "Sign in timed out. Check the internet connection and try again."
+        )
           .then(function (cred) {
             cloud.user = cred.user;
             if (profile && (profile.name || profile.role)) {

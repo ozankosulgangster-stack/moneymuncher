@@ -314,10 +314,10 @@
       </select>
     </label>
     <label>Email
-      <input id="emailInput" type="email" required placeholder="parent@email.com" />
+      <input id="emailInput" type="email" required autocomplete="email" inputmode="email" placeholder="parent@email.com" />
     </label>
     <label>Password
-      <input id="passInput" type="password" required placeholder="Choose a password" />
+      <input id="passInput" type="password" required autocomplete="current-password" placeholder="Choose or enter a password" />
     </label>
 
     <div style="display:flex;gap:10px;margin-top:10px;">
@@ -325,6 +325,7 @@
       <button type="button" id="signInBtn" class="secondary">Sign In</button>
     </div>
     <button type="button" id="forgotPasswordBtn" class="secondary small" style="margin-top:10px;">Forgot password?</button>
+    <p id="authFormStatus" class="modal-copy" role="status" aria-live="assertive"></p>
     <p style="font-size:12px;color:#666;">Kids: ask a parent to help with email.</p>
   </form>
 </dialog>

@@ -407,6 +407,33 @@ document.addEventListener('DOMContentLoaded', function() {
   var roleIn     = $('roleInput');
   var emailIn    = $('emailInput');
   var passIn     = $('passInput');
+  var authStatus = $('authFormStatus');
+
+  function setAuthStatus(message) {
+    authStatus.textContent = message || '';
+  }
+
+  function setAuthBusy(busy, action) {
+    signUpBtn.disabled = busy;
+    signInBtn.disabled = busy;
+    forgotPasswordBtn.disabled = busy;
+    signInBtn.textContent = busy && action === 'signin' ? 'Signing in…' : 'Sign In';
+    signUpBtn.textContent = busy && action === 'signup' ? 'Creating account…' : 'Sign Up';
+  }
+
+  function authErrorMessage(error) {
+    var code = error && error.code ? error.code : '';
+    if (code === 'auth/user-not-found' || code === 'auth/wrong-password' || code === 'auth/invalid-login-credentials' || code === 'auth/invalid-credential') {
+      return 'The email or password is incorrect.';
+    }
+    if (code === 'auth/network-request-failed' || code === 'auth/timeout') {
+      return 'Sign in could not reach the account service. Check the internet connection and try again.';
+    }
+    if (code === 'auth/too-many-requests') {
+      return 'Too many attempts. Wait a moment, then try again or reset the password.';
+    }
+    return error && error.message ? error.message : 'The account request failed. Please try again.';
+  }
 
   // Native iOS "Family Sign Up" links here with action=signup. Open the
   // account dialog immediately so reviewers do not have to find Log in first.
@@ -444,7 +471,13 @@ document.addEventListener('DOMContentLoaded', function() {
         platformInterest: betaSignupIntent ? 'ios' : '',
         betaJoinedAt: betaSignupIntent ? new Date().toISOString() : ''
       };
-      if (!em || !pw) return alert('Enter email and password');
+      if (!em || !pw) {
+        setAuthStatus('Enter both an email address and password.');
+        (!em ? emailIn : passIn).focus();
+        return;
+      }
+      setAuthStatus('Creating your account…');
+      setAuthBusy(true, 'signup');
       MoneyMuncher.signUp(em, pw, profile).then(function(u) {
         account = {
           id: u.uid,
@@ -469,17 +502,31 @@ document.addEventListener('DOMContentLoaded', function() {
         openDialog('emailVerificationDialog');
         betaSignupIntent = false;
         renderAccount(); renderStats(); renderMap();
-      }).catch(function(e) { alert(e.message); });
+      }).catch(function(e) {
+        setAuthStatus(authErrorMessage(e));
+      }).finally(function() {
+        setAuthBusy(false);
+      });
     });
   }
 
   if (forgotPasswordBtn && emailIn) {
     forgotPasswordBtn.addEventListener('click', function() {
       var em = emailIn.value.trim();
-      if (!em) return alert('Enter your email first, then tap Forgot password.');
+      if (!em) {
+        setAuthStatus('Enter your email first, then tap Forgot password.');
+        emailIn.focus();
+        return;
+      }
+      setAuthStatus('Sending password-reset email…');
+      setAuthBusy(true, 'reset');
       MoneyMuncher.resetPassword(em).then(function() {
-        alert('Password reset email sent. Please check your inbox.');
-      }).catch(function(e) { alert(e.message); });
+        setAuthStatus('Password-reset email sent to ' + em + '. Check your inbox and spam folder.');
+      }).catch(function(e) {
+        setAuthStatus(authErrorMessage(e));
+      }).finally(function() {
+        setAuthBusy(false);
+      });
     });
   }
 
@@ -495,7 +542,13 @@ document.addEventListener('DOMContentLoaded', function() {
         platformInterest: betaSignupIntent ? 'ios' : '',
         betaJoinedAt: betaSignupIntent ? new Date().toISOString() : ''
       } : null;
-      if (!em || !pw) return alert('Enter email and password');
+      if (!em || !pw) {
+        setAuthStatus('Enter both an email address and password.');
+        (!em ? emailIn : passIn).focus();
+        return;
+      }
+      setAuthStatus('Signing in securely…');
+      setAuthBusy(true, 'signin');
       MoneyMuncher.signIn(em, pw, profile).then(function(u) {
         var saved = (hasMM && MoneyMuncher.getUser && MoneyMuncher.getUser()) || {};
         account = {
@@ -516,7 +569,11 @@ document.addEventListener('DOMContentLoaded', function() {
           : (betaSignupIntent ? 'Thanks. Your account is marked for iOS beta interest.' : 'Welcome back!');
         betaSignupIntent = false;
         renderAccount(); renderStats(); renderMap();
-      }).catch(function(e) { alert(e.message); });
+      }).catch(function(e) {
+        setAuthStatus(authErrorMessage(e));
+      }).finally(function() {
+        setAuthBusy(false);
+      });
     });
   }
 });
@@ -1130,11 +1187,12 @@ $('confirmDeleteAccountBtn').addEventListener('click', function() {
   });
 });
 
-// Treat Return/Go from the iOS keyboard as Sign Up. Previously this created a
-// local-only profile that looked like an account but could not be deleted.
+// Treat Return/Go from the iOS keyboard as Sign In. Account creation remains
+// an explicit choice, preventing existing users from receiving an ambiguous
+// email-already-in-use error when they press Return on iPad.
 $('loginForm').addEventListener('submit', function(ev) {
   ev.preventDefault();
-  $('signUpBtn').click();
+  $('signInBtn').click();
 });
 
 $('questForm').addEventListener('submit', function(ev) {

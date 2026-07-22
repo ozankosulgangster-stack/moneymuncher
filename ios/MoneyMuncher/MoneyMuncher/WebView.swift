@@ -17,6 +17,7 @@ struct MoneyMuncherWebView: UIViewRepresentable {
 
         let webView = WKWebView(frame: .zero, configuration: configuration)
         webView.navigationDelegate = context.coordinator
+        webView.uiDelegate = context.coordinator
         webView.scrollView.contentInsetAdjustmentBehavior = .never
 
         context.coordinator.load(url, in: webView, configuration: configuration)
@@ -30,7 +31,7 @@ struct MoneyMuncherWebView: UIViewRepresentable {
 }
 
 extension MoneyMuncherWebView {
-    final class Coordinator: NSObject, WKNavigationDelegate {
+    final class Coordinator: NSObject, WKNavigationDelegate, WKUIDelegate {
         private let allowedHosts = [
             "moneymuncher.ca",
             "www.moneymuncher.ca"
@@ -80,6 +81,50 @@ extension MoneyMuncherWebView {
             let isFirstParty = allowedHosts.contains(host) || host.hasSuffix(".moneymuncher.ca")
 
             decisionHandler(isFirstParty ? .allow : .cancel)
+        }
+
+        private func presentingViewController(for webView: WKWebView) -> UIViewController? {
+            var responder: UIResponder? = webView
+            while let current = responder {
+                if let viewController = current as? UIViewController {
+                    return viewController
+                }
+                responder = current.next
+            }
+            return nil
+        }
+
+        func webView(
+            _ webView: WKWebView,
+            runJavaScriptAlertPanelWithMessage message: String,
+            initiatedByFrame frame: WKFrameInfo,
+            completionHandler: @escaping () -> Void
+        ) {
+            guard let presenter = presentingViewController(for: webView) else {
+                completionHandler()
+                return
+            }
+
+            let alert = UIAlertController(title: "Money Muncher", message: message, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default) { _ in completionHandler() })
+            presenter.present(alert, animated: true)
+        }
+
+        func webView(
+            _ webView: WKWebView,
+            runJavaScriptConfirmPanelWithMessage message: String,
+            initiatedByFrame frame: WKFrameInfo,
+            completionHandler: @escaping (Bool) -> Void
+        ) {
+            guard let presenter = presentingViewController(for: webView) else {
+                completionHandler(false)
+                return
+            }
+
+            let alert = UIAlertController(title: "Money Muncher", message: message, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel) { _ in completionHandler(false) })
+            alert.addAction(UIAlertAction(title: "Continue", style: .default) { _ in completionHandler(true) })
+            presenter.present(alert, animated: true)
         }
     }
 }

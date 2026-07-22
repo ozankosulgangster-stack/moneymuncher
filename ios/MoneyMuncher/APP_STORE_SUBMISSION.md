@@ -55,6 +55,32 @@ The app uses no native advertising SDKs, no in-app purchases, and no brokerage o
    - Type: Educational interactive software
    - Description: Generates short family financial-literacy scenarios and choices.
    - Monetization: None; no purchases, advertising, or real-money activity.
+3. **Money Muncher Learning Hub**
+   - Developer: Money Muncher
+   - URL: `https://moneymuncher.ca/`
+   - Type: Interactive financial-literacy learning software
+   - Description: Guided quests, a learning map, lessons, quizzes, and parent/teacher activities.
+   - Monetization: None; no purchases, advertising, or real-money activity.
+4. **Money Muncher Market Lab**
+   - Developer: Money Muncher
+   - URL: `https://moneymuncher.ca/market-lab/`
+   - Type: Educational virtual-market simulator
+   - Description: Simulated stock and ETF portfolio learning with virtual coins only.
+   - Monetization: None; no brokerage activity or real-money trading.
+5. **Money Muncher Classroom Market**
+   - Developer: Money Muncher
+   - URL: `https://moneymuncher.ca/kids/classroom-market/`
+   - Type: Educational browser game
+   - Description: Players compare price, quality, value, and need using virtual classroom coins.
+   - Monetization: None; no purchases, advertising, or real-money activity.
+6. **Money Muncher Badge Shop**
+   - Developer: Money Muncher
+   - URL: `https://moneymuncher.ca/kids/rewards/`
+   - Type: Interactive educational rewards software
+   - Description: Players use virtual practice coins for learning badges and review virtual coin history.
+   - Monetization: None; rewards have no cash value and cannot be purchased.
+
+Public index with complete metadata: `https://moneymuncher.ca/app-review/`
 
 ### Account deletion review path
 

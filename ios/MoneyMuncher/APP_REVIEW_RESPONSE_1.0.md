@@ -1,32 +1,44 @@
-# App Review Response — Version 1.0
+# App Review Response — Version 1.0 (Build 6)
 
-Submission ID: `2f926406-16f9-4296-8d48-c5e7eb0a8704`
+Submission ID: `a16d0f5f-4fa2-4c51-8555-9d07dc4b1167`
 
-Thank you for reviewing Money Muncher. We addressed each item as follows:
+Thank you for reviewing Money Muncher. We addressed each item as follows.
 
-## Guideline 1.5 — Support URL
+## Guideline 2.1(a) — Sign In on iPad
 
-The Support URL has been updated to `https://moneymuncher.ca/support.html`. The page provides a functional support-request form, problem-reporting guidance, account-deletion instructions, troubleshooting information, and a privacy-policy link.
+We corrected the Sign In flow for iPad. Tapping **Sign In** now immediately displays an inline "Signing in" state, prevents duplicate taps, reports missing or incorrect credentials directly inside the account dialog, and displays a clear network-timeout message if the account service does not respond. Pressing Return on the iPad keyboard now invokes Sign In rather than Sign Up. The native WKWebView also implements JavaScript-dialog presentation as a fallback.
 
-## Guideline 5.1.1(v) — Account deletion
+The flow was tested from a clean installation on iPad and iPhone with Version 1.0, Build 6.
 
-Signed-in users can now initiate and complete permanent account deletion in the app. From the native home screen, choose **Family Area > Account & Data**, sign in if needed, choose **Delete account**, and confirm **Delete permanently**. This deletes the Firebase Authentication account, its cloud-saved profile/progress document, and its Market Lab portfolio document. A physical-device recording of account creation/sign-in and the complete deletion flow is attached in App Review Information > Notes.
+## Guideline 4.7.4 — Complete non-embedded software index
 
-## Guideline 4.7.4 — Non-embedded software index
+Developer and publisher for every item: **Money Muncher**. All items are first-party educational experiences hosted on `moneymuncher.ca`. None has advertising, in-app purchases, monetization, or real-money activity.
 
-1. Money Muncher Cup Rush
+1. **Money Muncher Learning Hub**
+   - Developer: Money Muncher
+   - URL: `https://moneymuncher.ca/`
+2. **Money Muncher Cup Rush**
    - Developer: Money Muncher
    - URL: `https://moneymuncher.ca/kids/play/`
-   - Educational Unity WebGL mini game in which players collect virtual coins, avoid debt obstacles, and answer financial-literacy gates.
-   - No purchases, advertising, or real-money activity.
-2. Everyday Quest Generator
+3. **Everyday Quest Generator**
    - Developer: Money Muncher
    - URL: `https://moneymuncher.ca/kids/#questGeneratorTitle`
-   - Interactive educational software that generates short family financial-literacy scenarios and choices.
-   - No purchases, advertising, or real-money activity.
+4. **Money Muncher Market Lab**
+   - Developer: Money Muncher
+   - URL: `https://moneymuncher.ca/market-lab/`
+5. **Classroom Market**
+   - Developer: Money Muncher
+   - URL: `https://moneymuncher.ca/kids/classroom-market/`
+6. **Money Muncher Badge Shop**
+   - Developer: Money Muncher
+   - URL: `https://moneymuncher.ca/kids/rewards/`
 
-Both experiences are developed and published by Money Muncher and are served from the first-party `moneymuncher.ca` domain.
+The same index with descriptions and metadata is publicly available at:
+`https://moneymuncher.ca/app-review/`
 
-## Guideline 2.1(a) — Cup Rush responsiveness
+## Previously addressed items
 
-Cup Rush previously relied on keyboard-only Unity movement input. We added visible touch movement controls for iPhone and iPad, prevented page scrolling from intercepting game gestures, focused the Unity canvas when controls are used, and reduced the mobile WebGL rendering pixel ratio for improved responsiveness. The loading and full play flow have been retested on supported form factors.
+- Support URL: `https://moneymuncher.ca/support.html`
+- Permanent account deletion remains available in-app at **Family Area > Account & Data > Delete account**.
+- Account email verification does not prevent permanent deletion.
+- Cup Rush includes visible touch controls for iPhone and iPad.
