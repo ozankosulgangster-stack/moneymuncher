@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Card Quest World | Money Muncher Kids</title>
+  <meta name="description" content="A playful story world where kids learn how loyalty cards, credit cards, and interest rates work.">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="../index.html" aria-label="Back to Money Muncher Kids">
+      <span class="brand-mark" aria-hidden="true">M</span>
+      <span>Money Muncher</span>
+    </a>
+    <div class="star-counter" aria-live="polite">
+      <span aria-hidden="true">★</span>
+      <strong id="starCount">0 / 3</strong>
+      <span>story stars</span>
+    </div>
+  </header>
+
+  <main class="app-shell">
+    <section class="world-screen" id="worldScreen">
+      <div class="world-intro">
+        <div>
+          <p class="eyebrow">A new story adventure</p>
+          <h1>Card Quest<br><span>World</span></h1>
+          <p>Travel with Munch through three magical places. Meet friendly guides, solve a money mystery, and collect every story star.</p>
+        </div>
+        <div class="hero-character" aria-label="Munch the dinosaur waves beside a magical map">
+          <span class="map-orbit orbit-one" aria-hidden="true">★</span>
+          <span class="map-orbit orbit-two" aria-hidden="true">%</span>
+          <span class="munch" aria-hidden="true">🦖</span>
+          <span class="mini-card" aria-hidden="true"></span>
+        </div>
+      </div>
+
+      <div class="guide-bubble">
+        <span class="guide-avatar" aria-hidden="true">🦖</span>
+        <div>
+          <strong>Munch says</strong>
+          <p>“Some cards collect rewards. Some cards borrow money. Let’s meet the guides who know the difference!”</p>
+        </div>
+      </div>
+
+      <section class="map-card" aria-labelledby="mapTitle">
+        <div class="map-heading">
+          <div>
+            <p class="eyebrow">Choose the glowing path</p>
+            <h2 id="mapTitle">The Story Map</h2>
+          </div>
+          <p id="mapStatus">Begin at Star Market. Each story opens the next path.</p>
+        </div>
+
+        <div class="world-map">
+          <div class="cloud cloud-one" aria-hidden="true"></div>
+          <div class="cloud cloud-two" aria-hidden="true"></div>
+          <div class="path-line" aria-hidden="true"></div>
+
+          <button class="world-stop market" type="button" data-stop="loyalty">
+            <span class="stop-number">Chapter 1</span>
+            <span class="stop-art" aria-hidden="true">🛍️</span>
+            <strong>Star Market</strong>
+            <span>Loyalty cards</span>
+            <i class="stop-state" aria-hidden="true">Start →</i>
+          </button>
+
+          <button class="world-stop castle" type="button" data-stop="credit" disabled>
+            <span class="stop-number">Chapter 2</span>
+            <span class="stop-art" aria-hidden="true">🏰</span>
+            <strong>Cloud Castle</strong>
+            <span>Credit cards</span>
+            <i class="stop-state" aria-hidden="true">Locked</i>
+          </button>
+
+          <button class="world-stop peak" type="button" data-stop="interest" disabled>
+            <span class="stop-number">Chapter 3</span>
+            <span class="stop-art" aria-hidden="true">⛰️</span>
+            <strong>Percent Peak</strong>
+            <span>Interest rates</span>
+            <i class="stop-state" aria-hidden="true">Locked</i>
+          </button>
+
+          <button class="moon-bank" id="moonBank" type="button" disabled>
+            <span aria-hidden="true">🏦</span>
+            <strong>Moon Bank</strong>
+            <small>Collect 3 stars</small>
+          </button>
+        </div>
+      </section>
+
+      <p class="privacy-note">Made for learning: no real cards, sign-ups, purchases, or personal information.</p>
+    </section>
+
+    <section class="story-screen" id="storyScreen" hidden aria-labelledby="storyTitle">
+      <button class="map-button" id="backToMap" type="button">← World map</button>
+
+      <div class="scene-card" id="sceneCard">
+        <div class="scene-copy">
+          <p class="eyebrow" id="storyEyebrow"></p>
+          <h2 id="storyTitle"></h2>
+          <p id="storySubtitle"></p>
+        </div>
+        <div class="scene-emoji" id="sceneEmoji" aria-hidden="true"></div>
+      </div>
+
+      <div class="character-bubble">
+        <div class="character-avatar" id="characterEmoji" aria-hidden="true"></div>
+        <div>
+          <strong id="characterName"></strong>
+          <p id="storyText"></p>
+        </div>
+      </div>
+
+      <article class="magic-card">
+        <p class="eyebrow">Money magic revealed</p>
+        <h3 id="factTitle"></h3>
+        <p id="factText"></p>
+      </article>
+
+      <section class="choice-card" aria-labelledby="questionTitle">
+        <p class="eyebrow">Story choice</p>
+        <h3 id="questionTitle"></h3>
+        <div class="choices" id="choices"></div>
+      </section>
+
+      <div class="feedback" id="feedback" hidden aria-live="polite"></div>
+      <button class="primary-action" id="collectStar" type="button" hidden>Collect the story star <span aria-hidden="true">★</span></button>
+    </section>
+
+    <section class="ending-screen" id="endingScreen" hidden aria-labelledby="endingTitle">
+      <div class="celebration" aria-hidden="true">
+        <span>★</span><span>★</span><span>★</span>
+        <div>🏦</div>
+      </div>
+      <p class="eyebrow">World complete</p>
+      <h2 id="endingTitle">You’re a Card-Smart Explorer!</h2>
+      <p class="ending-lead">You can spot the difference between earning rewards, borrowing money, and paying or earning interest.</p>
+
+      <div class="takeaways">
+        <article>
+          <span aria-hidden="true">⭐</span>
+          <div><strong>Loyalty card</strong><p>Tracks rewards. Compare the final price.</p></div>
+        </article>
+        <article>
+          <span aria-hidden="true">💳</span>
+          <div><strong>Credit card</strong><p>Borrows money that must be repaid.</p></div>
+        </article>
+        <article>
+          <span aria-hidden="true">%</span>
+          <div><strong>Interest rate</strong><p>Can cost borrowers or reward savers.</p></div>
+        </article>
+      </div>
+
+      <button class="primary-action" id="playAgain" type="button">Explore again ↻</button>
+      <a class="text-link" href="../index.html">Back to Money Muncher Kids</a>
+    </section>
+  </main>
+
+  <script src="./world.js"></script>
+</body>
+</html>

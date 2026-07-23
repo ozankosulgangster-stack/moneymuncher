@@ -3,6 +3,7 @@ import SwiftUI
 enum AppDestination: Identifiable {
     case play
     case questGenerator
+    case storyQuest
     case familySignup
     case account
     case parentGuide
@@ -13,6 +14,7 @@ enum AppDestination: Identifiable {
         switch self {
         case .play: return "play"
         case .questGenerator: return "quest-generator"
+        case .storyQuest: return "story-quest"
         case .familySignup: return "family-signup"
         case .account: return "account"
         case .parentGuide: return "parent-guide"
@@ -25,6 +27,7 @@ enum AppDestination: Identifiable {
         switch self {
         case .play: return "Cup Rush"
         case .questGenerator: return "Everyday Quest"
+        case .storyQuest: return "Card Quest World"
         case .familySignup: return "Family Sign Up"
         case .account: return "Account & Data"
         case .parentGuide: return "Parent Guide"
@@ -39,6 +42,8 @@ enum AppDestination: Identifiable {
             return URL(string: "https://moneymuncher.ca/kids/play/?source=ios-app")!
         case .questGenerator:
             return URL(string: "https://moneymuncher.ca/kids/?source=ios-app#questGeneratorTitle")!
+        case .storyQuest:
+            return URL(string: "https://moneymuncher.ca/kids/card-quest/?source=ios-app")!
         case .familySignup:
             return URL(string: "https://moneymuncher.ca/?source=ios-app&action=signup")!
         case .account:
@@ -56,7 +61,7 @@ enum AppDestination: Identifiable {
         switch self {
         case .familySignup, .account, .parentGuide, .support:
             return true
-        case .play, .questGenerator, .privacy:
+        case .play, .questGenerator, .storyQuest, .privacy:
             return false
         }
     }
@@ -74,6 +79,7 @@ struct ContentView: View {
     @State private var activeDestination: AppDestination?
     @State private var gatedDestination: AppDestination?
     @State private var isShowingParentGate = false
+    @State private var isShowingStoryQuest = false
 
     private let kidCards = [
         FeatureCard(
@@ -87,6 +93,12 @@ struct ContentView: View {
             subtitle: "Turn snack runs, birthdays, and allowance moments into quick money choices.",
             systemImage: "sparkles",
             destination: .questGenerator
+        ),
+        FeatureCard(
+            title: "Card Quest World",
+            subtitle: "Meet storybook guides and discover loyalty cards, credit cards, and interest rates.",
+            systemImage: "map.fill",
+            destination: .storyQuest
         )
     ]
 
@@ -143,6 +155,9 @@ struct ContentView: View {
         }
         .sheet(item: $activeDestination) { destination in
             WebExperienceView(destination: destination)
+        }
+        .fullScreenCover(isPresented: $isShowingStoryQuest) {
+            StoryQuestView()
         }
         .sheet(isPresented: $isShowingParentGate) {
             ParentGateView(
@@ -250,6 +265,11 @@ struct ContentView: View {
     }
 
     private func open(_ destination: AppDestination) {
+        if destination == .storyQuest {
+            isShowingStoryQuest = true
+            return
+        }
+
         if destination.requiresParentGate {
             gatedDestination = destination
             isShowingParentGate = true
