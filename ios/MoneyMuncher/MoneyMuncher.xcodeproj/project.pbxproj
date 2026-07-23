@@ -10,6 +10,7 @@
 		A4F7D1136D9148B5902A0011 /* MoneyMuncherApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0010 /* MoneyMuncherApp.swift */; };
 		A4F7D1136D9148B5902A0013 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0012 /* ContentView.swift */; };
 		A4F7D1136D9148B5902A0015 /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0014 /* WebView.swift */; };
+		B5A8E2247E0259C6A13B0031 /* StoryQuestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A8E2247E0259C6A13B0030 /* StoryQuestView.swift */; };
 		A4F7D1136D9148B5902A0018 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0017 /* Assets.xcassets */; };
 		A4F7D1136D9148B5902A0020 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0019 /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
@@ -22,6 +23,7 @@
 		A4F7D1136D9148B5902A0016 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A4F7D1136D9148B5902A0017 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A4F7D1136D9148B5902A0019 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		B5A8E2247E0259C6A13B0030 /* StoryQuestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryQuestView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +58,7 @@
 			children = (
 				A4F7D1136D9148B5902A0010 /* MoneyMuncherApp.swift */,
 				A4F7D1136D9148B5902A0012 /* ContentView.swift */,
+				B5A8E2247E0259C6A13B0030 /* StoryQuestView.swift */,
 				A4F7D1136D9148B5902A0014 /* WebView.swift */,
 				A4F7D1136D9148B5902A0016 /* Info.plist */,
 				A4F7D1136D9148B5902A0017 /* Assets.xcassets */,
@@ -137,6 +140,7 @@
 				A4F7D1136D9148B5902A0011 /* MoneyMuncherApp.swift in Sources */,
 				A4F7D1136D9148B5902A0013 /* ContentView.swift in Sources */,
 				A4F7D1136D9148B5902A0015 /* WebView.swift in Sources */,
+				B5A8E2247E0259C6A13B0031 /* StoryQuestView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
