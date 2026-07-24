@@ -19,6 +19,8 @@ struct MoneyMuncherWebView: UIViewRepresentable {
         webView.navigationDelegate = context.coordinator
         webView.uiDelegate = context.coordinator
         webView.scrollView.contentInsetAdjustmentBehavior = .never
+        webView.scrollView.keyboardDismissMode = .interactive
+        webView.scrollView.alwaysBounceVertical = true
 
         context.coordinator.load(url, in: webView, configuration: configuration)
 

@@ -40,9 +40,9 @@ enum AppDestination: Identifiable {
         case .questGenerator:
             return URL(string: "https://moneymuncher.ca/kids/?source=ios-app#questGeneratorTitle")!
         case .familySignup:
-            return URL(string: "https://moneymuncher.ca/?source=ios-app&action=signup&reviewBuild=8")!
+            return URL(string: "https://moneymuncher.ca/?source=ios-app&action=signup&reviewBuild=9")!
         case .account:
-            return URL(string: "https://moneymuncher.ca/?source=ios-app&action=signin&reviewBuild=8#account")!
+            return URL(string: "https://moneymuncher.ca/?source=ios-app&action=signin&reviewBuild=9#account")!
         case .parentGuide:
             return URL(string: "https://moneymuncher.ca/kids/parent-guide.html?source=ios-app")!
         case .support:
@@ -142,7 +142,7 @@ struct ContentView: View {
                 }
             }
         }
-        .sheet(item: $activeDestination) { destination in
+        .fullScreenCover(item: $activeDestination) { destination in
             WebExperienceView(destination: destination)
         }
         .sheet(isPresented: $isShowingParentGate, onDismiss: presentPendingDestination) {

@@ -6,6 +6,10 @@
 // --- 0. Helpers ---
 function $(id) { return document.getElementById(id); }
 
+var pageParams = new URLSearchParams(window.location.search);
+var isIOSAppExperience = pageParams.get('source') === 'ios-app';
+if (isIOSAppExperience) document.documentElement.classList.add('ios-app');
+
 function safeStorageGet(key, fallback) {
   try {
     var value = localStorage.getItem(key);
@@ -447,6 +451,10 @@ document.addEventListener('DOMContentLoaded', function() {
   var emailIn    = $('emailInput');
   var passIn     = $('passInput');
   var authStatus = $('authFormStatus');
+  var authTitle  = $('authDialogTitle');
+  var authCopy   = $('authDialogCopy');
+  var nameField  = $('authNameField');
+  var roleField  = $('authRoleField');
 
   function setAuthStatus(message) {
     authStatus.textContent = message || '';
@@ -482,13 +490,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Native iOS "Family Sign Up" links here with action=signup. Open the
   // account dialog immediately so reviewers do not have to find Log in first.
-  var requestedAction = new URLSearchParams(window.location.search).get('action');
+  var requestedAction = pageParams.get('action');
   if (requestedAction === 'signup' || requestedAction === 'signin') {
     if (requestedAction === 'signup') {
       betaSignupIntent = true;
       selectedRole = 'Family Team';
       safeStorageSet('moneymuncherRole', selectedRole);
       if (roleIn) roleIn.value = selectedRole;
+    } else {
+      if (authTitle) authTitle.textContent = 'Sign in to Money Muncher';
+      if (authCopy) authCopy.textContent = 'Enter the family review account email and password.';
+      if (nameField) nameField.classList.add('hidden');
+      if (roleField) roleField.classList.add('hidden');
+      if (signUpBtn) signUpBtn.hidden = true;
     }
     setTimeout(function() {
       openDialog('loginDialog');

@@ -1,25 +1,27 @@
-# Build 8 App Review Checklist
+# Build 9 App Review Checklist
 
 Do not resubmit until every item below is complete.
 
 ## 1. Deploy the account-page hotfix
 
-- Deploy the build 8 versions of `index.html`, `app.js`, and `styles.css` to `moneymuncher.ca` before archiving the iOS app.
-- Open `https://moneymuncher.ca/?source=ios-app&action=signin&reviewBuild=8#account` in Safari.
+- Deploy the build 9 versions of `index.html`, `app.js`, and `styles.css` to `moneymuncher.ca` before archiving the iOS app.
+- Open `https://moneymuncher.ca/?source=ios-app&action=signin&reviewBuild=9#account` in Safari.
 - Confirm the account dialog opens automatically and shows the green review-account instruction above the Sign In button.
-- Confirm the deployed page loads `app.js?v=8` and `styles.css?v=8`, rather than a cached build 6 asset.
+- Confirm the deployed page loads `app.js?v=9` and `styles.css?v=9`, rather than an older cached asset.
 
 ## 2. Verify sign in from a clean install
 
-- Archive and upload **version 1.0 (build 8)**.
+- Archive and upload **version 1.0 (build 9)**.
 - Delete Money Muncher from the test iPad before installing the TestFlight build.
 - Test on an iPad, ideally the **iPad Air 11-inch (M3)** used by App Review.
 - Open **Family Area > Account & Data**.
 - Enter `13` in the parent gate and tap **Unlock**.
 - Confirm the parent gate dismisses and the account sheet opens automatically.
+- Confirm the account experience fills the iPad screen rather than appearing in a short form sheet.
+- Confirm the direct Sign In form shows email and password without signup-only Name and Role fields.
 - Confirm the green instruction/status panel is visible above the buttons.
 - Test empty fields, incorrect credentials, correct credentials, and Return/Go on the keyboard.
-- Repeat once by installing build 8 as an update over build 6.
+- Repeat once by installing build 9 as an update over build 6.
 - Record the exact devices and OS versions in `APP_REVIEW_RESPONSE_1.0.md`.
 
 ## 3. Supply a working review account
@@ -51,11 +53,11 @@ Preferred upload sizes:
 - iPhone 6.5-inch fallback: `1284 × 2778` portrait.
 - iPad 13-inch: `2064 × 2752` portrait.
 
-Use PNG or JPEG without transparency. Confirm the images are sharp, contain no test credentials, and match build 8.
+Use PNG or JPEG without transparency. Confirm the images are sharp, contain no test credentials, and match build 9.
 
 ## 5. Final App Store Connect pass
 
-- Select build 8 for version 1.0.
+- Select build 9 for version 1.0.
 - Confirm the Support URL and Privacy Policy URL still load.
 - Confirm the demo account is present and working.
 - Paste the completed response from `APP_REVIEW_RESPONSE_1.0.md`.

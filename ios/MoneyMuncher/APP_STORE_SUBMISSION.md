@@ -3,7 +3,7 @@
 ## App Identity
 
 - App name: Money Muncher
-- Version: `1.0 (8)`
+- Version: `1.0 (9)`
 - Subtitle: Money quests for kids and families
 - Bundle ID: `ca.moneymuncher.app`
 - SKU: `moneymuncher-ios`
@@ -43,15 +43,15 @@ The app uses no native advertising SDKs, no in-app purchases, and no brokerage o
 
 ### Guideline 2.1(a) Sign In review path
 
-Build 8 waits until the parent gate has fully dismissed before presenting the account sheet, opens **Account & Data** directly at Sign In, keeps authentication feedback visible above the action buttons, and uses larger iPad touch targets. Tapping **Sign In** immediately shows an in-dialog signing-in state, prevents duplicate taps, reports credential problems inside the dialog, and reports network timeouts. Pressing Return invokes Sign In.
+Build 9 waits until the parent gate has fully dismissed before presenting the account experience, uses a full-screen iPad presentation, and opens **Account & Data** directly at a simplified email-and-password Sign In form. Authentication feedback remains visible above the action button, the keyboard can be dismissed interactively, and the web form scrolls when space is constrained. Tapping **Sign In** immediately shows an in-dialog signing-in state, prevents duplicate taps, reports credential problems inside the dialog, and reports network timeouts. Pressing Return invokes Sign In.
 
-1. Open **Family Area > Family Sign Up**.
+1. Open **Family Area > Account & Data**.
 2. At **Parent Check**, enter `13` and tap **Unlock**.
-3. The account dialog opens automatically. Enter the review credentials and tap **Sign In**.
+3. The full-screen account experience opens automatically. Enter the review credentials and tap **Sign In**.
 
 - Review account email: `[ADD VERIFIED DEMO EMAIL]`
 - Review account password: `[ADD DEMO PASSWORD]`
-- Clean-install device test: `[ADD EXACT DEVICE AND OS AFTER TESTING BUILD 8]`
+- Clean-install device test: `[ADD EXACT DEVICE AND OS AFTER TESTING BUILD 9]`
 
 ### Guideline 4.7 content index
 

@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Inter:wght@500;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=8" />
+  <link rel="stylesheet" href="styles.css?v=9" />
 </head>
 <body>
   <main class="app-shell">
@@ -299,13 +299,13 @@
   <form id="loginForm" class="modal-card" method="dialog">
     <button class="close" value="cancel" aria-label="Close">×</button>
     <p class="eyebrow">Account</p>
-    <h2>Save progress online</h2>
-    <p class="modal-copy">Create a family account to save progress and join MoneyMuncher iOS beta updates.</p>
+    <h2 id="authDialogTitle">Save progress online</h2>
+    <p id="authDialogCopy" class="modal-copy">Create a family account to save progress and join MoneyMuncher iOS beta updates.</p>
 
-    <label>Name
+    <label id="authNameField">Name
       <input id="nameInput" autocomplete="name" placeholder="Player or parent name" />
     </label>
-    <label>Role
+    <label id="authRoleField">Role
       <select id="roleInput">
         <option>Kid Explorer</option>
         <option>Parent Guide</option>
@@ -365,7 +365,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
   <!-- 2. Progress manager -->
-  <script src="progress-manager.js?v=8"></script>
+  <script src="progress-manager.js?v=9"></script>
 
   <!-- 3. Initialize with your real config -->
   <script>
@@ -383,6 +383,6 @@
   </script>
 
   <!-- 4. Your game logic (LAST — it needs MoneyMuncher to exist first) -->
-  <script src="app.js?v=8"></script>
+  <script src="app.js?v=9"></script>
 </body>
 </html>
