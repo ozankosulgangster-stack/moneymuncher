@@ -1,52 +1,47 @@
-# App Review Response — Version 1.0 (Build 6)
+# App Review Response — Version 1.0 (Build 8)
 
 Submission ID: `a16d0f5f-4fa2-4c51-8555-9d07dc4b1167`
 
-Thank you for reviewing Money Muncher. We addressed each item as follows.
+> Paste this response only after completing the build-8 device test, adding the demo account in App Review Information, and replacing every promotional screenshot listed in the checklist.
+
+Hello App Review,
+
+Thank you for the additional review. We addressed both remaining issues.
 
 ## Guideline 2.1(a) — Sign In on iPad
 
-We corrected the Sign In flow for iPad. Tapping **Sign In** now immediately displays an inline "Signing in" state, prevents duplicate taps, reports missing or incorrect credentials directly inside the account dialog, and displays a clear network-timeout message if the account service does not respond. Pressing Return on the iPad keyboard now invokes Sign In rather than Sign Up. The native WKWebView also implements JavaScript-dialog presentation as a fallback.
+We identified an iPad presentation-order issue in the native parent-gate flow. The app previously attempted to present the account sheet before the parent-gate sheet had finished dismissing, which could cause the account action to appear unresponsive. Build 8 now waits for the parent gate to dismiss completely before presenting the account experience.
+
+We also made the account flow more explicit and resilient:
+
+- **Account & Data** opens the sign-in dialog directly.
+- Sign-in feedback appears above the action buttons and remains visible while the keyboard is present.
+- Sign In and Sign Up use larger iPad touch targets.
+- Tapping Sign In immediately displays **Signing in…** and disables duplicate actions.
+- Missing credentials, incorrect credentials, network failure, and timeout states appear inside the dialog.
+- The account page and its scripts use build-8 cache identifiers.
 
 Review path:
 
-1. Open **Family Area > Family Sign Up**.
+1. Open **Family Area > Account & Data**.
 2. At **Parent Check**, enter `13` and tap **Unlock**.
-3. The account dialog opens automatically. Enter the review credentials and tap **Sign In**.
+3. Wait for the account sheet to open automatically.
+4. Enter the review credentials supplied in App Review Information and tap **Sign In**.
 
-- Review account email: `[ADD VERIFIED DEMO EMAIL]`
-- Review account password: `[ADD DEMO PASSWORD]`
-- Clean-install device test: `[ADD EXACT DEVICE AND OS AFTER TESTING BUILD 6]`
+The flow was tested from a clean install using the Release configuration on:
 
-## Guideline 4.7.4 — Complete non-embedded software index
+- `[ADD EXACT iPAD MODEL AND iPADOS VERSION]`
+- `[ADD EXACT iPHONE MODEL AND iOS VERSION]`
 
-Developer and publisher for every item: **Ozan Kosulgan (Money Muncher)**. All items are first-party educational experiences hosted on `moneymuncher.ca`. They contain no advertising, in-app purchases, brokerage activity, or real-money trading.
+## Guideline 2.3.3 — Accurate Metadata
 
-1. **Money Muncher Learning Hub**
-   - Developer: Ozan Kosulgan (Money Muncher)
-   - URL: `https://www.moneymuncher.ca/`
-2. **Money Muncher Cup Rush**
-   - Developer: Ozan Kosulgan (Money Muncher)
-   - URL: `https://www.moneymuncher.ca/kids/play/`
-3. **Everyday Quest Generator**
-   - Developer: Ozan Kosulgan (Money Muncher)
-   - URL: `https://www.moneymuncher.ca/kids/#questGeneratorTitle`
-4. **Money Muncher Market Lab**
-   - Developer: Ozan Kosulgan (Money Muncher)
-   - URL: `https://www.moneymuncher.ca/market-lab/`
-5. **Classroom Market**
-   - Developer: Ozan Kosulgan (Money Muncher)
-   - URL: `https://www.moneymuncher.ca/kids/classroom-market/`
-6. **Money Muncher Badge Shop**
-   - Developer: Ozan Kosulgan (Money Muncher)
-   - URL: `https://www.moneymuncher.ca/kids/rewards/`
+We removed the promotional images that did not show the actual app interface. The replacement screenshots were captured from build 8 and show Money Muncher in active use, including:
 
-The same index with descriptions and metadata is publicly available at:
-`https://www.moneymuncher.ca/app-review/`
+- the native Money Muncher mission home
+- active Cup Rush gameplay
+- a generated Everyday Quest with its choices
+- the Money World map and an active learning scenario
 
-## Previously addressed items
+The iPhone and iPad screenshot sets now use actual in-app screens throughout and accurately represent the submitted binary.
 
-- Support URL: `https://moneymuncher.ca/support.html`
-- Permanent account deletion remains available in-app at **Family Area > Account & Data > Delete account**.
-- Account email verification does not prevent permanent deletion.
-- Cup Rush includes visible touch controls for iPhone and iPad.
+Thank you for reviewing Money Muncher build 8.

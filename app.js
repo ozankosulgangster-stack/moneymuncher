@@ -450,6 +450,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function setAuthStatus(message) {
     authStatus.textContent = message || '';
+    authStatus.classList.toggle('visible', Boolean(message));
+    if (message) {
+      requestAnimationFrame(function() {
+        authStatus.scrollIntoView({ block: 'nearest' });
+      });
+    }
   }
 
   function setAuthBusy(busy, action) {
@@ -477,14 +483,18 @@ document.addEventListener('DOMContentLoaded', function() {
   // Native iOS "Family Sign Up" links here with action=signup. Open the
   // account dialog immediately so reviewers do not have to find Log in first.
   var requestedAction = new URLSearchParams(window.location.search).get('action');
-  if (requestedAction === 'signup') {
-    betaSignupIntent = true;
-    selectedRole = 'Family Team';
-    safeStorageSet('moneymuncherRole', selectedRole);
-    if (roleIn) roleIn.value = selectedRole;
+  if (requestedAction === 'signup' || requestedAction === 'signin') {
+    if (requestedAction === 'signup') {
+      betaSignupIntent = true;
+      selectedRole = 'Family Team';
+      safeStorageSet('moneymuncherRole', selectedRole);
+      if (roleIn) roleIn.value = selectedRole;
+    }
     setTimeout(function() {
       openDialog('loginDialog');
-      if (nameIn && window.matchMedia && window.matchMedia('(pointer: fine)').matches) nameIn.focus();
+      if (requestedAction === 'signin') setAuthStatus('Enter the review account email and password, then tap Sign In.');
+      var firstField = requestedAction === 'signin' ? emailIn : nameIn;
+      if (firstField && window.matchMedia && window.matchMedia('(pointer: fine)').matches) firstField.focus();
     }, 0);
   }
 
@@ -1245,7 +1255,7 @@ $('confirmDeleteAccountBtn').addEventListener('click', function() {
 // email-already-in-use error when they press Return on iPad.
 $('loginForm').addEventListener('submit', function(ev) {
   ev.preventDefault();
-  $('signInBtn').click();
+  if (!$('signInBtn').disabled) $('signInBtn').click();
 });
 
 $('questForm').addEventListener('submit', function(ev) {

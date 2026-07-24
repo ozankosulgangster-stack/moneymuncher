@@ -40,9 +40,9 @@ enum AppDestination: Identifiable {
         case .questGenerator:
             return URL(string: "https://moneymuncher.ca/kids/?source=ios-app#questGeneratorTitle")!
         case .familySignup:
-            return URL(string: "https://moneymuncher.ca/?source=ios-app&action=signup")!
+            return URL(string: "https://moneymuncher.ca/?source=ios-app&action=signup&reviewBuild=8")!
         case .account:
-            return URL(string: "https://moneymuncher.ca/?source=ios-app#account")!
+            return URL(string: "https://moneymuncher.ca/?source=ios-app&action=signin&reviewBuild=8#account")!
         case .parentGuide:
             return URL(string: "https://moneymuncher.ca/kids/parent-guide.html?source=ios-app")!
         case .support:
@@ -73,6 +73,7 @@ private struct FeatureCard: Identifiable {
 struct ContentView: View {
     @State private var activeDestination: AppDestination?
     @State private var gatedDestination: AppDestination?
+    @State private var pendingDestinationAfterGate: AppDestination?
     @State private var isShowingParentGate = false
 
     private let kidCards = [
@@ -144,17 +145,15 @@ struct ContentView: View {
         .sheet(item: $activeDestination) { destination in
             WebExperienceView(destination: destination)
         }
-        .sheet(isPresented: $isShowingParentGate) {
+        .sheet(isPresented: $isShowingParentGate, onDismiss: presentPendingDestination) {
             ParentGateView(
                 onUnlock: {
-                    if let destination = gatedDestination {
-                        activeDestination = destination
-                    }
-
+                    pendingDestinationAfterGate = gatedDestination
                     gatedDestination = nil
                     isShowingParentGate = false
                 },
                 onCancel: {
+                    pendingDestinationAfterGate = nil
                     gatedDestination = nil
                     isShowingParentGate = false
                 }
@@ -256,6 +255,12 @@ struct ContentView: View {
         } else {
             activeDestination = destination
         }
+    }
+
+    private func presentPendingDestination() {
+        guard let destination = pendingDestinationAfterGate else { return }
+        pendingDestinationAfterGate = nil
+        activeDestination = destination
     }
 }
 
