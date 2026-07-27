@@ -28,9 +28,9 @@ public class MoneyMuncherHud : MonoBehaviour
     {
         if (gameManager != null)
         {
-            gameManager.onScoreChanged.AddListener(Refresh);
-            gameManager.onRoundEnded.AddListener(Refresh);
-            gameManager.onLevelCompleted.AddListener(Refresh);
+            gameManager.onScoreChanged?.AddListener(Refresh);
+            gameManager.onRoundEnded?.AddListener(Refresh);
+            gameManager.onLevelCompleted?.AddListener(Refresh);
         }
     }
 
@@ -38,9 +38,9 @@ public class MoneyMuncherHud : MonoBehaviour
     {
         if (gameManager != null)
         {
-            gameManager.onScoreChanged.RemoveListener(Refresh);
-            gameManager.onRoundEnded.RemoveListener(Refresh);
-            gameManager.onLevelCompleted.RemoveListener(Refresh);
+            gameManager.onScoreChanged?.RemoveListener(Refresh);
+            gameManager.onRoundEnded?.RemoveListener(Refresh);
+            gameManager.onLevelCompleted?.RemoveListener(Refresh);
         }
     }
 

@@ -24,6 +24,14 @@ public class PlayerMuncherController : MonoBehaviour
     {
         controller = GetComponent<CharacterController>();
         gameManager = FindObjectOfType<MoneyMuncherGameManager>();
+
+        if (controller == null)
+        {
+            Debug.LogError("PlayerMuncherController requires a CharacterController.", this);
+            enabled = false;
+            return;
+        }
+
         ApplyGearBonuses();
     }
 
