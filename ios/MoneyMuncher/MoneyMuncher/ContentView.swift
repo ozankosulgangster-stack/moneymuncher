@@ -75,6 +75,7 @@ struct ContentView: View {
     @State private var gatedDestination: AppDestination?
     @State private var pendingDestinationAfterGate: AppDestination?
     @State private var isShowingParentGate = false
+    @State private var isShowingFamilyQuest = false
 
     private let kidCards = [
         FeatureCard(
@@ -123,6 +124,7 @@ struct ContentView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
                     hero
+                    familyQuestSpotlight
                     section(title: "Kid Missions", cards: kidCards)
                     section(title: "Family Area", cards: familyCards)
                 }
@@ -144,6 +146,9 @@ struct ContentView: View {
         }
         .fullScreenCover(item: $activeDestination) { destination in
             WebExperienceView(destination: destination)
+        }
+        .fullScreenCover(isPresented: $isShowingFamilyQuest) {
+            FamilyQuestView()
         }
         .sheet(isPresented: $isShowingParentGate, onDismiss: presentPendingDestination) {
             ParentGateView(
@@ -174,16 +179,16 @@ struct ContentView: View {
 
             HStack(spacing: 12) {
                 Button {
-                    open(.play)
+                    isShowingFamilyQuest = true
                 } label: {
-                    Label("Kick Off", systemImage: "play.fill")
+                    Label("Family Quest", systemImage: "flag.checkered")
                 }
                 .buttonStyle(PrimaryActionButtonStyle())
 
                 Button {
-                    open(.questGenerator)
+                    open(.play)
                 } label: {
-                    Label("Quest", systemImage: "wand.and.stars")
+                    Label("Cup Rush", systemImage: "soccerball")
                 }
                 .buttonStyle(SecondaryActionButtonStyle())
             }
@@ -201,6 +206,65 @@ struct ContentView: View {
             )
         )
         .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+    }
+
+    private var familyQuestSpotlight: some View {
+        Button {
+            isShowingFamilyQuest = true
+        } label: {
+            HStack(spacing: 15) {
+                ZStack {
+                    Circle()
+                        .fill(Color.white.opacity(0.82))
+                        .frame(width: 74, height: 74)
+
+                    HStack(spacing: -8) {
+                        Text("🦝")
+                        Text("🐼")
+                    }
+                    .font(.system(size: 35))
+                }
+
+                VStack(alignment: .leading, spacing: 5) {
+                    Text("NEW · FAMILY QUEST LOOP")
+                        .font(.caption.weight(.black))
+                        .tracking(1)
+                        .foregroundStyle(Color(red: 0.32, green: 0.22, blue: 0.64))
+
+                    Text("Turn real-world wins into money choices")
+                        .font(.title3.weight(.black))
+                        .foregroundStyle(Color(red: 0.08, green: 0.20, blue: 0.24))
+                        .multilineTextAlignment(.leading)
+
+                    Text("Create a mission, celebrate the effort, then split virtual coins into Spend, Save, and Share.")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 4)
+
+                Image(systemName: "chevron.right.circle.fill")
+                    .font(.title2)
+                    .foregroundStyle(Color(red: 0.38, green: 0.29, blue: 0.70))
+            }
+            .padding(18)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                LinearGradient(
+                    colors: [
+                        Color(red: 1.0, green: 0.94, blue: 0.72),
+                        Color(red: 0.82, green: 0.92, blue: 1.0)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .accessibilityHint("Opens the native Family Quest experience")
     }
 
     private func section(title: String, cards: [FeatureCard]) -> some View {
@@ -285,7 +349,7 @@ private struct WebExperienceView: View {
     }
 }
 
-private struct ParentGateView: View {
+struct ParentGateView: View {
     let onUnlock: () -> Void
     let onCancel: () -> Void
 

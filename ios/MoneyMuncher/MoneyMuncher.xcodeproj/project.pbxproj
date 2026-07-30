@@ -10,6 +10,7 @@
 		A4F7D1136D9148B5902A0011 /* MoneyMuncherApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0010 /* MoneyMuncherApp.swift */; };
 		A4F7D1136D9148B5902A0013 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0012 /* ContentView.swift */; };
 		A4F7D1136D9148B5902A0015 /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0014 /* WebView.swift */; };
+		C6B9F3358F136AD7B24C0041 /* FamilyQuestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6B9F3358F136AD7B24C0040 /* FamilyQuestView.swift */; };
 		A4F7D1136D9148B5902A0018 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0017 /* Assets.xcassets */; };
 		A4F7D1136D9148B5902A0020 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0019 /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
@@ -22,6 +23,7 @@
 		A4F7D1136D9148B5902A0016 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A4F7D1136D9148B5902A0017 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A4F7D1136D9148B5902A0019 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		C6B9F3358F136AD7B24C0040 /* FamilyQuestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamilyQuestView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +58,7 @@
 			children = (
 				A4F7D1136D9148B5902A0010 /* MoneyMuncherApp.swift */,
 				A4F7D1136D9148B5902A0012 /* ContentView.swift */,
+				C6B9F3358F136AD7B24C0040 /* FamilyQuestView.swift */,
 				A4F7D1136D9148B5902A0014 /* WebView.swift */,
 				A4F7D1136D9148B5902A0016 /* Info.plist */,
 				A4F7D1136D9148B5902A0017 /* Assets.xcassets */,
@@ -137,6 +140,7 @@
 				A4F7D1136D9148B5902A0011 /* MoneyMuncherApp.swift in Sources */,
 				A4F7D1136D9148B5902A0013 /* ContentView.swift in Sources */,
 				A4F7D1136D9148B5902A0015 /* WebView.swift in Sources */,
+				C6B9F3358F136AD7B24C0041 /* FamilyQuestView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -263,7 +267,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_TEAM = A2TAG4GHM2;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = MoneyMuncher/Info.plist;
@@ -272,7 +276,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = ca.moneymuncher.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -290,7 +294,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = A2TAG4GHM2;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -300,7 +304,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = ca.moneymuncher.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
