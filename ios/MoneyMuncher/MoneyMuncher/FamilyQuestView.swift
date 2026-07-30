@@ -4,6 +4,7 @@ import UIKit
 struct FamilyQuestView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var store = FamilyQuestStore()
+    @StateObject private var parentAccess = ParentAccessManager.shared
     @State private var mode: FamilyQuestMode = .kid
     @State private var isShowingParentGate = false
     @State private var isShowingQuestEditor = false
@@ -33,6 +34,7 @@ struct FamilyQuestView: View {
         }
         .sheet(isPresented: $isShowingParentGate) {
             ParentGateView(
+                access: parentAccess,
                 onUnlock: {
                     isShowingParentGate = false
                     mode = .parent
@@ -45,6 +47,14 @@ struct FamilyQuestView: View {
         }
         .sheet(item: $rewardQuest) { quest in
             RewardChoiceView(quest: quest, store: store)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)) { _ in
+            lockParentMode()
+        }
+        .onReceive(Timer.publish(every: 1, on: .main, in: .common).autoconnect()) { _ in
+            if mode == .parent && !parentAccess.refreshSession() {
+                lockParentMode()
+            }
         }
     }
 
@@ -61,11 +71,11 @@ struct FamilyQuestView: View {
     private var modePicker: some View {
         HStack(spacing: 8) {
             ModeButton(title: "Kid Quest Board", systemImage: "sparkles", isSelected: mode == .kid, color: FamilyQuestPalette.purple) {
-                withAnimation(.easeInOut(duration: 0.2)) { mode = .kid }
+                withAnimation(.easeInOut(duration: 0.2)) { lockParentMode() }
             }
             ModeButton(title: "Grown-up Camp", systemImage: "lock.fill", isSelected: mode == .parent, color: FamilyQuestPalette.green) {
                 guard mode != .parent else { return }
-                isShowingParentGate = true
+                openParentMode()
             }
         }
     }
@@ -75,7 +85,7 @@ struct FamilyQuestView: View {
             GuideHero(guide: .rolo, eyebrow: "ROLO'S QUEST BOARD", title: kidHeroTitle, message: kidHeroMessage)
 
             if store.activeQuests.isEmpty && store.waitingQuests.isEmpty && store.rewardQuests.isEmpty {
-                EmptyQuestCard { isShowingParentGate = true }
+                EmptyQuestCard { openParentMode() }
             } else {
                 if !store.rewardQuests.isEmpty {
                     QuestSectionTitle(title: "Rewards ready!", subtitle: "Choose what your coins will do next", emoji: "🎉")
@@ -111,7 +121,7 @@ struct FamilyQuestView: View {
                     : "Celebrate the effort, check the mission, then release the coins."
             )
 
-            Button { isShowingQuestEditor = true } label: {
+            Button { requireParentAccess { isShowingQuestEditor = true } } label: {
                 Label("Create a family quest", systemImage: "plus.circle.fill").frame(maxWidth: .infinity)
             }
             .buttonStyle(FamilyQuestPrimaryButtonStyle(color: FamilyQuestPalette.green))
@@ -122,11 +132,15 @@ struct FamilyQuestView: View {
                     ParentReviewCard(
                         quest: quest,
                         onApprove: {
-                            withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) { store.approve(quest.id) }
-                            UINotificationFeedbackGenerator().notificationOccurred(.success)
+                            requireParentAccess {
+                                withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) { store.approve(quest.id) }
+                                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                            }
                         },
                         onRetry: {
-                            withAnimation(.easeInOut(duration: 0.25)) { store.requestRetry(quest.id) }
+                            requireParentAccess {
+                                withAnimation(.easeInOut(duration: 0.25)) { store.requestRetry(quest.id) }
+                            }
                         }
                     )
                 }
@@ -134,7 +148,9 @@ struct FamilyQuestView: View {
 
             if !store.openQuests.isEmpty {
                 QuestSectionTitle(title: "Open quests", subtitle: "What the family is working on", emoji: "📌")
-                ForEach(store.openQuests) { quest in ParentQuestRow(quest: quest) { store.delete(quest.id) } }
+                ForEach(store.openQuests) { quest in
+                    ParentQuestRow(quest: quest) { requireParentAccess { store.delete(quest.id) } }
+                }
             }
 
             if !store.completedQuests.isEmpty {
@@ -142,7 +158,39 @@ struct FamilyQuestView: View {
                 ForEach(Array(store.completedQuests.prefix(5))) { quest in CompletedQuestRow(quest: quest) }
             }
             ParentPrivacyNote()
+
+            Button {
+                withAnimation(.easeInOut(duration: 0.2)) { lockParentMode() }
+            } label: {
+                Label("Lock Grown-up Camp", systemImage: "lock.fill")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .tint(FamilyQuestPalette.green)
         }
+    }
+
+    private func openParentMode() {
+        if parentAccess.refreshSession() {
+            withAnimation(.easeInOut(duration: 0.2)) { mode = .parent }
+        } else {
+            isShowingParentGate = true
+        }
+    }
+
+    private func requireParentAccess(_ action: () -> Void) {
+        guard parentAccess.refreshSession() else {
+            lockParentMode()
+            isShowingParentGate = true
+            return
+        }
+        action()
+    }
+
+    private func lockParentMode() {
+        parentAccess.lock()
+        mode = .kid
+        isShowingQuestEditor = false
     }
 
     private var kidHeroTitle: String {

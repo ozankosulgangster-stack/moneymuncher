@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 enum AppDestination: Identifiable {
     case play
@@ -71,6 +72,7 @@ private struct FeatureCard: Identifiable {
 }
 
 struct ContentView: View {
+    @StateObject private var parentAccess = ParentAccessManager.shared
     @State private var activeDestination: AppDestination?
     @State private var gatedDestination: AppDestination?
     @State private var pendingDestinationAfterGate: AppDestination?
@@ -152,6 +154,7 @@ struct ContentView: View {
         }
         .sheet(isPresented: $isShowingParentGate, onDismiss: presentPendingDestination) {
             ParentGateView(
+                access: parentAccess,
                 onUnlock: {
                     pendingDestinationAfterGate = gatedDestination
                     gatedDestination = nil
@@ -163,6 +166,17 @@ struct ContentView: View {
                     isShowingParentGate = false
                 }
             )
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)) { _ in
+            parentAccess.lock()
+            if activeDestination?.requiresParentGate == true {
+                activeDestination = nil
+            }
+        }
+        .onReceive(Timer.publish(every: 1, on: .main, in: .common).autoconnect()) { _ in
+            if activeDestination?.requiresParentGate == true && !parentAccess.refreshSession() {
+                activeDestination = nil
+            }
         }
     }
 
@@ -314,6 +328,10 @@ struct ContentView: View {
 
     private func open(_ destination: AppDestination) {
         if destination.requiresParentGate {
+            if parentAccess.refreshSession() {
+                activeDestination = destination
+                return
+            }
             gatedDestination = destination
             isShowingParentGate = true
         } else {
@@ -345,70 +363,6 @@ private struct WebExperienceView: View {
                         }
                     }
                 }
-        }
-    }
-}
-
-struct ParentGateView: View {
-    let onUnlock: () -> Void
-    let onCancel: () -> Void
-
-    @State private var answer = ""
-    @State private var errorMessage: String?
-
-    var body: some View {
-        NavigationStack {
-            VStack(alignment: .leading, spacing: 18) {
-                Image(systemName: "lock.shield.fill")
-                    .font(.system(size: 46, weight: .bold))
-                    .foregroundStyle(Color(red: 0.05, green: 0.46, blue: 0.39))
-
-                Text("Parent Check")
-                    .font(.largeTitle.bold())
-
-                Text("Grown-up areas can include account setup or guidance links. Enter the answer to continue.")
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("What is 9 + 4?")
-                        .font(.headline)
-
-                    TextField("Answer", text: $answer)
-                        .keyboardType(.numberPad)
-                        .textFieldStyle(.roundedBorder)
-
-                    if let errorMessage {
-                        Text(errorMessage)
-                            .font(.footnote.weight(.semibold))
-                            .foregroundStyle(.red)
-                    }
-                }
-
-                Button {
-                    if answer.trimmingCharacters(in: .whitespacesAndNewlines) == "13" {
-                        onUnlock()
-                    } else {
-                        errorMessage = "Try again or ask a grown-up."
-                    }
-                } label: {
-                    Text("Unlock")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(PrimaryActionButtonStyle())
-
-                Spacer()
-            }
-            .padding(24)
-            .navigationTitle("Parent Gate")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        onCancel()
-                    }
-                }
-            }
         }
     }
 }
