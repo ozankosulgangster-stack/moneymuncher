@@ -2,11 +2,16 @@ import Foundation
 import SwiftUI
 import WebKit
 
+enum MoneyMuncherWebEvent: Equatable {
+    case openFamilyQuest
+}
+
 struct MoneyMuncherWebView: UIViewRepresentable {
     let url: URL
+    let onEvent: (MoneyMuncherWebEvent) -> Void
 
     func makeCoordinator() -> Coordinator {
-        Coordinator()
+        Coordinator(onEvent: onEvent)
     }
 
     func makeUIView(context: Context) -> WKWebView {
@@ -14,6 +19,7 @@ struct MoneyMuncherWebView: UIViewRepresentable {
         configuration.allowsInlineMediaPlayback = true
         configuration.defaultWebpagePreferences.allowsContentJavaScript = true
         configuration.mediaTypesRequiringUserActionForPlayback = []
+        configuration.userContentController.add(context.coordinator, name: Coordinator.messageHandlerName)
 
         let webView = WKWebView(frame: .zero, configuration: configuration)
         webView.navigationDelegate = context.coordinator
@@ -30,14 +36,27 @@ struct MoneyMuncherWebView: UIViewRepresentable {
     func updateUIView(_ uiView: WKWebView, context: Context) {
         // The app shell only changes URLs by presenting a new web experience.
     }
+
+    static func dismantleUIView(_ uiView: WKWebView, coordinator: Coordinator) {
+        uiView.configuration.userContentController.removeScriptMessageHandler(forName: Coordinator.messageHandlerName)
+        uiView.navigationDelegate = nil
+        uiView.uiDelegate = nil
+    }
 }
 
 extension MoneyMuncherWebView {
-    final class Coordinator: NSObject, WKNavigationDelegate, WKUIDelegate {
+    final class Coordinator: NSObject, WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler {
+        static let messageHandlerName = "moneyMuncher"
+
+        private let onEvent: (MoneyMuncherWebEvent) -> Void
         private let allowedHosts = [
             "moneymuncher.ca",
             "www.moneymuncher.ca"
         ]
+
+        init(onEvent: @escaping (MoneyMuncherWebEvent) -> Void) {
+            self.onEvent = onEvent
+        }
 
         private let privacyRules = """
         [
@@ -88,6 +107,24 @@ extension MoneyMuncherWebView {
             let isFirstParty = allowedHosts.contains(host) || host.hasSuffix(".moneymuncher.ca")
 
             decisionHandler(isFirstParty ? .allow : .cancel)
+        }
+
+        func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+            guard message.name == Self.messageHandlerName, message.frameInfo.isMainFrame else { return }
+
+            let eventName: String?
+            if let body = message.body as? String {
+                eventName = body
+            } else if let body = message.body as? [String: Any] {
+                eventName = body["type"] as? String
+            } else {
+                eventName = nil
+            }
+
+            guard eventName == "open-family-quest" else { return }
+            DispatchQueue.main.async {
+                self.onEvent(.openFamilyQuest)
+            }
         }
 
         private func presentingViewController(for webView: WKWebView) -> UIViewController? {

@@ -339,7 +339,8 @@
     <p class="modal-copy">You can still sign out or permanently delete the account before verification.</p>
     <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;">
       <button type="button" id="verificationDialogResendBtn" class="secondary">Resend email</button>
-      <button type="submit" class="primary">Done</button>
+      <button type="button" id="continueToFamilyQuestBtn" class="primary" hidden>Continue to Family Quest</button>
+      <button type="submit" class="secondary">Stay here</button>
     </div>
     <p id="verificationDialogStatus" class="modal-copy" role="status" aria-live="polite"></p>
   </form>
@@ -383,6 +384,6 @@
   </script>
 
   <!-- 4. Your game logic (LAST — it needs MoneyMuncher to exist first) -->
-  <script src="app.js?v=9"></script>
+  <script src="app.js?v=10"></script>
 </body>
 </html>

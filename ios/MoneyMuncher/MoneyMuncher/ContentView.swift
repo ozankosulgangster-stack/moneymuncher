@@ -1,7 +1,7 @@
 import SwiftUI
 import UIKit
 
-enum AppDestination: Identifiable {
+enum AppDestination: Identifiable, Equatable {
     case play
     case questGenerator
     case familySignup
@@ -147,7 +147,12 @@ struct ContentView: View {
             }
         }
         .fullScreenCover(item: $activeDestination) { destination in
-            WebExperienceView(destination: destination)
+            WebExperienceView(destination: destination) {
+                activeDestination = nil
+                DispatchQueue.main.async {
+                    isShowingFamilyQuest = true
+                }
+            }
         }
         .fullScreenCover(isPresented: $isShowingFamilyQuest) {
             FamilyQuestView()
@@ -349,10 +354,15 @@ struct ContentView: View {
 private struct WebExperienceView: View {
     @Environment(\.dismiss) private var dismiss
     let destination: AppDestination
+    let onOpenFamilyQuest: () -> Void
 
     var body: some View {
         NavigationStack {
-            MoneyMuncherWebView(url: destination.url)
+            MoneyMuncherWebView(url: destination.url) { event in
+                if event == .openFamilyQuest {
+                    openFamilyQuest()
+                }
+            }
                 .ignoresSafeArea(edges: .bottom)
                 .navigationTitle(destination.title)
                 .navigationBarTitleDisplayMode(.inline)
@@ -362,8 +372,22 @@ private struct WebExperienceView: View {
                             dismiss()
                         }
                     }
+
+                    if destination == .familySignup || destination == .account {
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Family Quest") {
+                                openFamilyQuest()
+                            }
+                            .fontWeight(.semibold)
+                        }
+                    }
                 }
         }
+    }
+
+    private func openFamilyQuest() {
+        dismiss()
+        onOpenFamilyQuest()
     }
 }
 

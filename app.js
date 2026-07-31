@@ -10,6 +10,21 @@ var pageParams = new URLSearchParams(window.location.search);
 var isIOSAppExperience = pageParams.get('source') === 'ios-app';
 if (isIOSAppExperience) document.documentElement.classList.add('ios-app');
 
+function canOpenNativeFamilyQuest() {
+  return Boolean(
+    isIOSAppExperience &&
+    window.webkit &&
+    window.webkit.messageHandlers &&
+    window.webkit.messageHandlers.moneyMuncher
+  );
+}
+
+function openNativeFamilyQuest() {
+  if (!canOpenNativeFamilyQuest()) return false;
+  window.webkit.messageHandlers.moneyMuncher.postMessage({ type: 'open-family-quest' });
+  return true;
+}
+
 function safeStorageGet(key, fallback) {
   try {
     var value = localStorage.getItem(key);
@@ -1191,6 +1206,14 @@ $('resendVerificationBtn').addEventListener('click', function() {
 $('verificationDialogResendBtn').addEventListener('click', function() {
   resendVerification($('verificationDialogStatus'), $('verificationDialogResendBtn'));
 });
+
+var continueToFamilyQuestBtn = $('continueToFamilyQuestBtn');
+if (continueToFamilyQuestBtn && canOpenNativeFamilyQuest()) {
+  continueToFamilyQuestBtn.hidden = false;
+  continueToFamilyQuestBtn.addEventListener('click', function() {
+    openNativeFamilyQuest();
+  });
+}
 
 function quietlyRefreshVerification() {
   if (!(hasMM && MoneyMuncher.isLoggedIn()) || account.emailVerified) return;
