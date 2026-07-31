@@ -3,7 +3,7 @@
 ## App Identity
 
 - App name: Money Muncher
-- Version: `1.0 (9)`
+- Version: `1.1 (13)`
 - Subtitle: Money quests for kids and families
 - Bundle ID: `ca.moneymuncher.app`
 - SKU: `moneymuncher-ios`
@@ -19,7 +19,7 @@ Money Muncher turns everyday family choices into playful money missions. Kids ca
 
 ## Promotional Text
 
-Kick off Cup Rush, try an Everyday Quest, and make money conversations easier at home.
+New: Family Quest turns everyday wins into smart money choices. Kids complete missions, parents approve with a PIN, and families split coins into Spend, Save, and Share.
 
 ## Keywords
 
@@ -37,21 +37,24 @@ Create a dedicated, verified test family login before submission and include it 
 
 ## Review Notes
 
-Money Muncher is a family-friendly financial education app. The native iOS home screen offers quick access to kid missions and parent resources. Account setup and parent guidance are protected with a parent gate. The app restricts in-app web navigation to Money Muncher first-party pages.
+Use the paste-ready build 13 notes in [`BUILD_13_APP_REVIEW_NOTES.md`](BUILD_13_APP_REVIEW_NOTES.md).
+
+Money Muncher is a family-friendly financial education app. Version 1.1 adds the native Family Quest Loop, including kid missions, Parent PIN-protected approvals, and virtual reward allocation across Spend, Save, and Share. Account setup and parent resources remain protected by the parent gate. The app restricts in-app web navigation to Money Muncher first-party pages.
 
 The app uses no native advertising SDKs, no in-app purchases, and no brokerage or real-money trading features. Learning experiences use virtual coins only.
 
 ### Guideline 2.1(a) Sign In review path
 
-Build 9 waits until the parent gate has fully dismissed before presenting the account experience, uses a full-screen iPad presentation, and opens **Account & Data** directly at a simplified email-and-password Sign In form. Authentication feedback remains visible above the action button, the keyboard can be dismissed interactively, and the web form scrolls when space is constrained. Tapping **Sign In** immediately shows an in-dialog signing-in state, prevents duplicate taps, reports credential problems inside the dialog, and reports network timeouts. Pressing Return invokes Sign In.
+Build 13 uses a full-screen iPad account presentation and opens **Account & Data** directly at the email-and-password Sign In form. Authentication feedback remains visible above the action button, the keyboard can be dismissed interactively, and the web form scrolls when space is constrained. The build also waits for the account experience to finish dismissing before opening Family Quest, fixing the iPad presentation transition.
 
 1. Open **Family Area > Account & Data**.
-2. At **Parent Check**, enter `13` and tap **Unlock**.
+2. Complete the Parent Check or enter the Parent PIN created on that device.
 3. The full-screen account experience opens automatically. Enter the review credentials and tap **Sign In**.
+4. Tap **Family Quest** in the account toolbar to verify the corrected iPad transition.
 
 - Review account email: `[ADD VERIFIED DEMO EMAIL]`
 - Review account password: `[ADD DEMO PASSWORD]`
-- Clean-install device test: `[ADD EXACT DEVICE AND OS AFTER TESTING BUILD 9]`
+- Clean-install device test: `[ADD EXACT DEVICE AND OS AFTER TESTING BUILD 13]`
 
 ### Guideline 4.7 content index
 

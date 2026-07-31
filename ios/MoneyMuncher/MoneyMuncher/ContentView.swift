@@ -78,6 +78,7 @@ struct ContentView: View {
     @State private var pendingDestinationAfterGate: AppDestination?
     @State private var isShowingParentGate = false
     @State private var isShowingFamilyQuest = false
+    @State private var shouldOpenFamilyQuestAfterWebDismiss = false
 
     private let kidCards = [
         FeatureCard(
@@ -146,12 +147,10 @@ struct ContentView: View {
                 }
             }
         }
-        .fullScreenCover(item: $activeDestination) { destination in
+        .fullScreenCover(item: $activeDestination, onDismiss: presentFamilyQuestAfterWebDismiss) { destination in
             WebExperienceView(destination: destination) {
+                shouldOpenFamilyQuestAfterWebDismiss = true
                 activeDestination = nil
-                DispatchQueue.main.async {
-                    isShowingFamilyQuest = true
-                }
             }
         }
         .fullScreenCover(isPresented: $isShowingFamilyQuest) {
@@ -349,6 +348,18 @@ struct ContentView: View {
         pendingDestinationAfterGate = nil
         activeDestination = destination
     }
+
+    private func presentFamilyQuestAfterWebDismiss() {
+        guard shouldOpenFamilyQuestAfterWebDismiss else { return }
+        shouldOpenFamilyQuestAfterWebDismiss = false
+
+        // On iPad, presenting another full-screen cover during the web cover's
+        // dismissal transaction can be ignored. Start a fresh transaction only
+        // after SwiftUI confirms the web experience has fully dismissed.
+        DispatchQueue.main.async {
+            isShowingFamilyQuest = true
+        }
+    }
 }
 
 private struct WebExperienceView: View {
@@ -386,7 +397,6 @@ private struct WebExperienceView: View {
     }
 
     private func openFamilyQuest() {
-        dismiss()
         onOpenFamilyQuest()
     }
 }

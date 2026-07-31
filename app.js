@@ -508,7 +508,6 @@ document.addEventListener('DOMContentLoaded', function() {
   var requestedAction = pageParams.get('action');
   if (requestedAction === 'signup' || requestedAction === 'signin') {
     if (requestedAction === 'signup') {
-      betaSignupIntent = true;
       selectedRole = 'Family Team';
       safeStorageSet('moneymuncherRole', selectedRole);
       if (roleIn) roleIn.value = selectedRole;
@@ -1156,19 +1155,6 @@ $('teacherBtn').addEventListener('click', function() {
 
 $('marketLabLoginBtn').addEventListener('click', function() {
   openDialog('loginDialog');
-});
-
-$('betaSignupOpenBtn').addEventListener('click', function() {
-  betaSignupIntent = true;
-  selectedRole = 'Family Team';
-  safeStorageSet('moneymuncherRole', selectedRole);
-  var roleInput = $('roleInput');
-  if (roleInput) roleInput.value = selectedRole;
-  openDialog('loginDialog');
-  setTimeout(function() {
-    var emailInput = $('emailInput');
-    if (emailInput && window.matchMedia && window.matchMedia('(pointer: fine)').matches) emailInput.focus();
-  }, 0);
 });
 
 $('loginOpenBtn').addEventListener('click', function() { openDialog('loginDialog'); });

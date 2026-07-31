@@ -69,7 +69,7 @@ body {
 }
 .account-area { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
 .account-status { background: #fff7d0; border-radius: 999px; color: #7a5200; font-size: .9rem; font-weight: 900; padding: 9px 12px; }
-.ios-beta-banner {
+.ios-launch-banner {
   display: grid;
   grid-template-columns: auto 1fr auto;
   gap: 18px;
@@ -80,7 +80,7 @@ body {
   background: linear-gradient(135deg, #102029, #176145 62%, #8abf43);
   border-color: rgba(255,255,255,.86);
 }
-.ios-beta-icon {
+.ios-launch-icon {
   width: 66px;
   height: 66px;
   display: grid;
@@ -93,27 +93,27 @@ body {
   font-size: 1.35rem;
   font-weight: 900;
 }
-.ios-beta-copy .eyebrow { color: #ffe58a; }
-.ios-beta-copy h2 { font-size: clamp(1.6rem, 3vw, 2.6rem); }
-.ios-beta-copy p:not(.eyebrow) {
+.ios-launch-copy .eyebrow { color: #ffe58a; }
+.ios-launch-copy h2 { font-size: clamp(1.6rem, 3vw, 2.6rem); }
+.ios-launch-copy p:not(.eyebrow) {
   max-width: 660px;
   margin: 9px 0 0;
   color: rgba(255,255,255,.86);
   font-size: 1rem;
   line-height: 1.5;
 }
-.ios-beta-actions {
+.ios-launch-actions {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
   flex-wrap: wrap;
 }
-.ios-beta-banner .primary {
+.ios-launch-banner .primary {
   background: white;
   color: var(--ink);
   box-shadow: 0 12px 22px rgba(0,0,0,.18);
 }
-.ios-beta-banner .secondary {
+.ios-launch-banner .secondary {
   color: white;
   background: rgba(255,255,255,.12);
   border-color: rgba(255,255,255,.36);
@@ -739,8 +739,8 @@ html.ios-app .modal[open] .modal-card {
   .topbar, .hero, .choices, .hub-grid { grid-template-columns: 1fr; }
   .topbar { display: grid; }
   .account-area { justify-content: flex-start; }
-  .ios-beta-banner { grid-template-columns: 1fr; }
-  .ios-beta-actions { justify-content: flex-start; }
+  .ios-launch-banner { grid-template-columns: 1fr; }
+  .ios-launch-actions { justify-content: flex-start; }
   .stats { grid-template-columns: repeat(2,1fr); }
   .game-header, .section-heading, .quest-form { flex-direction: column; }
   .kids-arcade { grid-template-columns: 1fr; }
