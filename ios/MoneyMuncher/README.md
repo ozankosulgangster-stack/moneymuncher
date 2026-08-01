@@ -52,6 +52,8 @@ Before TestFlight purchase testing:
 
 Until those products exist in App Store Connect or a local StoreKit configuration, the paywall will show a "Plans are not available yet" state.
 
+Debug simulator builds include an `Unlock Plus in Simulator` button on the paywall so premium flows can be reviewed before StoreKit products are live. This button is compiled only for Debug simulator builds and is not included in device Release/TestFlight archives.
+
 For the Firebase phase, keep StoreKit as the source of truth on iOS and sync entitlement state to Firebase only after we add accounts and server-side receipt/App Store Server Notification handling.
 
 ## Open In Xcode

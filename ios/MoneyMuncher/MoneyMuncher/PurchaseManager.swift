@@ -3,6 +3,10 @@ import StoreKit
 
 @MainActor
 final class PurchaseManager: ObservableObject {
+    #if DEBUG && targetEnvironment(simulator)
+    private static let debugPremiumAccessKey = "MoneyMuncherDebugPremiumAccess"
+    #endif
+
     @Published private(set) var products: [Product] = []
     @Published private(set) var hasPremiumAccess = false
     @Published private(set) var isLoadingProducts = false
@@ -108,8 +112,20 @@ final class PurchaseManager: ObservableObject {
             }
         }
 
+        #if DEBUG && targetEnvironment(simulator)
+        hasPremiumAccess = hasActiveSubscription || UserDefaults.standard.bool(forKey: Self.debugPremiumAccessKey)
+        #else
         hasPremiumAccess = hasActiveSubscription
+        #endif
     }
+
+    #if DEBUG && targetEnvironment(simulator)
+    func unlockPremiumForDebug() {
+        UserDefaults.standard.set(true, forKey: Self.debugPremiumAccessKey)
+        hasPremiumAccess = true
+        purchaseMessage = "Plus is unlocked for simulator testing."
+    }
+    #endif
 
     private func observeTransactionUpdates() -> Task<Void, Never> {
         Task { [weak self] in

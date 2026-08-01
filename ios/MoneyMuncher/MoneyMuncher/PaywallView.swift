@@ -13,6 +13,9 @@ struct PaywallView: View {
                 VStack(alignment: .leading, spacing: 24) {
                     header
                     benefits
+                    #if DEBUG && targetEnvironment(simulator)
+                    debugUnlockButton
+                    #endif
                     productOptions
                     restoreButton
                     legalLinks
@@ -72,6 +75,21 @@ struct PaywallView: View {
             PaywallBenefitRow(systemImage: "book.closed.fill", title: "Dino lessons", subtitle: "Learn cards, interest, and stock-market basics with character-led modules.")
         }
     }
+
+    #if DEBUG && targetEnvironment(simulator)
+    private var debugUnlockButton: some View {
+        Button {
+            purchaseManager.unlockPremiumForDebug()
+            onUnlocked()
+            dismiss()
+        } label: {
+            Label("Unlock Plus in Simulator", systemImage: "hammer.fill")
+                .frame(maxWidth: .infinity)
+        }
+        .buttonStyle(PrimaryActionButtonStyle())
+        .accessibilityHint("Unlocks premium content for local simulator testing only")
+    }
+    #endif
 
     @ViewBuilder
     private var productOptions: some View {
