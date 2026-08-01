@@ -17,6 +17,7 @@
 		A4F7D1136D9148B5902A0035 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0034 /* PaywallView.swift */; };
 		A4F7D1136D9148B5902A0037 /* PremiumLearningModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0036 /* PremiumLearningModule.swift */; };
 		A4F7D1136D9148B5902A0039 /* PremiumLearningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0038 /* PremiumLearningView.swift */; };
+		A4F7D1136D9148B5902A0041 /* LessonNarrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0040 /* LessonNarrator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +33,7 @@
 		A4F7D1136D9148B5902A0034 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
 		A4F7D1136D9148B5902A0036 /* PremiumLearningModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumLearningModule.swift; sourceTree = "<group>"; };
 		A4F7D1136D9148B5902A0038 /* PremiumLearningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumLearningView.swift; sourceTree = "<group>"; };
+		A4F7D1136D9148B5902A0040 /* LessonNarrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonNarrator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +74,7 @@
 				A4F7D1136D9148B5902A0034 /* PaywallView.swift */,
 				A4F7D1136D9148B5902A0036 /* PremiumLearningModule.swift */,
 				A4F7D1136D9148B5902A0038 /* PremiumLearningView.swift */,
+				A4F7D1136D9148B5902A0040 /* LessonNarrator.swift */,
 				A4F7D1136D9148B5902A0016 /* Info.plist */,
 				A4F7D1136D9148B5902A0017 /* Assets.xcassets */,
 				A4F7D1136D9148B5902A0019 /* PrivacyInfo.xcprivacy */,
@@ -157,6 +160,7 @@
 				A4F7D1136D9148B5902A0035 /* PaywallView.swift in Sources */,
 				A4F7D1136D9148B5902A0037 /* PremiumLearningModule.swift in Sources */,
 				A4F7D1136D9148B5902A0039 /* PremiumLearningView.swift in Sources */,
+				A4F7D1136D9148B5902A0041 /* LessonNarrator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

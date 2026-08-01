@@ -121,6 +121,7 @@ private struct PremiumLearningModuleCard: View {
 private struct PremiumLearningModuleDetailView: View {
     let module: PremiumLearningModule
 
+    @StateObject private var narrator = LessonNarrator()
     @State private var selectedStepIndex = 0
     @State private var selectedAnswerIndex: Int?
 
@@ -130,6 +131,10 @@ private struct PremiumLearningModuleDetailView: View {
 
     private var isLastStep: Bool {
         selectedStepIndex == module.steps.count - 1
+    }
+
+    private var isNarratingCurrentStep: Bool {
+        narrator.isSpeaking && narrator.spokenStepID == selectedStep.id
     }
 
     var body: some View {
@@ -149,6 +154,9 @@ private struct PremiumLearningModuleDetailView: View {
         .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle(module.title)
         .navigationBarTitleDisplayMode(.inline)
+        .onDisappear {
+            narrator.stop()
+        }
     }
 
     private var detailHeader: some View {
@@ -207,6 +215,8 @@ private struct PremiumLearningModuleDetailView: View {
                 .foregroundStyle(.primary)
                 .fixedSize(horizontal: false, vertical: true)
 
+            lessonAudioControls
+
             HStack(alignment: .top, spacing: 10) {
                 DinoAvatar(size: 42)
 
@@ -226,11 +236,34 @@ private struct PremiumLearningModuleDetailView: View {
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
     }
 
+    private var lessonAudioControls: some View {
+        HStack(spacing: 10) {
+            Button {
+                toggleNarration()
+            } label: {
+                Label(isNarratingCurrentStep ? "Stop Audio" : "Listen", systemImage: isNarratingCurrentStep ? "stop.fill" : "speaker.wave.2.fill")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(LessonNarrationButtonStyle(isActive: isNarratingCurrentStep))
+            .accessibilityHint(isNarratingCurrentStep ? "Stops the lesson audio" : "Reads the current lesson step aloud")
+
+            Button {
+                speakCurrentStep()
+            } label: {
+                Image(systemName: "arrow.clockwise")
+                    .font(.headline.weight(.bold))
+                    .frame(width: 48, height: 48)
+            }
+            .buttonStyle(LessonIconButtonStyle())
+            .accessibilityLabel("Replay audio")
+            .accessibilityHint("Starts the current lesson step again")
+        }
+    }
+
     private var stepControls: some View {
         HStack(spacing: 12) {
             Button {
-                selectedStepIndex = max(0, selectedStepIndex - 1)
-                selectedAnswerIndex = nil
+                moveToStep(selectedStepIndex - 1)
             } label: {
                 Label("Back", systemImage: "chevron.left")
                     .frame(maxWidth: .infinity)
@@ -239,8 +272,7 @@ private struct PremiumLearningModuleDetailView: View {
             .disabled(selectedStepIndex == 0)
 
             Button {
-                selectedStepIndex = min(module.steps.count - 1, selectedStepIndex + 1)
-                selectedAnswerIndex = nil
+                moveToStep(selectedStepIndex + 1)
             } label: {
                 Label("Next", systemImage: "chevron.right")
                     .frame(maxWidth: .infinity)
@@ -344,6 +376,24 @@ private struct PremiumLearningModuleDetailView: View {
 
         return Color(uiColor: .tertiarySystemGroupedBackground)
     }
+
+    private func toggleNarration() {
+        if isNarratingCurrentStep {
+            narrator.stop()
+        } else {
+            speakCurrentStep()
+        }
+    }
+
+    private func speakCurrentStep() {
+        narrator.speak(module: module, step: selectedStep)
+    }
+
+    private func moveToStep(_ stepIndex: Int) {
+        narrator.stop()
+        selectedStepIndex = min(max(stepIndex, 0), module.steps.count - 1)
+        selectedAnswerIndex = nil
+    }
 }
 
 struct DinoAvatar: View {
@@ -396,5 +446,36 @@ struct DinoAvatar: View {
         }
         .frame(width: size, height: size)
         .accessibilityHidden(true)
+    }
+}
+
+private struct LessonNarrationButtonStyle: ButtonStyle {
+    let isActive: Bool
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.headline)
+            .padding(.horizontal, 18)
+            .padding(.vertical, 13)
+            .foregroundStyle(isActive ? Color(red: 0.04, green: 0.35, blue: 0.30) : .white)
+            .background(backgroundColor(isPressed: configuration.isPressed))
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+
+    private func backgroundColor(isPressed: Bool) -> Color {
+        if isActive {
+            return isPressed ? Color(red: 0.82, green: 0.93, blue: 0.88) : .white
+        }
+
+        return isPressed ? Color(red: 0.02, green: 0.30, blue: 0.25) : Color(red: 0.04, green: 0.43, blue: 0.36)
+    }
+}
+
+private struct LessonIconButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .foregroundStyle(Color(red: 0.04, green: 0.35, blue: 0.30))
+            .background(configuration.isPressed ? Color(red: 0.82, green: 0.93, blue: 0.88) : Color.white)
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 }
