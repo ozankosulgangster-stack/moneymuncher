@@ -38,15 +38,16 @@ If review needs an account, create a test family login before submission and inc
 
 Money Muncher is a family-friendly financial education app. The native iOS home screen offers quick access to kid missions and parent resources. Account setup, parent guidance, and Money Muncher Plus purchase options are protected with a parent gate. The app restricts in-app web navigation to Money Muncher first-party pages.
 
-The app uses no native advertising SDKs and no brokerage or real-money trading features. Learning experiences use virtual coins only. Money Muncher Plus uses native Apple in-app purchases through StoreKit 2 and includes restore purchases.
+The app uses no native advertising SDKs and no brokerage or real-money trading features. Learning experiences use virtual coins and virtual examples only. Money Muncher Plus uses native Apple in-app purchases through StoreKit 2 and includes restore purchases.
 
 ## In-App Purchase Setup
 
 - Subscription group: `Money Muncher Plus`
 - Monthly product ID: `ca.moneymuncher.app.plus.monthly`
 - Annual product ID: `ca.moneymuncher.app.plus.annual`
-- First paid feature in MVP: `Everyday Quest`
-- Required review evidence: paywall screenshot, parent gate screenshot, subscription metadata, privacy policy URL, restore purchase flow.
+- First paid features in MVP: `Everyday Quest` and `Dino Money Lab`
+- Premium learning modules: `Card Captain`, `Interest Lab`, and `Stock Slice Studio`
+- Required review evidence: paywall screenshot, parent gate screenshot, premium module screenshot, subscription metadata, privacy policy URL, restore purchase flow.
 
 ## Screenshots Needed
 

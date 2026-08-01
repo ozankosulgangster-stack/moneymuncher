@@ -93,6 +93,8 @@ struct ContentView: View {
     @State private var isShowingParentGate = false
     @State private var isPaywallPending = false
     @State private var isShowingPaywall = false
+    @State private var isShowingPremiumLearning = false
+    @State private var pendingPremiumLearning = false
 
     private let kidCards = [
         FeatureCard(
@@ -131,6 +133,7 @@ struct ContentView: View {
                 VStack(alignment: .leading, spacing: 24) {
                     hero
                     premiumStatus
+                    premiumLearningEntry
                     section(title: "Kid Missions", cards: kidCards)
                     section(title: "Family Area", cards: familyCards)
                 }
@@ -152,6 +155,9 @@ struct ContentView: View {
         }
         .sheet(item: $activeDestination) { destination in
             WebExperienceView(destination: destination)
+        }
+        .sheet(isPresented: $isShowingPremiumLearning) {
+            PremiumLearningHubView()
         }
         .sheet(isPresented: $isShowingPaywall, onDismiss: openPremiumDestinationIfUnlocked) {
             PaywallView {
@@ -182,6 +188,7 @@ struct ContentView: View {
                 onCancel: {
                     gatedDestination = nil
                     premiumDestination = nil
+                    pendingPremiumLearning = false
                     isPaywallPending = false
                     isShowingParentGate = false
                 }
@@ -268,6 +275,38 @@ struct ContentView: View {
         .accessibilityHint(purchaseManager.hasPremiumAccess ? "Premium access is active" : "Parent gate required before purchase options")
     }
 
+    private var premiumLearningEntry: some View {
+        Button {
+            openPremiumLearning()
+        } label: {
+            HStack(spacing: 14) {
+                DinoAvatar(size: 50)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Dino Money Lab")
+                        .font(.headline)
+                        .foregroundStyle(.primary)
+
+                    Text("Plus lessons for cards, interest, and stock-market basics.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 10)
+
+                Image(systemName: purchaseManager.hasPremiumAccess ? "chevron.right" : "crown.fill")
+                    .foregroundStyle(.tertiary)
+            }
+            .padding(16)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color(uiColor: .secondarySystemGroupedBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .accessibilityHint(purchaseManager.hasPremiumAccess ? "Opens Dino Money Lab" : "Plus subscription required")
+    }
+
     private func section(title: String, cards: [FeatureCard]) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(title)
@@ -327,21 +366,40 @@ struct ContentView: View {
         }
     }
 
-    private func requestPaywall(for destination: AppDestination? = nil) {
+    private func requestPaywall(for destination: AppDestination? = nil, opensLearningHub: Bool = false) {
         premiumDestination = destination
+        pendingPremiumLearning = opensLearningHub
         gatedDestination = nil
         isPaywallPending = true
         isShowingParentGate = true
     }
 
+    private func openPremiumLearning() {
+        if purchaseManager.hasPremiumAccess {
+            isShowingPremiumLearning = true
+        } else {
+            requestPaywall(opensLearningHub: true)
+        }
+    }
+
     private func openPremiumDestinationIfUnlocked() {
-        guard purchaseManager.hasPremiumAccess, let destination = premiumDestination else {
+        guard purchaseManager.hasPremiumAccess else {
             premiumDestination = nil
+            pendingPremiumLearning = false
             return
         }
 
-        premiumDestination = nil
-        activeDestination = destination
+        if let destination = premiumDestination {
+            premiumDestination = nil
+            pendingPremiumLearning = false
+            activeDestination = destination
+            return
+        }
+
+        if pendingPremiumLearning {
+            pendingPremiumLearning = false
+            isShowingPremiumLearning = true
+        }
     }
 
     private func trailingIcon(for card: FeatureCard) -> String {

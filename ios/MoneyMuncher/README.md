@@ -10,6 +10,7 @@ This folder contains a lightweight iOS app shell for Money Muncher. It is built 
 - Native StoreKit 2 paywall for Money Muncher Plus.
 - Parent gate before purchase options are shown.
 - Premium unlock checks using current App Store entitlements.
+- Dino Money Lab premium modules for cards, interest, and stock-market basics.
 - First-party navigation restriction for `moneymuncher.ca`.
 - In-app content rules that block Google Tag Manager and Google Analytics requests inside the iOS app web views.
 - Apple privacy manifest with no native SDK data collection declared.
@@ -17,6 +18,16 @@ This folder contains a lightweight iOS app shell for Money Muncher. It is built 
 ## Money Muncher Plus Paywall
 
 The iOS app now has a native StoreKit 2 paywall. For the first MVP slice, `Everyday Quest` is treated as the first Plus feature while `Cup Rush` remains free.
+
+Plus content currently includes:
+
+- `Everyday Quest`
+- `Dino Money Lab`
+- `Card Captain`: credit cards, debit cards, and safe card habits.
+- `Interest Lab`: borrowing costs, APR, minimum payments, and compounding.
+- `Stock Slice Studio`: stock ownership, trades, risk, and diversification.
+
+Investing lessons use virtual examples only and do not provide real-money trading advice.
 
 Subscription product IDs live in:
 

@@ -69,7 +69,7 @@ struct PaywallView: View {
         VStack(alignment: .leading, spacing: 12) {
             PaywallBenefitRow(systemImage: "map.fill", title: "Level path", subtitle: "Unlock premium mission packs as the Duolingo-style path expands.")
             PaywallBenefitRow(systemImage: "sparkles", title: "Everyday quests", subtitle: "Turn allowance, snacks, birthdays, and saving goals into quick challenges.")
-            PaywallBenefitRow(systemImage: "person.2.fill", title: "Family progress", subtitle: "Keep parents in the loop as progress, streaks, and rewards grow.")
+            PaywallBenefitRow(systemImage: "book.closed.fill", title: "Dino lessons", subtitle: "Learn cards, interest, and stock-market basics with character-led modules.")
         }
     }
 
