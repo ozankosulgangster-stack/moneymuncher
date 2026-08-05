@@ -5,7 +5,7 @@ struct PaywallView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var purchaseManager: PurchaseManager
 
-    let onUnlocked: () -> Void
+    let onOpenLessons: () -> Void
 
     var body: some View {
         NavigationStack {
@@ -14,7 +14,9 @@ struct PaywallView: View {
                     header
                     benefits
                     #if DEBUG && targetEnvironment(simulator)
-                    debugUnlockButton
+                    if !purchaseManager.hasPremiumAccess {
+                        debugUnlockButton
+                    }
                     #endif
                     productOptions
                     restoreButton
@@ -33,6 +35,7 @@ struct PaywallView: View {
                 }
             }
             .task {
+                await purchaseManager.refreshPurchasedProducts()
                 await purchaseManager.loadProducts()
             }
         }
@@ -80,7 +83,7 @@ struct PaywallView: View {
     private var debugUnlockButton: some View {
         Button {
             purchaseManager.unlockPremiumForDebug()
-            onUnlocked()
+            onOpenLessons()
             dismiss()
         } label: {
             Label("Unlock Plus in Simulator", systemImage: "hammer.fill")
@@ -95,7 +98,7 @@ struct PaywallView: View {
     private var productOptions: some View {
         if purchaseManager.hasPremiumAccess {
             unlockedState
-        } else if purchaseManager.isLoadingProducts {
+        } else if purchaseManager.isRefreshingEntitlements || purchaseManager.isLoadingProducts {
             ProgressView("Loading plans...")
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 28)
@@ -107,7 +110,7 @@ struct PaywallView: View {
                     Button {
                         Task {
                             if await purchaseManager.purchase(product) {
-                                onUnlocked()
+                                onOpenLessons()
                                 dismiss()
                             }
                         }
@@ -154,19 +157,30 @@ struct PaywallView: View {
     }
 
     private var unlockedState: some View {
-        HStack(spacing: 12) {
-            Image(systemName: "checkmark.seal.fill")
-                .font(.title2.weight(.bold))
-                .foregroundStyle(Color(red: 0.05, green: 0.46, blue: 0.39))
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(spacing: 12) {
+                Image(systemName: "checkmark.seal.fill")
+                    .font(.title2.weight(.bold))
+                    .foregroundStyle(Color(red: 0.05, green: 0.46, blue: 0.39))
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Plus is active")
-                    .font(.headline)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Plus is active")
+                        .font(.headline)
 
-                Text("Premium quests are unlocked on this device.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    Text("Premium lessons and quests are unlocked on this device.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
             }
+
+            Button {
+                onOpenLessons()
+                dismiss()
+            } label: {
+                Label("Open Dino Lessons", systemImage: "book.closed.fill")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(PrimaryActionButtonStyle())
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -194,7 +208,7 @@ struct PaywallView: View {
         Button {
             Task {
                 if await purchaseManager.restorePurchases() {
-                    onUnlocked()
+                    onOpenLessons()
                     dismiss()
                 }
             }

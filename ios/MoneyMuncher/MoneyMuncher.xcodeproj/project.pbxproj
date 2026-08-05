@@ -18,6 +18,7 @@
 		A4F7D1136D9148B5902A0037 /* PremiumLearningModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0036 /* PremiumLearningModule.swift */; };
 		A4F7D1136D9148B5902A0039 /* PremiumLearningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0038 /* PremiumLearningView.swift */; };
 		A4F7D1136D9148B5902A0041 /* LessonNarrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0040 /* LessonNarrator.swift */; };
+		A4F7D1136D9148B5902A0042 /* ollie-interest.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0043 /* ollie-interest.mp3 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +35,7 @@
 		A4F7D1136D9148B5902A0036 /* PremiumLearningModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumLearningModule.swift; sourceTree = "<group>"; };
 		A4F7D1136D9148B5902A0038 /* PremiumLearningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumLearningView.swift; sourceTree = "<group>"; };
 		A4F7D1136D9148B5902A0040 /* LessonNarrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonNarrator.swift; sourceTree = "<group>"; };
+		A4F7D1136D9148B5902A0043 /* ollie-interest.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Narrations/ollie-interest.mp3; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,6 +77,7 @@
 				A4F7D1136D9148B5902A0036 /* PremiumLearningModule.swift */,
 				A4F7D1136D9148B5902A0038 /* PremiumLearningView.swift */,
 				A4F7D1136D9148B5902A0040 /* LessonNarrator.swift */,
+				A4F7D1136D9148B5902A0043 /* ollie-interest.mp3 */,
 				A4F7D1136D9148B5902A0016 /* Info.plist */,
 				A4F7D1136D9148B5902A0017 /* Assets.xcassets */,
 				A4F7D1136D9148B5902A0019 /* PrivacyInfo.xcprivacy */,
@@ -142,6 +145,7 @@
 			files = (
 				A4F7D1136D9148B5902A0018 /* Assets.xcassets in Resources */,
 				A4F7D1136D9148B5902A0020 /* PrivacyInfo.xcprivacy in Resources */,
+				A4F7D1136D9148B5902A0042 /* ollie-interest.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -287,7 +291,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 14;
+				CURRENT_PROJECT_VERSION = 23;
 				DEVELOPMENT_TEAM = A2TAG4GHM2;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = MoneyMuncher/Info.plist;
@@ -312,9 +316,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 14;
-				DEVELOPMENT_TEAM = A2TAG4GHM2;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 23;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = A2TAG4GHM2;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = MoneyMuncher/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
@@ -325,6 +331,8 @@
 				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = ca.moneymuncher.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MoneyMuncher App Store";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;

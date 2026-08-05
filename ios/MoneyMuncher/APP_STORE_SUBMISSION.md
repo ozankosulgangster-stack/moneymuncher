@@ -51,9 +51,8 @@ The app uses no native advertising SDKs and no brokerage or real-money trading f
 
 ## Screenshots Needed
 
-- iPhone 6.7-inch: native home, Cup Rush, Everyday Quest, parent gate.
-- iPhone 6.5-inch or 6.1-inch: same set if App Store Connect requests it.
-- iPad 13-inch: native home and Cup Rush landscape.
+- Follow `APP_STORE_MARKETING_1.2.md` for the current iPhone and iPad capture list, file sizes, screenshot copy, and App Store accessibility declaration plan.
+- Use actual `1.2 (23)` screens. Do not upload a TestFlight state that says subscription plans are unavailable.
 
 ## Privacy Questionnaire Prep
 
@@ -79,6 +78,8 @@ Confirm the final answer set before submission:
 - TestFlight upload requires Xcode 26 or later because App Store Connect rejects iOS 18.4 SDK uploads.
 - Privacy policy is live and accurate.
 - Support URL is live.
+- Accessibility page is ready at `kids/accessibility.html`; deploy it to `https://moneymuncher.ca/kids/accessibility.html` before entering that URL in App Store Connect.
+- Accessibility Nutrition Labels are left unselected until the iPhone and iPad device audit in `APP_STORE_MARKETING_1.2.md` is completed.
 - Parent gate is tested.
 - TestFlight build is tested on real iPhone and iPad.
 - App Review demo account is created if account access is required.

@@ -51,14 +51,6 @@ enum AppDestination: Identifiable {
         }
     }
 
-    var requiresPremium: Bool {
-        switch self {
-        case .questGenerator:
-            return true
-        case .play, .familySignup, .parentGuide, .privacy:
-            return false
-        }
-    }
 }
 
 private struct FeatureCard: Identifiable {
@@ -67,21 +59,6 @@ private struct FeatureCard: Identifiable {
     let subtitle: String
     let systemImage: String
     let destination: AppDestination
-    let requiresPremium: Bool
-
-    init(
-        title: String,
-        subtitle: String,
-        systemImage: String,
-        destination: AppDestination,
-        requiresPremium: Bool = false
-    ) {
-        self.title = title
-        self.subtitle = subtitle
-        self.systemImage = systemImage
-        self.destination = destination
-        self.requiresPremium = requiresPremium
-    }
 }
 
 struct ContentView: View {
@@ -89,7 +66,6 @@ struct ContentView: View {
 
     @State private var activeDestination: AppDestination?
     @State private var gatedDestination: AppDestination?
-    @State private var premiumDestination: AppDestination?
     @State private var isShowingParentGate = false
     @State private var isPaywallPending = false
     @State private var isShowingPaywall = false
@@ -105,10 +81,9 @@ struct ContentView: View {
         ),
         FeatureCard(
             title: "Everyday Quest",
-            subtitle: "Plus unlocks snack runs, birthdays, and allowance moments as quick money choices.",
+            subtitle: "Turn snack runs, birthdays, and allowance moments into quick money choices.",
             systemImage: "sparkles",
-            destination: .questGenerator,
-            requiresPremium: true
+            destination: .questGenerator
         )
     ]
 
@@ -132,10 +107,9 @@ struct ContentView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
                     hero
-                    premiumStatus
-                    premiumLearningEntry
                     section(title: "Kid Missions", cards: kidCards)
                     section(title: "Family Area", cards: familyCards)
+                    plusLearning
                 }
                 .padding(20)
             }
@@ -156,13 +130,23 @@ struct ContentView: View {
         .sheet(item: $activeDestination) { destination in
             WebExperienceView(destination: destination)
         }
+        .task {
+            await purchaseManager.refreshPurchasedProducts()
+        }
         .sheet(isPresented: $isShowingPremiumLearning) {
             PremiumLearningHubView()
         }
         .sheet(isPresented: $isShowingPaywall, onDismiss: openPremiumDestinationIfUnlocked) {
-            PaywallView {
-                isShowingPaywall = false
-            }
+            PaywallView(
+                onOpenLessons: {
+                    pendingPremiumLearning = false
+                    isShowingPaywall = false
+
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                        isShowingPremiumLearning = true
+                    }
+                }
+            )
             .environmentObject(purchaseManager)
         }
         .sheet(isPresented: $isShowingParentGate) {
@@ -180,19 +164,36 @@ struct ContentView: View {
                             activeDestination = destination
                         }
                     } else if shouldShowPaywall {
-                        DispatchQueue.main.async {
-                            isShowingPaywall = true
+                        Task { @MainActor in
+                            let restoredPremiumAccess = await purchaseManager.restorePurchases()
+
+                            if restoredPremiumAccess, pendingPremiumLearning {
+                                pendingPremiumLearning = false
+                                isShowingPremiumLearning = true
+                            } else {
+                                isShowingPaywall = true
+                            }
                         }
                     }
                 },
                 onCancel: {
                     gatedDestination = nil
-                    premiumDestination = nil
                     pendingPremiumLearning = false
                     isPaywallPending = false
                     isShowingParentGate = false
                 }
             )
+        }
+    }
+
+    private var plusLearning: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Plus Learning")
+                .font(.headline)
+                .foregroundStyle(Color(red: 0.05, green: 0.26, blue: 0.23))
+
+            premiumStatus
+            premiumLearningEntry
         }
     }
 
@@ -353,11 +354,6 @@ struct ContentView: View {
     }
 
     private func open(_ destination: AppDestination) {
-        if destination.requiresPremium && !purchaseManager.hasPremiumAccess {
-            requestPaywall(for: destination)
-            return
-        }
-
         if destination.requiresParentGate {
             gatedDestination = destination
             isShowingParentGate = true
@@ -366,8 +362,7 @@ struct ContentView: View {
         }
     }
 
-    private func requestPaywall(for destination: AppDestination? = nil, opensLearningHub: Bool = false) {
-        premiumDestination = destination
+    private func requestPaywall(opensLearningHub: Bool = false) {
         pendingPremiumLearning = opensLearningHub
         gatedDestination = nil
         isPaywallPending = true
@@ -384,15 +379,7 @@ struct ContentView: View {
 
     private func openPremiumDestinationIfUnlocked() {
         guard purchaseManager.hasPremiumAccess else {
-            premiumDestination = nil
             pendingPremiumLearning = false
-            return
-        }
-
-        if let destination = premiumDestination {
-            premiumDestination = nil
-            pendingPremiumLearning = false
-            activeDestination = destination
             return
         }
 
@@ -407,20 +394,12 @@ struct ContentView: View {
             return "lock.fill"
         }
 
-        if card.requiresPremium && !purchaseManager.hasPremiumAccess {
-            return "crown.fill"
-        }
-
         return "chevron.right"
     }
 
     private func accessibilityHint(for card: FeatureCard) -> String {
         if card.destination.requiresParentGate {
             return "Parent gate required"
-        }
-
-        if card.requiresPremium && !purchaseManager.hasPremiumAccess {
-            return "Plus subscription required"
         }
 
         return "Opens Money Muncher"

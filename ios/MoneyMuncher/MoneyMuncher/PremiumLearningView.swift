@@ -11,6 +11,13 @@ struct PremiumLearningHubView: View {
                 VStack(alignment: .leading, spacing: 18) {
                     hubHeader
 
+                    NavigationLink {
+                        DinoStoryPlayerView()
+                    } label: {
+                        DinoStoryPreview()
+                    }
+                    .buttonStyle(.plain)
+
                     ForEach(modules) { module in
                         NavigationLink(value: module) {
                             PremiumLearningModuleCard(module: module)
@@ -70,6 +77,40 @@ struct PremiumLearningHubView: View {
             )
         )
         .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+    }
+}
+
+private struct DinoStoryPreview: View {
+    var body: some View {
+        ZStack(alignment: .bottomLeading) {
+            Image("DinoStoryBackdrop")
+                .resizable()
+                .scaledToFill()
+
+            Color.black.opacity(0.24)
+
+            HStack(alignment: .bottom, spacing: 12) {
+                Image(systemName: "play.circle.fill")
+                    .font(.system(size: 42, weight: .semibold))
+                    .foregroundStyle(.white)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Dino's Money Story")
+                        .font(.title3.weight(.bold))
+                        .foregroundStyle(.white)
+
+                    Text("A narrated adventure about debit, interest, and saving.")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(.white.opacity(0.92))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .padding(18)
+        }
+        .aspectRatio(16.0 / 9.0, contentMode: .fit)
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Play Dino's Money Story")
     }
 }
 
@@ -393,6 +434,642 @@ private struct PremiumLearningModuleDetailView: View {
         narrator.stop()
         selectedStepIndex = min(max(stepIndex, 0), module.steps.count - 1)
         selectedAnswerIndex = nil
+    }
+}
+
+private struct DinoStoryScene: Identifiable {
+    enum Visual {
+        case debit
+        case interest
+        case saving
+    }
+
+    let id: String
+    let narratorName: String
+    let title: String
+    let subtitle: String
+    let narration: String
+    let boardCaption: String
+    let visual: Visual
+    let recordingResource: String?
+}
+
+private struct DinoStoryPlayerView: View {
+    @StateObject private var narrator = LessonNarrator()
+    @State private var selectedSceneIndex = 0
+    @State private var isPlayingStory = false
+
+    private let scenes: [DinoStoryScene] = [
+        DinoStoryScene(
+            id: "debit-story",
+            narratorName: "Dino",
+            title: "The snack shop",
+            subtitle: "Debit spends money now.",
+            narration: "Hi, I am Dino. When you tap with a debit card, the money comes out of your bank account now. Before you buy, check that your account has enough money.",
+            boardCaption: "Money leaves your bank now.",
+            visual: .debit,
+            recordingResource: nil
+        ),
+        DinoStoryScene(
+            id: "interest-story",
+            narratorName: "Ollie Owl",
+            title: "Two kinds of interest",
+            subtitle: "Saving can earn; borrowing can cost.",
+            narration: "Interest has two jobs. Savings can earn a little extra money over time. Borrowed money can cost extra when you pay it back later. That is why paying a credit card bill in full and on time matters.",
+            boardCaption: "Saving earns. Borrowing costs.",
+            visual: .interest,
+            recordingResource: "ollie-interest"
+        ),
+        DinoStoryScene(
+            id: "saving-story",
+            narratorName: "Dino",
+            title: "The goal jar",
+            subtitle: "Small deposits grow a goal.",
+            narration: "Saving gives each dollar a job. Put a little toward a goal, then leave it there. Small deposits and time can make a big difference.",
+            boardCaption: "A little, often, for a goal.",
+            visual: .saving,
+            recordingResource: nil
+        )
+    ]
+
+    private var currentScene: DinoStoryScene {
+        scenes[selectedSceneIndex]
+    }
+
+    private var isLastScene: Bool {
+        selectedSceneIndex == scenes.count - 1
+    }
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                storyStage
+                storyProgress
+                storyText
+                storyControls
+                scenePicker
+
+                Text("Dino uses pretend money in this story. Talk through real money choices with a parent or guardian.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(20)
+        }
+        .background(Color(uiColor: .systemGroupedBackground))
+        .navigationTitle("Dino's Money Story")
+        .navigationBarTitleDisplayMode(.inline)
+        .onDisappear {
+            stopStory()
+        }
+    }
+
+    @ViewBuilder
+    private var storyStage: some View {
+        switch currentScene.visual {
+        case .interest:
+            OllieInterestStoryStage(
+                speechLevel: narrator.speechLevel,
+                playbackProgress: narrator.recordedPlaybackProgress,
+                isNarrating: narrator.isSpeaking && narrator.spokenStepID == currentScene.id
+            )
+
+        case .debit, .saving:
+            DinoTeacherStoryStage(
+                scene: currentScene,
+                isNarrating: narrator.isSpeaking && narrator.spokenStepID == currentScene.id,
+                speechLevel: narrator.speechLevel,
+                sceneNumber: selectedSceneIndex + 1
+            )
+        }
+    }
+
+    private var storyProgress: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Scene \(selectedSceneIndex + 1) of \(scenes.count)")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(.secondary)
+
+                Spacer()
+
+                Text(currentScene.subtitle)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color(red: 0.04, green: 0.35, blue: 0.30))
+                    .multilineTextAlignment(.trailing)
+            }
+
+            ProgressView(value: Double(selectedSceneIndex + 1), total: Double(scenes.count))
+                .tint(Color(red: 0.05, green: 0.46, blue: 0.39))
+        }
+    }
+
+    private var storyText: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Narrated by \(currentScene.narratorName)")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(Color(red: 0.04, green: 0.35, blue: 0.30))
+
+            Text(currentScene.title)
+                .font(.title2.weight(.bold))
+                .foregroundStyle(Color(red: 0.05, green: 0.26, blue: 0.23))
+
+            Text(currentScene.narration)
+                .font(.body)
+                .foregroundStyle(.primary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    private var storyControls: some View {
+        HStack(spacing: 12) {
+            Button {
+                isPlayingStory ? stopStory() : startStory()
+            } label: {
+                Label(isPlayingStory ? "Stop Story" : "Play Story", systemImage: isPlayingStory ? "stop.fill" : "play.fill")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(PrimaryActionButtonStyle())
+
+            Button {
+                selectScene(min(selectedSceneIndex + 1, scenes.count - 1))
+            } label: {
+                Image(systemName: "chevron.right")
+                    .font(.headline.weight(.bold))
+                    .frame(width: 48, height: 48)
+            }
+            .buttonStyle(LessonIconButtonStyle())
+            .disabled(isLastScene)
+            .accessibilityLabel("Next story scene")
+        }
+    }
+
+    private var scenePicker: some View {
+        HStack(spacing: 8) {
+            ForEach(scenes.indices, id: \.self) { index in
+                let scene = scenes[index]
+
+                Button {
+                    selectScene(index)
+                } label: {
+                    VStack(spacing: 5) {
+                        Image(systemName: icon(for: scene.visual))
+                            .font(.headline.weight(.bold))
+
+                        Text("\(index + 1)")
+                            .font(.caption.weight(.bold))
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 10)
+                    .foregroundStyle(index == selectedSceneIndex ? .white : Color(red: 0.04, green: 0.35, blue: 0.30))
+                    .background(index == selectedSceneIndex ? Color(red: 0.04, green: 0.43, blue: 0.36) : Color(uiColor: .secondarySystemGroupedBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Scene \(index + 1): \(scene.title)")
+            }
+        }
+    }
+
+    private func startStory() {
+        narrator.stop()
+        isPlayingStory = true
+        playScene(at: 0, advancesStory: true)
+    }
+
+    private func playScene(at index: Int, advancesStory: Bool) {
+        guard scenes.indices.contains(index) else {
+            stopStory()
+            return
+        }
+
+        withAnimation(.easeInOut(duration: 0.35)) {
+            selectedSceneIndex = index
+        }
+
+        narrateScene(scenes[index]) {
+            guard advancesStory, isPlayingStory else {
+                return
+            }
+
+            if index < scenes.count - 1 {
+                playScene(at: index + 1, advancesStory: true)
+            } else {
+                stopStory()
+            }
+        }
+    }
+
+    private func selectScene(_ index: Int) {
+        guard scenes.indices.contains(index) else {
+            return
+        }
+
+        stopStory()
+        withAnimation(.easeInOut(duration: 0.35)) {
+            selectedSceneIndex = index
+        }
+        narrateScene(scenes[index])
+    }
+
+    private func stopStory() {
+        isPlayingStory = false
+        narrator.stop()
+    }
+
+    private func narrateScene(_ scene: DinoStoryScene, completion: (() -> Void)? = nil) {
+        if let recordingResource = scene.recordingResource {
+            narrator.playRecordedAudio(
+                resource: recordingResource,
+                id: scene.id,
+                fallbackText: scene.narration,
+                completion: completion
+            )
+        } else {
+            narrator.speak(id: scene.id, text: scene.narration, completion: completion)
+        }
+    }
+
+    private func icon(for visual: DinoStoryScene.Visual) -> String {
+        switch visual {
+        case .debit:
+            return "creditcard.fill"
+        case .interest:
+            return "arrow.triangle.2.circlepath"
+        case .saving:
+            return "target"
+        }
+    }
+}
+
+private struct DinoTeacherStoryStage: View {
+    let scene: DinoStoryScene
+    let isNarrating: Bool
+    let speechLevel: Float
+    let sceneNumber: Int
+
+    @State private var isTeachingMotion = false
+
+    var body: some View {
+        GeometryReader { proxy in
+            ZStack {
+                LinearGradient(
+                    colors: [
+                        Color(red: 0.91, green: 0.98, blue: 0.90),
+                        Color(red: 0.73, green: 0.90, blue: 0.98)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+
+                DinoStoryBoardVisual(scene: scene, isPlaying: isNarrating)
+                    .frame(width: proxy.size.width * 0.38, height: proxy.size.height * 0.52)
+                    .position(x: proxy.size.width * 0.76, y: proxy.size.height * 0.46)
+                    .id(scene.id)
+                    .transition(.opacity.combined(with: .scale(scale: 0.94)))
+                    .animation(.easeInOut(duration: 0.4), value: scene.id)
+
+                Image("DinoTeacher")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: proxy.size.width * 0.55, height: proxy.size.height * 0.95)
+                    .position(x: proxy.size.width * 0.31, y: proxy.size.height * 0.59)
+                    .offset(y: isNarrating && isTeachingMotion ? -7 : 0)
+                    .rotationEffect(.degrees(isNarrating ? (isTeachingMotion ? -1.4 : 1.4) : 0))
+                    .scaleEffect(1 + CGFloat(speechLevel) * 0.018)
+                    .animation(.easeInOut(duration: 1.0), value: isTeachingMotion)
+                    .animation(.linear(duration: 0.07), value: speechLevel)
+
+                stageChrome
+            }
+        }
+        .aspectRatio(16.0 / 9.0, contentMode: .fit)
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(Color.white.opacity(0.6), lineWidth: 1)
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Dino story scene \(sceneNumber): \(scene.title)")
+        .onAppear {
+            withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
+                isTeachingMotion = true
+            }
+        }
+    }
+
+    private var stageChrome: some View {
+        VStack {
+            HStack {
+                Text("DINO TEACHES")
+                    .font(.caption2.weight(.heavy))
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 6)
+                    .foregroundStyle(Color(red: 0.04, green: 0.35, blue: 0.30))
+                    .background(.white.opacity(0.88))
+                    .clipShape(Capsule())
+
+                Spacer()
+            }
+
+            Spacer()
+
+            HStack {
+                Spacer()
+
+                if isNarrating {
+                    Label("Playing", systemImage: "speaker.wave.2.fill")
+                        .font(.caption.weight(.bold))
+                        .padding(.horizontal, 9)
+                        .padding(.vertical, 6)
+                        .foregroundStyle(.white)
+                        .background(.black.opacity(0.38))
+                        .clipShape(Capsule())
+                }
+            }
+        }
+        .padding(14)
+    }
+}
+
+private struct DinoStoryBoardVisual: View {
+    let scene: DinoStoryScene
+    let isPlaying: Bool
+
+    var body: some View {
+        VStack(spacing: 7) {
+            Text(scene.title)
+                .font(.system(size: 15, weight: .bold, design: .rounded))
+                .multilineTextAlignment(.center)
+                .foregroundStyle(Color(red: 0.04, green: 0.29, blue: 0.25))
+
+            HStack(spacing: 6) {
+                visualIcons
+            }
+            .font(.system(size: 22, weight: .bold))
+
+            Text(scene.boardCaption)
+                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                .multilineTextAlignment(.center)
+                .foregroundStyle(Color(red: 0.13, green: 0.34, blue: 0.30))
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(8)
+        .scaleEffect(isPlaying ? 1.03 : 1.0)
+        .animation(
+            isPlaying ? .easeInOut(duration: 1.1).repeatForever(autoreverses: true) : .default,
+            value: isPlaying
+        )
+    }
+
+    @ViewBuilder
+    private var visualIcons: some View {
+        switch scene.visual {
+        case .debit:
+            Image(systemName: "creditcard.fill")
+                .foregroundStyle(Color(red: 0.04, green: 0.43, blue: 0.36))
+            Image(systemName: "arrow.right")
+                .foregroundStyle(Color(red: 0.13, green: 0.34, blue: 0.30))
+            Image(systemName: "building.columns.fill")
+                .foregroundStyle(Color(red: 0.10, green: 0.47, blue: 0.64))
+
+        case .interest:
+            Image(systemName: "banknote.fill")
+                .foregroundStyle(Color(red: 0.04, green: 0.43, blue: 0.36))
+            Image(systemName: "arrow.triangle.2.circlepath")
+                .foregroundStyle(Color(red: 0.80, green: 0.42, blue: 0.10))
+            Image(systemName: "creditcard.fill")
+                .foregroundStyle(Color(red: 0.57, green: 0.22, blue: 0.15))
+
+        case .saving:
+            Image(systemName: "coins.fill")
+                .foregroundStyle(Color(red: 0.80, green: 0.55, blue: 0.08))
+            Image(systemName: "arrow.right")
+                .foregroundStyle(Color(red: 0.13, green: 0.34, blue: 0.30))
+            Image(systemName: "target")
+                .foregroundStyle(Color(red: 0.13, green: 0.42, blue: 0.68))
+        }
+    }
+}
+
+private struct OllieInterestStoryStage: View {
+    enum StoryBeat {
+        case saving
+        case borrowing
+        case payingInFull
+    }
+
+    let speechLevel: Float
+    let playbackProgress: Double
+    let isNarrating: Bool
+
+    @State private var isFloating = false
+
+    private var storyBeat: StoryBeat {
+        if playbackProgress < 0.34 {
+            return .saving
+        }
+
+        if playbackProgress < 0.70 {
+            return .borrowing
+        }
+
+        return .payingInFull
+    }
+
+    var body: some View {
+        GeometryReader { proxy in
+            ZStack {
+                LinearGradient(
+                    colors: [
+                        Color(red: 0.89, green: 0.97, blue: 0.92),
+                        Color(red: 0.73, green: 0.90, blue: 0.98)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+
+                storyVisual(in: proxy.size)
+
+                OllieTalkingAvatar(
+                    speechLevel: speechLevel,
+                    isNarrating: isNarrating
+                )
+                .frame(width: proxy.size.width * 0.49, height: proxy.size.height * 0.92)
+                .position(x: proxy.size.width * 0.32, y: proxy.size.height * 0.56)
+                .offset(y: isNarrating && isFloating ? -6 : 0)
+                .rotationEffect(.degrees(isNarrating ? (isFloating ? -1.2 : 1.2) : 0))
+                .animation(.easeInOut(duration: 1.15), value: isFloating)
+
+                VStack {
+                    HStack {
+                        Text("OLLIE OWL NARRATES")
+                            .font(.caption2.weight(.heavy))
+                            .padding(.horizontal, 9)
+                            .padding(.vertical, 6)
+                            .foregroundStyle(Color(red: 0.04, green: 0.35, blue: 0.30))
+                            .background(.white.opacity(0.88))
+                            .clipShape(Capsule())
+
+                        Spacer()
+                    }
+
+                    Spacer()
+
+                    HStack {
+                        Spacer()
+
+                        if isNarrating {
+                            Label("Playing", systemImage: "speaker.wave.2.fill")
+                                .font(.caption.weight(.bold))
+                                .padding(.horizontal, 9)
+                                .padding(.vertical, 6)
+                                .foregroundStyle(.white)
+                                .background(.black.opacity(0.38))
+                                .clipShape(Capsule())
+                        }
+                    }
+                }
+                .padding(14)
+            }
+        }
+        .aspectRatio(16.0 / 9.0, contentMode: .fit)
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(Color.white.opacity(0.6), lineWidth: 1)
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Ollie Owl explains saving and borrowing interest")
+        .onAppear {
+            startMotion()
+        }
+    }
+
+    private func startMotion() {
+        withAnimation(.easeInOut(duration: 1.15).repeatForever(autoreverses: true)) {
+            isFloating = true
+        }
+    }
+
+    private func storyVisual(in size: CGSize) -> some View {
+        InterestStoryBeatVisual(beat: storyBeat, isNarrating: isNarrating)
+            .frame(width: size.width * 0.40, height: size.height * 0.50)
+            .position(x: size.width * 0.75, y: size.height * 0.47)
+            .id(storyBeat)
+            .transition(.opacity.combined(with: .scale(scale: 0.92)))
+            .animation(.easeInOut(duration: 0.35), value: playbackProgress)
+    }
+}
+
+private struct InterestStoryBeatVisual: View {
+    let beat: OllieInterestStoryStage.StoryBeat
+    let isNarrating: Bool
+
+    var body: some View {
+        VStack(spacing: 10) {
+            HStack(spacing: 8) {
+                beatIcon
+                    .font(.system(size: 30, weight: .bold))
+
+                Text(heading)
+                    .font(.system(size: 18, weight: .heavy, design: .rounded))
+            }
+            .foregroundStyle(Color(red: 0.04, green: 0.29, blue: 0.25))
+
+            Text(detail)
+                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                .multilineTextAlignment(.center)
+                .foregroundStyle(Color(red: 0.13, green: 0.34, blue: 0.30))
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(10)
+        .scaleEffect(isNarrating ? 1.03 : 1.0)
+        .animation(
+            isNarrating ? .easeInOut(duration: 1.0).repeatForever(autoreverses: true) : .default,
+            value: isNarrating
+        )
+    }
+
+    private var heading: String {
+        switch beat {
+        case .saving:
+            return "Savings can grow"
+        case .borrowing:
+            return "Borrowing can cost"
+        case .payingInFull:
+            return "Pay in full"
+        }
+    }
+
+    private var detail: String {
+        switch beat {
+        case .saving:
+            return "A bank may add a little extra over time."
+        case .borrowing:
+            return "Credit can cost extra to repay later."
+        case .payingInFull:
+            return "Paying on time helps avoid interest."
+        }
+    }
+
+    @ViewBuilder
+    private var beatIcon: some View {
+        switch beat {
+        case .saving:
+            Image(systemName: "banknote.fill")
+                .foregroundStyle(Color(red: 0.04, green: 0.43, blue: 0.36))
+            Image(systemName: "arrow.up.right")
+                .foregroundStyle(Color(red: 0.13, green: 0.42, blue: 0.68))
+
+        case .borrowing:
+            Image(systemName: "creditcard.fill")
+                .foregroundStyle(Color(red: 0.57, green: 0.22, blue: 0.15))
+            Image(systemName: "percent")
+                .foregroundStyle(Color(red: 0.80, green: 0.42, blue: 0.10))
+
+        case .payingInFull:
+            Image(systemName: "checkmark.circle.fill")
+                .foregroundStyle(Color(red: 0.04, green: 0.43, blue: 0.36))
+            Image(systemName: "calendar")
+                .foregroundStyle(Color(red: 0.13, green: 0.42, blue: 0.68))
+        }
+    }
+}
+
+private struct OllieTalkingAvatar: View {
+    let speechLevel: Float
+    let isNarrating: Bool
+
+    private let assetAspectRatio = 1112.0 / 1414.0
+
+    var body: some View {
+        GeometryReader { proxy in
+            let imageHeight = min(proxy.size.height, proxy.size.width / assetAspectRatio)
+            let imageWidth = imageHeight * assetAspectRatio
+            let beakOffset = isNarrating ? imageHeight * (0.006 + CGFloat(speechLevel) * 0.022) : 0
+
+            ZStack {
+                Image("OllieOwl")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: imageWidth, height: imageHeight)
+
+                Image("OllieOwl")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: imageWidth, height: imageHeight)
+                    .mask {
+                        Ellipse()
+                            .frame(width: imageWidth * 0.17, height: imageHeight * 0.08)
+                            .position(x: imageWidth * 0.505, y: imageHeight * 0.425)
+                    }
+                    .offset(y: beakOffset)
+                    .animation(.linear(duration: 0.065), value: speechLevel)
+            }
+            .frame(width: proxy.size.width, height: proxy.size.height)
+        }
+        .accessibilityHidden(true)
     }
 }
 

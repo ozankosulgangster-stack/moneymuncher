@@ -11,7 +11,7 @@ This folder contains a lightweight iOS app shell for Money Muncher. It is built 
 - Parent gate before purchase options are shown.
 - Premium unlock checks using current App Store entitlements.
 - Dino Money Lab premium modules for cards, interest, and stock-market basics.
-- Built-in audio narration for Dino lesson steps using iOS text-to-speech.
+- Built-in audio narration for Dino lesson steps using iOS text-to-speech, plus recorded Ollie narration for the interest story.
 - First-party navigation restriction for `moneymuncher.ca`.
 - In-app content rules that block Google Tag Manager and Google Analytics requests inside the iOS app web views.
 - Apple privacy manifest with no native SDK data collection declared.
@@ -31,7 +31,7 @@ Plus content currently includes:
 
 Investing lessons use virtual examples only and do not provide real-money trading advice.
 
-Audio lessons use `AVSpeechSynthesizer` with the device's built-in text-to-speech voices. They do not require recorded audio assets, a microphone permission, or a cloud service.
+Audio lessons use `AVSpeechSynthesizer` with the device's built-in text-to-speech voices. The Ollie interest story also includes the bundled `Narrations/ollie-interest.mp3` recording, which does not require a microphone permission or cloud service.
 
 Subscription product IDs live in:
 

@@ -10,6 +10,8 @@ final class PurchaseManager: ObservableObject {
     @Published private(set) var products: [Product] = []
     @Published private(set) var hasPremiumAccess = false
     @Published private(set) var isLoadingProducts = false
+    @Published private(set) var isRefreshingEntitlements = false
+    @Published private(set) var isUsingSandboxPremiumFallback = false
     @Published private(set) var activePurchaseProductID: String?
     @Published var purchaseMessage: String?
 
@@ -88,6 +90,8 @@ final class PurchaseManager: ObservableObject {
 
             if !hasPremiumAccess {
                 purchaseMessage = "No active Plus subscription was found for this Apple ID."
+            } else if isUsingSandboxPremiumFallback {
+                purchaseMessage = "Plus was restored from a previous Sandbox test purchase."
             }
 
             return hasPremiumAccess
@@ -98,7 +102,12 @@ final class PurchaseManager: ObservableObject {
     }
 
     func refreshPurchasedProducts() async {
+        isRefreshingEntitlements = true
+        defer { isRefreshingEntitlements = false }
+
         var hasActiveSubscription = false
+        var hasSandboxPlusPurchase = false
+        let now = Date()
 
         for await entitlement in Transaction.currentEntitlements {
             guard let transaction = try? verified(entitlement) else {
@@ -107,15 +116,34 @@ final class PurchaseManager: ObservableObject {
 
             if MoneyMuncherSubscriptionProduct.all.contains(transaction.productID),
                transaction.revocationDate == nil,
-               !transaction.isUpgraded {
+               transaction.expirationDate.map({ $0 > now }) ?? true {
                 hasActiveSubscription = true
             }
         }
 
+        // TestFlight uses StoreKit's Sandbox environment, where subscriptions expire
+        // quickly after a limited number of renewals. Keep beta content testable after
+        // a prior Sandbox purchase without changing production entitlement behavior.
+        if !hasActiveSubscription {
+            for await transactionResult in Transaction.all {
+                guard let transaction = try? verified(transactionResult) else {
+                    continue
+                }
+
+                if MoneyMuncherSubscriptionProduct.all.contains(transaction.productID),
+                   transaction.environment == .sandbox {
+                    hasSandboxPlusPurchase = true
+                    break
+                }
+            }
+        }
+
+        isUsingSandboxPremiumFallback = !hasActiveSubscription && hasSandboxPlusPurchase
+
         #if DEBUG && targetEnvironment(simulator)
-        hasPremiumAccess = hasActiveSubscription || UserDefaults.standard.bool(forKey: Self.debugPremiumAccessKey)
+        hasPremiumAccess = hasActiveSubscription || hasSandboxPlusPurchase || UserDefaults.standard.bool(forKey: Self.debugPremiumAccessKey)
         #else
-        hasPremiumAccess = hasActiveSubscription
+        hasPremiumAccess = hasActiveSubscription || hasSandboxPlusPurchase
         #endif
     }
 
