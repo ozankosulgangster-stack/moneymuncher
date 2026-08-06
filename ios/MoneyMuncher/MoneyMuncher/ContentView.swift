@@ -3,6 +3,7 @@ import SwiftUI
 enum AppDestination: Identifiable {
     case play
     case questGenerator
+    case familyQuest
     case familySignup
     case parentGuide
     case privacy
@@ -11,6 +12,7 @@ enum AppDestination: Identifiable {
         switch self {
         case .play: return "play"
         case .questGenerator: return "quest-generator"
+        case .familyQuest: return "family-quest"
         case .familySignup: return "family-signup"
         case .parentGuide: return "parent-guide"
         case .privacy: return "privacy"
@@ -21,6 +23,7 @@ enum AppDestination: Identifiable {
         switch self {
         case .play: return "Cup Rush"
         case .questGenerator: return "Everyday Quest"
+        case .familyQuest: return "Family Quest"
         case .familySignup: return "Family Sign Up"
         case .parentGuide: return "Parent Guide"
         case .privacy: return "Privacy"
@@ -33,6 +36,8 @@ enum AppDestination: Identifiable {
             return URL(string: "https://moneymuncher.ca/kids/play/?source=ios-app")!
         case .questGenerator:
             return URL(string: "https://moneymuncher.ca/kids/?source=ios-app#questGeneratorTitle")!
+        case .familyQuest:
+            return URL(string: "https://moneymuncher.ca/kids/?source=ios-app&entry=family-quest#questGeneratorTitle")!
         case .familySignup:
             return URL(string: "https://moneymuncher.ca/?source=ios-app")!
         case .parentGuide:
@@ -44,7 +49,7 @@ enum AppDestination: Identifiable {
 
     var requiresParentGate: Bool {
         switch self {
-        case .familySignup, .parentGuide:
+        case .familyQuest, .familySignup, .parentGuide:
             return true
         case .play, .questGenerator, .privacy:
             return false
@@ -88,6 +93,12 @@ struct ContentView: View {
     ]
 
     private let familyCards = [
+        FeatureCard(
+            title: "Family Quest",
+            subtitle: "Create a quick money choice game from a real family moment.",
+            systemImage: "flag.checkered",
+            destination: .familyQuest
+        ),
         FeatureCard(
             title: "Family Sign Up",
             subtitle: "Create an account and keep learning progress together.",
