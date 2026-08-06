@@ -452,6 +452,17 @@ private struct DinoStoryScene: Identifiable {
     let boardCaption: String
     let visual: Visual
     let recordingResource: String?
+
+    var storyBackdropName: String? {
+        switch visual {
+        case .debit:
+            return "DinoDebitStoryBackdrop"
+        case .interest:
+            return nil
+        case .saving:
+            return "DinoSavingStoryBackdrop"
+        }
+    }
 }
 
 private struct DinoStoryPlayerView: View {
@@ -463,10 +474,10 @@ private struct DinoStoryPlayerView: View {
         DinoStoryScene(
             id: "debit-story",
             narratorName: "Dino",
-            title: "The snack shop",
-            subtitle: "Debit spends money now.",
-            narration: "Hi, I am Dino. When you tap with a debit card, the money comes out of your bank account now. Before you buy, check that your account has enough money.",
-            boardCaption: "Money leaves your bank now.",
+            title: "Mia's snack-shop choice",
+            subtitle: "Debit uses money you have now.",
+            narration: "Hi, I am Dino! Today I am helping my friend Mia use a debit card. Mia has twenty dollars in her bank account. That is her balance, like a money backpack. At the snack shop, she chooses a juice for three dollars and a fruit cup for two dollars. She checks that twenty dollars is enough, then taps her debit card. Five dollars comes out of her account right away, so Mia has fifteen dollars left. Next she sees a toy for eighteen dollars. It looks fun, but fifteen dollars is not enough. A debit card does not create extra money. Mia decides to save for the toy instead. Before you tap, swipe, or buy online, check your balance. Ask: do I have enough, and will I have money left for things I need? Check, choose, and spend smart!",
+            boardCaption: "Check your balance before you tap.",
             visual: .debit,
             recordingResource: nil
         ),
@@ -483,12 +494,12 @@ private struct DinoStoryPlayerView: View {
         DinoStoryScene(
             id: "saving-story",
             narratorName: "Dino",
-            title: "The goal jar",
-            subtitle: "Small deposits grow a goal.",
-            narration: "Saving gives each dollar a job. Put a little toward a goal, then leave it there. Small deposits and time can make a big difference.",
-            boardCaption: "A little, often, for a goal.",
+            title: "Leo's soccer-ball goal",
+            subtitle: "Small saves build a goal.",
+            narration: "Hi, I'm Dino! Today I'm helping my friend Leo save for something special. Leo wants a new soccer ball that costs thirty dollars. Right now, he has eight dollars in his savings jar. That means he needs twenty-two more dollars to reach his goal. Leo gets five dollars for helping wash the car. He could spend it on candy, but he remembers his soccer-ball goal. He puts four dollars into his savings jar and keeps one dollar for a small treat. Now Leo has twelve dollars saved. A week later, Leo receives ten dollars for his birthday. He puts six dollars into his jar. His family also finds four dollars of change from an old coat pocket. Leo adds that too. Let's count: eight dollars, plus four dollars, plus six dollars, plus four dollars. Leo now has twenty-two dollars saved! He is not at thirty dollars yet, but he is getting closer. Leo makes a plan: each week, he will save three dollars from his allowance. After a few more weeks, his jar will reach thirty dollars. Saving is not about never spending. It is about choosing what matters most and giving your money a job for later. Pick a goal. Write down how much it costs. Add small amounts often. Watch your savings grow. That's Dino-smart saving!",
+            boardCaption: "Small amounts move a goal forward.",
             visual: .saving,
-            recordingResource: nil
+            recordingResource: "dino-saving"
         )
     ]
 
@@ -713,18 +724,18 @@ private struct DinoTeacherStoryStage: View {
     var body: some View {
         GeometryReader { proxy in
             ZStack {
-                LinearGradient(
-                    colors: [
-                        Color(red: 0.91, green: 0.98, blue: 0.90),
-                        Color(red: 0.73, green: 0.90, blue: 0.98)
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
+                if let storyBackdropName = scene.storyBackdropName {
+                    Image(storyBackdropName)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: proxy.size.width, height: proxy.size.height)
+                        .clipped()
+                }
 
                 DinoStoryBoardVisual(scene: scene, isPlaying: isNarrating)
-                    .frame(width: proxy.size.width * 0.38, height: proxy.size.height * 0.52)
-                    .position(x: proxy.size.width * 0.76, y: proxy.size.height * 0.46)
+                    .frame(width: proxy.size.width * 0.34, height: proxy.size.height * 0.40)
+                    .background(.white.opacity(0.88), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .position(x: proxy.size.width * 0.25, y: proxy.size.height * 0.25)
                     .id(scene.id)
                     .transition(.opacity.combined(with: .scale(scale: 0.94)))
                     .animation(.easeInOut(duration: 0.4), value: scene.id)
@@ -732,11 +743,11 @@ private struct DinoTeacherStoryStage: View {
                 Image("DinoTeacher")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: proxy.size.width * 0.55, height: proxy.size.height * 0.95)
-                    .position(x: proxy.size.width * 0.31, y: proxy.size.height * 0.59)
-                    .offset(y: isNarrating && isTeachingMotion ? -7 : 0)
-                    .rotationEffect(.degrees(isNarrating ? (isTeachingMotion ? -1.4 : 1.4) : 0))
-                    .scaleEffect(1 + CGFloat(speechLevel) * 0.018)
+                    .frame(width: proxy.size.width * 0.43, height: proxy.size.height * 0.76)
+                    .position(x: proxy.size.width * 0.24, y: proxy.size.height * 0.69)
+                    .offset(y: isNarrating && isTeachingMotion ? -6 : 0)
+                    .rotationEffect(.degrees(isNarrating ? (isTeachingMotion ? -1.2 : 1.2) : 0))
+                    .scaleEffect(1 + CGFloat(speechLevel) * 0.025)
                     .animation(.easeInOut(duration: 1.0), value: isTeachingMotion)
                     .animation(.linear(duration: 0.07), value: speechLevel)
 
