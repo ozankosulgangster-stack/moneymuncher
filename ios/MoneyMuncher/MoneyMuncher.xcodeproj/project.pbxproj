@@ -20,6 +20,7 @@
 		A4F7D1136D9148B5902A0041 /* LessonNarrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0040 /* LessonNarrator.swift */; };
 		A4F7D1136D9148B5902A0042 /* ollie-interest.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0043 /* ollie-interest.mp3 */; };
 		A4F7D1136D9148B5902A0044 /* dino-saving.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0045 /* dino-saving.mp3 */; };
+		A4F7D1136D9148B5902A0046 /* dino-debit.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0047 /* dino-debit.mp3 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +39,7 @@
 		A4F7D1136D9148B5902A0040 /* LessonNarrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonNarrator.swift; sourceTree = "<group>"; };
 		A4F7D1136D9148B5902A0043 /* ollie-interest.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Narrations/ollie-interest.mp3; sourceTree = "<group>"; };
 		A4F7D1136D9148B5902A0045 /* dino-saving.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Narrations/dino-saving.mp3; sourceTree = "<group>"; };
+		A4F7D1136D9148B5902A0047 /* dino-debit.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Narrations/dino-debit.mp3; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +83,7 @@
 				A4F7D1136D9148B5902A0040 /* LessonNarrator.swift */,
 				A4F7D1136D9148B5902A0043 /* ollie-interest.mp3 */,
 				A4F7D1136D9148B5902A0045 /* dino-saving.mp3 */,
+				A4F7D1136D9148B5902A0047 /* dino-debit.mp3 */,
 				A4F7D1136D9148B5902A0016 /* Info.plist */,
 				A4F7D1136D9148B5902A0017 /* Assets.xcassets */,
 				A4F7D1136D9148B5902A0019 /* PrivacyInfo.xcprivacy */,
@@ -150,6 +153,7 @@
 				A4F7D1136D9148B5902A0020 /* PrivacyInfo.xcprivacy in Resources */,
 				A4F7D1136D9148B5902A0042 /* ollie-interest.mp3 in Resources */,
 				A4F7D1136D9148B5902A0044 /* dino-saving.mp3 in Resources */,
+				A4F7D1136D9148B5902A0046 /* dino-debit.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -295,7 +299,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 24;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_TEAM = A2TAG4GHM2;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = MoneyMuncher/Info.plist;
@@ -322,7 +326,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 24;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = A2TAG4GHM2;
 				GENERATE_INFOPLIST_FILE = NO;

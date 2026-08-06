@@ -479,7 +479,7 @@ private struct DinoStoryPlayerView: View {
             narration: "Hi, I am Dino! Today I am helping my friend Mia use a debit card. Mia has twenty dollars in her bank account. That is her balance, like a money backpack. At the snack shop, she chooses a juice for three dollars and a fruit cup for two dollars. She checks that twenty dollars is enough, then taps her debit card. Five dollars comes out of her account right away, so Mia has fifteen dollars left. Next she sees a toy for eighteen dollars. It looks fun, but fifteen dollars is not enough. A debit card does not create extra money. Mia decides to save for the toy instead. Before you tap, swipe, or buy online, check your balance. Ask: do I have enough, and will I have money left for things I need? Check, choose, and spend smart!",
             boardCaption: "Check your balance before you tap.",
             visual: .debit,
-            recordingResource: nil
+            recordingResource: "dino-debit"
         ),
         DinoStoryScene(
             id: "interest-story",
