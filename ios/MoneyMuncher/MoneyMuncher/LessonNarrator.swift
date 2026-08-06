@@ -52,13 +52,21 @@ final class LessonNarrator: NSObject, ObservableObject, AVSpeechSynthesizerDeleg
         startSynthesizerMetering()
     }
 
-    func playRecordedAudio(resource: String, id: String, fallbackText: String, completion: (() -> Void)? = nil) {
+    func playRecordedAudio(resource: String, id: String, completion: (() -> Void)? = nil) {
+        playRecordedAudio(resource: resource, id: id, fallbackText: nil, completion: completion)
+    }
+
+    func playRecordedAudio(resource: String, id: String, fallbackText: String?, completion: (() -> Void)? = nil) {
         stop()
         prepareAudioSession()
 
         guard let url = Bundle.main.url(forResource: resource, withExtension: "mp3"),
               let player = try? AVAudioPlayer(contentsOf: url) else {
-            speak(id: id, text: fallbackText, completion: completion)
+            if let fallbackText {
+                speak(id: id, text: fallbackText, completion: completion)
+            } else {
+                completion?()
+            }
             return
         }
 

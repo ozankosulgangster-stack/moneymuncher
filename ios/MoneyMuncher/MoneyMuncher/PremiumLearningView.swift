@@ -44,7 +44,11 @@ struct PremiumLearningHubView: View {
                 }
             }
             .navigationDestination(for: PremiumLearningModule.self) { module in
-                if module.id == "stock-starter" {
+                if module.id == "card-basics" {
+                    CaptainJackCardCabinView(module: module)
+                } else if module.id == "interest-lab" {
+                    MiraInterestGardenView(module: module)
+                } else if module.id == "stock-starter" {
                     SammyStockStudioView(module: module)
                 } else {
                     PremiumLearningModuleDetailView(module: module)
@@ -159,7 +163,19 @@ private struct PremiumLearningModuleCard: View {
 
     @ViewBuilder
     private var moduleIcon: some View {
-        if module.id == "stock-starter" {
+        if module.id == "card-basics" {
+            Image("CaptainJackShark")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 46, height: 46)
+                .background(Color(red: 0.89, green: 0.95, blue: 0.99), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        } else if module.id == "interest-lab" {
+            Image("MiraTurtle")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 46, height: 46)
+                .background(Color(red: 0.88, green: 0.96, blue: 0.89), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        } else if module.id == "stock-starter" {
             Image("SammyUnicorn")
                 .resizable()
                 .scaledToFit()
@@ -454,6 +470,441 @@ private struct PremiumLearningModuleDetailView: View {
     }
 }
 
+private struct MiraInterestGardenView: View {
+    let module: PremiumLearningModule
+
+    var body: some View {
+        CharacterLessonModuleView(module: module, presentation: .mira)
+    }
+}
+
+private struct CaptainJackCardCabinView: View {
+    let module: PremiumLearningModule
+
+    var body: some View {
+        CharacterLessonModuleView(module: module, presentation: .captainJack)
+    }
+}
+
+private struct CharacterLessonPresentation {
+    let characterName: String
+    let navigationTitle: String
+    let stageLabel: String
+    let assetName: String
+    let backdropName: String
+    let recordingResource: String
+    let welcomeTitle: String
+    let welcomeCaption: String
+    let welcomeDetail: String
+    let actionTitle: String
+    let safetyNote: String
+    let accent: Color
+    let highlight: Color
+
+    static let mira = CharacterLessonPresentation(
+        characterName: "Mira",
+        navigationTitle: "Mira's Interest Garden",
+        stageLabel: "MIRA EXPLAINS",
+        assetName: "MiraTurtle",
+        backdropName: "MiraInterestGardenBackdrop",
+        recordingResource: "mira-interest-intro",
+        welcomeTitle: "Welcome to Mira's Interest Garden",
+        welcomeCaption: "Saving can grow. Borrowing can cost.",
+        welcomeDetail: "Mira uses two garden jars to explain why time can make savings grow or make borrowed money cost more to return.",
+        actionTitle: "Play Mira's Welcome",
+        safetyNote: "Learning only. Interest rates and borrowing choices can be complicated, so talk through real money decisions with a parent or guardian.",
+        accent: Color(red: 0.05, green: 0.39, blue: 0.31),
+        highlight: Color(red: 0.89, green: 0.96, blue: 0.89)
+    )
+
+    static let captainJack = CharacterLessonPresentation(
+        characterName: "Captain Jack",
+        navigationTitle: "Captain Jack's Card Cabin",
+        stageLabel: "CAPTAIN JACK EXPLAINS",
+        assetName: "CaptainJackShark",
+        backdropName: "CaptainJackCardCabinBackdrop",
+        recordingResource: "captain-jack-card-intro",
+        welcomeTitle: "Welcome to Captain Jack's Card Cabin",
+        welcomeCaption: "Know whose money your card uses.",
+        welcomeDetail: "Captain Jack charts two routes: debit uses money already in a bank account, while credit is borrowed money that comes with a bill. Loyalty points are extras, not free money.",
+        actionTitle: "Play Captain Jack's Welcome",
+        safetyNote: "Learning only. Cards, rewards, and account details are real money choices. Ask a parent or guardian before sharing card information or joining a rewards program.",
+        accent: Color(red: 0.08, green: 0.31, blue: 0.50),
+        highlight: Color(red: 0.89, green: 0.95, blue: 0.99)
+    )
+}
+
+private struct CharacterLessonModuleView: View {
+    let module: PremiumLearningModule
+    let presentation: CharacterLessonPresentation
+
+    @StateObject private var narrator = LessonNarrator()
+    @State private var selectedBeatIndex = -1
+    @State private var selectedAnswerIndex: Int?
+
+    private var introID: String {
+        "\(module.id)-recorded-welcome"
+    }
+
+    private var isIntro: Bool {
+        selectedBeatIndex == -1
+    }
+
+    private var currentStep: PremiumLessonStep? {
+        guard module.steps.indices.contains(selectedBeatIndex) else {
+            return nil
+        }
+
+        return module.steps[selectedBeatIndex]
+    }
+
+    private var isLastBeat: Bool {
+        selectedBeatIndex == module.steps.count - 1
+    }
+
+    private var isNarratingIntro: Bool {
+        narrator.isSpeaking && narrator.spokenStepID == introID
+    }
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                CharacterLessonStage(
+                    presentation: presentation,
+                    title: isIntro ? presentation.welcomeTitle : currentStep?.title ?? module.title,
+                    caption: isIntro ? presentation.welcomeCaption : characterTip(for: currentStep),
+                    isNarrating: isNarratingIntro,
+                    speechLevel: narrator.speechLevel
+                )
+                storyProgress
+                storyCard
+                storyControls
+
+                if isLastBeat {
+                    quizCard
+                }
+
+                Text(presentation.safetyNote)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(20)
+        }
+        .background(Color(uiColor: .systemGroupedBackground))
+        .navigationTitle(presentation.navigationTitle)
+        .navigationBarTitleDisplayMode(.inline)
+        .onDisappear {
+            narrator.stop()
+        }
+    }
+
+    private var storyProgress: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(isIntro ? "Welcome" : "Story card \(selectedBeatIndex + 1) of \(module.steps.count)")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(.secondary)
+
+                Spacer()
+
+                Text(isIntro ? "\(presentation.characterName)'s recorded welcome" : "\(presentation.characterName)'s visual story")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(presentation.accent)
+                    .multilineTextAlignment(.trailing)
+            }
+
+            ProgressView(
+                value: Double(selectedBeatIndex + 2),
+                total: Double(module.steps.count + 1)
+            )
+            .tint(presentation.accent)
+        }
+    }
+
+    @ViewBuilder
+    private var storyCard: some View {
+        if isIntro {
+            VStack(alignment: .leading, spacing: 10) {
+                Label("Meet \(presentation.characterName)", systemImage: "sparkles")
+                    .font(.title3.weight(.bold))
+                    .foregroundStyle(presentation.accent)
+
+                Text(presentation.welcomeDetail)
+                    .font(.body)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Text("Tap play to hear \(presentation.characterName)'s recorded welcome.")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(presentation.accent)
+            }
+            .padding(18)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color(uiColor: .secondarySystemGroupedBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        } else if let currentStep {
+            VStack(alignment: .leading, spacing: 14) {
+                Label(currentStep.title, systemImage: module.systemImage)
+                    .font(.title3.weight(.bold))
+                    .foregroundStyle(presentation.accent)
+
+                Text(currentStep.body)
+                    .font(.body)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                HStack(alignment: .top, spacing: 10) {
+                    Image(presentation.assetName)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 42, height: 42)
+
+                    Text(characterTip(for: currentStep))
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(presentation.accent)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(presentation.highlight)
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            }
+            .padding(18)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color(uiColor: .secondarySystemGroupedBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        }
+    }
+
+    private var storyControls: some View {
+        VStack(spacing: 12) {
+            if isIntro {
+                Button {
+                    if isNarratingIntro {
+                        narrator.stop()
+                    } else {
+                        narrator.playRecordedAudio(
+                            resource: presentation.recordingResource,
+                            id: introID
+                        )
+                    }
+                } label: {
+                    Label(
+                        isNarratingIntro ? "Stop \(presentation.characterName)" : presentation.actionTitle,
+                        systemImage: isNarratingIntro ? "stop.fill" : "speaker.wave.2.fill"
+                    )
+                    .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(PrimaryActionButtonStyle())
+            }
+
+            HStack(spacing: 12) {
+                Button {
+                    moveToBeat(selectedBeatIndex - 1)
+                } label: {
+                    Label("Back", systemImage: "chevron.left")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(SecondaryActionButtonStyle())
+                .disabled(isIntro)
+
+                Button {
+                    moveToBeat(selectedBeatIndex + 1)
+                } label: {
+                    Label("Next", systemImage: "chevron.right")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(PrimaryActionButtonStyle())
+                .disabled(isLastBeat)
+            }
+        }
+    }
+
+    private var quizCard: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text("\(presentation.characterName) Check")
+                .font(.title3.weight(.bold))
+                .foregroundStyle(presentation.accent)
+
+            Text(module.quiz.prompt)
+                .font(.headline)
+                .fixedSize(horizontal: false, vertical: true)
+
+            ForEach(module.quiz.answers.indices, id: \.self) { index in
+                Button {
+                    selectedAnswerIndex = index
+                } label: {
+                    HStack(spacing: 12) {
+                        Image(systemName: answerIcon(for: index))
+                            .foregroundStyle(answerColor(for: index))
+
+                        Text(module.quiz.answers[index])
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(.primary)
+                            .fixedSize(horizontal: false, vertical: true)
+
+                        Spacer(minLength: 0)
+                    }
+                    .padding(14)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(answerBackground(for: index))
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                }
+                .buttonStyle(.plain)
+            }
+
+            if let selectedAnswerIndex {
+                Text(selectedAnswerIndex == module.quiz.correctAnswerIndex ? "Correct. \(module.quiz.explanation)" : "Not quite. \(module.quiz.explanation)")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(selectedAnswerIndex == module.quiz.correctAnswerIndex ? presentation.accent : .secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(18)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+
+    private func moveToBeat(_ index: Int) {
+        narrator.stop()
+        selectedBeatIndex = min(max(index, -1), module.steps.count - 1)
+        selectedAnswerIndex = nil
+    }
+
+    private func characterTip(for step: PremiumLessonStep?) -> String {
+        guard let step else {
+            return presentation.welcomeCaption
+        }
+
+        return step.dinoTip.replacingOccurrences(of: "Dino", with: presentation.characterName)
+    }
+
+    private func answerIcon(for index: Int) -> String {
+        guard let selectedAnswerIndex else {
+            return "circle"
+        }
+
+        if index == module.quiz.correctAnswerIndex {
+            return "checkmark.circle.fill"
+        }
+
+        return index == selectedAnswerIndex ? "xmark.circle.fill" : "circle"
+    }
+
+    private func answerColor(for index: Int) -> Color {
+        guard let selectedAnswerIndex else {
+            return Color(uiColor: .tertiaryLabel)
+        }
+
+        if index == module.quiz.correctAnswerIndex {
+            return presentation.accent
+        }
+
+        return index == selectedAnswerIndex ? .red : Color(uiColor: .tertiaryLabel)
+    }
+
+    private func answerBackground(for index: Int) -> Color {
+        guard let selectedAnswerIndex else {
+            return Color(uiColor: .tertiarySystemGroupedBackground)
+        }
+
+        if index == module.quiz.correctAnswerIndex {
+            return presentation.highlight
+        }
+
+        return index == selectedAnswerIndex ? Color(red: 1.0, green: 0.91, blue: 0.90) : Color(uiColor: .tertiarySystemGroupedBackground)
+    }
+}
+
+private struct CharacterLessonStage: View {
+    let presentation: CharacterLessonPresentation
+    let title: String
+    let caption: String
+    let isNarrating: Bool
+    let speechLevel: Float
+
+    @State private var isTeachingMotion = false
+
+    var body: some View {
+        GeometryReader { proxy in
+            ZStack {
+                Image(presentation.backdropName)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: proxy.size.width, height: proxy.size.height)
+                    .clipped()
+
+                Image(presentation.assetName)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: proxy.size.width * 0.42, height: proxy.size.height * 0.88)
+                    .position(x: proxy.size.width * 0.25, y: proxy.size.height * 0.62)
+                    .offset(y: isTeachingMotion ? -5 : 0)
+                    .rotationEffect(.degrees(isTeachingMotion ? -1.0 : 1.0))
+                    .scaleEffect(1 + CGFloat(speechLevel) * 0.025)
+                    .animation(.easeInOut(duration: 1.0), value: isTeachingMotion)
+                    .animation(.linear(duration: 0.07), value: speechLevel)
+
+                VStack {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(presentation.stageLabel)
+                                .font(.caption2.weight(.heavy))
+                                .foregroundStyle(presentation.accent)
+
+                            Text(title)
+                                .font(.caption.weight(.bold))
+                                .foregroundStyle(.primary)
+                                .lineLimit(2)
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 7)
+                        .background(.white.opacity(0.90), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+
+                        Spacer()
+                    }
+
+                    Spacer()
+
+                    HStack {
+                        Spacer()
+
+                        VStack(alignment: .trailing, spacing: 4) {
+                            Text(caption)
+                                .font(.caption.weight(.semibold))
+                                .multilineTextAlignment(.trailing)
+                                .lineLimit(2)
+
+                            if isNarrating {
+                                Label("Playing", systemImage: "speaker.wave.2.fill")
+                                    .font(.caption2.weight(.bold))
+                            }
+                        }
+                        .foregroundStyle(presentation.accent)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 7)
+                        .background(.white.opacity(0.90), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    }
+                }
+                .padding(13)
+            }
+        }
+        .aspectRatio(16.0 / 9.0, contentMode: .fit)
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(Color.white.opacity(0.6), lineWidth: 1)
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(presentation.characterName) explains \(title)")
+        .onAppear {
+            withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
+                isTeachingMotion = true
+            }
+        }
+    }
+}
+
 private struct SammyStockStudioView: View {
     let module: PremiumLearningModule
 
@@ -462,7 +913,6 @@ private struct SammyStockStudioView: View {
     @State private var selectedAnswerIndex: Int?
 
     private let introID = "sammy-stock-intro"
-    private let introText = "I am Unicorn Sammy, and I am here to tell you a story about Stock Slice Studio."
 
     private var isIntro: Bool {
         selectedBeatIndex == -1
@@ -602,8 +1052,7 @@ private struct SammyStockStudioView: View {
                     } else {
                         narrator.playRecordedAudio(
                             resource: introID,
-                            id: introID,
-                            fallbackText: introText
+                            id: introID
                         )
                     }
                 } label: {
@@ -862,13 +1311,13 @@ private struct DinoStoryPlayerView: View {
         ),
         DinoStoryScene(
             id: "interest-story",
-            narratorName: "Ollie Owl",
-            title: "Two kinds of interest",
+            narratorName: "Mira Turtle",
+            title: "Mira's two garden jars",
             subtitle: "Saving can earn; borrowing can cost.",
-            narration: "Interest has two jobs. Savings can earn a little extra money over time. Borrowed money can cost extra when you pay it back later. That is why paying a credit card bill in full and on time matters.",
-            boardCaption: "Saving earns. Borrowing costs.",
+            narration: "I am Turtle Mira. Interest is the time value of money when you borrow or save. In Mira's garden, one jar holds savings. A bank may add a little extra while it stays there. The other jar represents borrowed money. When money is borrowed, extra money may be needed to pay it back later. Time can help savings grow or make debt cost more, so always make a plan with a grown-up.",
+            boardCaption: "Time can add to savings or borrowing costs.",
             visual: .interest,
-            recordingResource: "ollie-interest"
+            recordingResource: "mira-interest-intro"
         ),
         DinoStoryScene(
             id: "saving-story",
@@ -899,7 +1348,7 @@ private struct DinoStoryPlayerView: View {
                 storyControls
                 scenePicker
 
-                Text("Dino uses pretend money in this story. Talk through real money choices with a parent or guardian.")
+                Text("These stories use pretend money. Talk through real money choices with a parent or guardian.")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -918,9 +1367,8 @@ private struct DinoStoryPlayerView: View {
     private var storyStage: some View {
         switch currentScene.visual {
         case .interest:
-            OllieInterestStoryStage(
+            MiraInterestStoryStage(
                 speechLevel: narrator.speechLevel,
-                playbackProgress: narrator.recordedPlaybackProgress,
                 isNarrating: narrator.isSpeaking && narrator.spokenStepID == currentScene.id
             )
 
@@ -1072,7 +1520,6 @@ private struct DinoStoryPlayerView: View {
             narrator.playRecordedAudio(
                 resource: recordingResource,
                 id: scene.id,
-                fallbackText: scene.narration,
                 completion: completion
             )
         } else {
@@ -1238,6 +1685,85 @@ private struct DinoStoryBoardVisual: View {
                 .foregroundStyle(Color(red: 0.13, green: 0.34, blue: 0.30))
             Image(systemName: "target")
                 .foregroundStyle(Color(red: 0.13, green: 0.42, blue: 0.68))
+        }
+    }
+}
+
+private struct MiraInterestStoryStage: View {
+    let speechLevel: Float
+    let isNarrating: Bool
+
+    @State private var isTeachingMotion = false
+
+    var body: some View {
+        GeometryReader { proxy in
+            ZStack {
+                Image("MiraInterestGardenBackdrop")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: proxy.size.width, height: proxy.size.height)
+                    .clipped()
+
+                Image("MiraTurtle")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: proxy.size.width * 0.43, height: proxy.size.height * 0.89)
+                    .position(x: proxy.size.width * 0.25, y: proxy.size.height * 0.62)
+                    .offset(y: isTeachingMotion ? -5 : 0)
+                    .rotationEffect(.degrees(isTeachingMotion ? -1.0 : 1.0))
+                    .scaleEffect(1 + CGFloat(speechLevel) * 0.025)
+                    .animation(.easeInOut(duration: 1.0), value: isTeachingMotion)
+                    .animation(.linear(duration: 0.07), value: speechLevel)
+
+                VStack {
+                    HStack {
+                        Text("MIRA TURTLE NARRATES")
+                            .font(.caption2.weight(.heavy))
+                            .padding(.horizontal, 9)
+                            .padding(.vertical, 6)
+                            .foregroundStyle(Color(red: 0.05, green: 0.39, blue: 0.31))
+                            .background(.white.opacity(0.88))
+                            .clipShape(Capsule())
+
+                        Spacer()
+                    }
+
+                    Spacer()
+
+                    HStack {
+                        Spacer()
+
+                        VStack(alignment: .trailing, spacing: 4) {
+                            Text("Saving can grow. Borrowing can cost.")
+                                .font(.caption.weight(.semibold))
+                                .multilineTextAlignment(.trailing)
+
+                            if isNarrating {
+                                Label("Playing Mira's recording", systemImage: "speaker.wave.2.fill")
+                                    .font(.caption2.weight(.bold))
+                            }
+                        }
+                        .foregroundStyle(Color(red: 0.05, green: 0.39, blue: 0.31))
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 7)
+                        .background(.white.opacity(0.90), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    }
+                }
+                .padding(14)
+            }
+        }
+        .aspectRatio(16.0 / 9.0, contentMode: .fit)
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(Color.white.opacity(0.6), lineWidth: 1)
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Mira Turtle explains saving and borrowing interest")
+        .onAppear {
+            withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
+                isTeachingMotion = true
+            }
         }
     }
 }
