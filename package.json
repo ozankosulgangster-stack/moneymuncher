@@ -5,7 +5,7 @@
   "description": "MoneyMuncher alpha prototype with local server-side user progress storage.",
   "scripts": {
     "start": "node server.js",
-    "check": "node --check server.js && node --check app.js && node --check progress-manager.js && node --check netlify/functions/api.js",
+    "check": "node --check server.js && node --check app.js && node --check progress-manager.js && node --check dino-chat.js && node --check netlify/functions/api.js && node --check netlify/functions/chat.js",
     "publish:github": "node scripts/publish-github.mjs"
   },
   "dependencies": {
