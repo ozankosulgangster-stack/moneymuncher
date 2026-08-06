@@ -117,11 +117,11 @@ extension PremiumLearningModule {
         ),
         PremiumLearningModule(
             id: "stock-starter",
-            title: "Stock Slice Studio",
-            subtitle: "Stocks, trades, risk, and why prices move.",
+            title: "Sammy's Stock Slice Studio",
+            subtitle: "A Unicorn story about ownership, patience, and risk.",
             concept: "Investing",
             systemImage: "chart.line.uptrend.xyaxis",
-            dinoLine: "A stock is a tiny slice of a business, not a magic coin machine.",
+            dinoLine: "Sammy says: a stock is a tiny slice of a business, not a magic coin machine.",
             steps: [
                 PremiumLessonStep(
                     id: "ownership",

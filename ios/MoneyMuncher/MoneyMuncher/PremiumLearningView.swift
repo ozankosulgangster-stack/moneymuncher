@@ -44,7 +44,11 @@ struct PremiumLearningHubView: View {
                 }
             }
             .navigationDestination(for: PremiumLearningModule.self) { module in
-                PremiumLearningModuleDetailView(module: module)
+                if module.id == "stock-starter" {
+                    SammyStockStudioView(module: module)
+                } else {
+                    PremiumLearningModuleDetailView(module: module)
+                }
             }
         }
     }
@@ -119,12 +123,7 @@ private struct PremiumLearningModuleCard: View {
 
     var body: some View {
         HStack(spacing: 14) {
-            Image(systemName: module.systemImage)
-                .font(.title2.weight(.bold))
-                .frame(width: 46, height: 46)
-                .foregroundStyle(Color(red: 0.05, green: 0.46, blue: 0.39))
-                .background(Color(red: 0.88, green: 0.96, blue: 0.89))
-                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            moduleIcon
 
             VStack(alignment: .leading, spacing: 5) {
                 HStack(spacing: 8) {
@@ -156,6 +155,24 @@ private struct PremiumLearningModuleCard: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(uiColor: .secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+    }
+
+    @ViewBuilder
+    private var moduleIcon: some View {
+        if module.id == "stock-starter" {
+            Image("SammyUnicorn")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 46, height: 46)
+                .background(Color(red: 0.88, green: 0.96, blue: 0.89), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        } else {
+            Image(systemName: module.systemImage)
+                .font(.title2.weight(.bold))
+                .frame(width: 46, height: 46)
+                .foregroundStyle(Color(red: 0.05, green: 0.46, blue: 0.39))
+                .background(Color(red: 0.88, green: 0.96, blue: 0.89))
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        }
     }
 }
 
@@ -437,6 +454,368 @@ private struct PremiumLearningModuleDetailView: View {
     }
 }
 
+private struct SammyStockStudioView: View {
+    let module: PremiumLearningModule
+
+    @StateObject private var narrator = LessonNarrator()
+    @State private var selectedBeatIndex = -1
+    @State private var selectedAnswerIndex: Int?
+
+    private let introID = "sammy-stock-intro"
+    private let introText = "I am Unicorn Sammy, and I am here to tell you a story about Stock Slice Studio."
+
+    private var isIntro: Bool {
+        selectedBeatIndex == -1
+    }
+
+    private var currentStep: PremiumLessonStep? {
+        guard module.steps.indices.contains(selectedBeatIndex) else {
+            return nil
+        }
+
+        return module.steps[selectedBeatIndex]
+    }
+
+    private var isLastBeat: Bool {
+        selectedBeatIndex == module.steps.count - 1
+    }
+
+    private var isNarratingIntro: Bool {
+        narrator.isSpeaking && narrator.spokenStepID == introID
+    }
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                SammyStockStudioStage(
+                    isIntro: isIntro,
+                    title: isIntro ? "Welcome to Stock Slice Studio" : currentStep?.title ?? module.title,
+                    caption: isIntro ? "A share is a tiny piece of a business." : currentStep?.dinoTip ?? "Learn first, then make a plan.",
+                    isNarrating: isNarratingIntro,
+                    speechLevel: narrator.speechLevel
+                )
+                storyProgress
+                storyCard
+                storyControls
+
+                if isLastBeat {
+                    quizCard
+                }
+
+                Text("Learning only. These are pretend examples, not real-money trading advice. Talk through investing choices with a parent or guardian.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(20)
+        }
+        .background(Color(uiColor: .systemGroupedBackground))
+        .navigationTitle("Sammy's Stock Studio")
+        .navigationBarTitleDisplayMode(.inline)
+        .onDisappear {
+            narrator.stop()
+        }
+    }
+
+    private var storyProgress: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(isIntro ? "Welcome" : "Story card \(selectedBeatIndex + 1) of \(module.steps.count)")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(.secondary)
+
+                Spacer()
+
+                Text(isIntro ? "Sammy's recorded introduction" : "Sammy's guided story")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color(red: 0.20, green: 0.40, blue: 0.55))
+                    .multilineTextAlignment(.trailing)
+            }
+
+            ProgressView(
+                value: Double(selectedBeatIndex + 2),
+                total: Double(module.steps.count + 1)
+            )
+            .tint(Color(red: 0.20, green: 0.40, blue: 0.55))
+        }
+    }
+
+    @ViewBuilder
+    private var storyCard: some View {
+        if isIntro {
+            VStack(alignment: .leading, spacing: 10) {
+                Label("Meet Sammy", systemImage: "sparkles")
+                    .font(.title3.weight(.bold))
+                    .foregroundStyle(Color(red: 0.13, green: 0.31, blue: 0.44))
+
+                Text("Sammy will use a make-believe studio to show how ownership, buying and selling, and risk fit together.")
+                    .font(.body)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Text("Tap play to hear Sammy's recorded welcome.")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Color(red: 0.20, green: 0.40, blue: 0.55))
+            }
+            .padding(18)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color(uiColor: .secondarySystemGroupedBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        } else if let currentStep {
+            VStack(alignment: .leading, spacing: 14) {
+                Label(currentStep.title, systemImage: module.systemImage)
+                    .font(.title3.weight(.bold))
+                    .foregroundStyle(Color(red: 0.13, green: 0.31, blue: 0.44))
+
+                Text(currentStep.body)
+                    .font(.body)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                HStack(alignment: .top, spacing: 10) {
+                    Image("SammyUnicorn")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 42, height: 42)
+
+                    Text(sammyTip(for: currentStep))
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Color(red: 0.20, green: 0.40, blue: 0.55))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color(red: 0.89, green: 0.95, blue: 0.99))
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            }
+            .padding(18)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color(uiColor: .secondarySystemGroupedBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        }
+    }
+
+    private var storyControls: some View {
+        VStack(spacing: 12) {
+            if isIntro {
+                Button {
+                    if isNarratingIntro {
+                        narrator.stop()
+                    } else {
+                        narrator.playRecordedAudio(
+                            resource: introID,
+                            id: introID,
+                            fallbackText: introText
+                        )
+                    }
+                } label: {
+                    Label(
+                        isNarratingIntro ? "Stop Sammy" : "Play Sammy's Welcome",
+                        systemImage: isNarratingIntro ? "stop.fill" : "speaker.wave.2.fill"
+                    )
+                    .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(PrimaryActionButtonStyle())
+            }
+
+            HStack(spacing: 12) {
+                Button {
+                    moveToBeat(selectedBeatIndex - 1)
+                } label: {
+                    Label("Back", systemImage: "chevron.left")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(SecondaryActionButtonStyle())
+                .disabled(isIntro)
+
+                Button {
+                    moveToBeat(selectedBeatIndex + 1)
+                } label: {
+                    Label("Next", systemImage: "chevron.right")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(PrimaryActionButtonStyle())
+                .disabled(isLastBeat)
+            }
+        }
+    }
+
+    private var quizCard: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text("Sammy Check")
+                .font(.title3.weight(.bold))
+                .foregroundStyle(Color(red: 0.13, green: 0.31, blue: 0.44))
+
+            Text(module.quiz.prompt)
+                .font(.headline)
+                .fixedSize(horizontal: false, vertical: true)
+
+            ForEach(module.quiz.answers.indices, id: \.self) { index in
+                Button {
+                    selectedAnswerIndex = index
+                } label: {
+                    HStack(spacing: 12) {
+                        Image(systemName: answerIcon(for: index))
+                            .foregroundStyle(answerColor(for: index))
+
+                        Text(module.quiz.answers[index])
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(.primary)
+                            .fixedSize(horizontal: false, vertical: true)
+
+                        Spacer(minLength: 0)
+                    }
+                    .padding(14)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(answerBackground(for: index))
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                }
+                .buttonStyle(.plain)
+            }
+
+            if let selectedAnswerIndex {
+                Text(selectedAnswerIndex == module.quiz.correctAnswerIndex ? "Correct. \(module.quiz.explanation)" : "Not quite. \(module.quiz.explanation)")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(selectedAnswerIndex == module.quiz.correctAnswerIndex ? Color(red: 0.20, green: 0.40, blue: 0.55) : .secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(18)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+
+    private func moveToBeat(_ index: Int) {
+        narrator.stop()
+        selectedBeatIndex = min(max(index, -1), module.steps.count - 1)
+        selectedAnswerIndex = nil
+    }
+
+    private func sammyTip(for step: PremiumLessonStep) -> String {
+        step.dinoTip.replacingOccurrences(of: "Dino", with: "Sammy")
+    }
+
+    private func answerIcon(for index: Int) -> String {
+        guard let selectedAnswerIndex else {
+            return "circle"
+        }
+
+        if index == module.quiz.correctAnswerIndex {
+            return "checkmark.circle.fill"
+        }
+
+        return index == selectedAnswerIndex ? "xmark.circle.fill" : "circle"
+    }
+
+    private func answerColor(for index: Int) -> Color {
+        guard let selectedAnswerIndex else {
+            return Color(uiColor: .tertiaryLabel)
+        }
+
+        if index == module.quiz.correctAnswerIndex {
+            return Color(red: 0.20, green: 0.40, blue: 0.55)
+        }
+
+        return index == selectedAnswerIndex ? .red : Color(uiColor: .tertiaryLabel)
+    }
+
+    private func answerBackground(for index: Int) -> Color {
+        guard let selectedAnswerIndex else {
+            return Color(uiColor: .tertiarySystemGroupedBackground)
+        }
+
+        if index == module.quiz.correctAnswerIndex {
+            return Color(red: 0.89, green: 0.95, blue: 0.99)
+        }
+
+        return index == selectedAnswerIndex ? Color(red: 1.0, green: 0.91, blue: 0.90) : Color(uiColor: .tertiarySystemGroupedBackground)
+    }
+}
+
+private struct SammyStockStudioStage: View {
+    let isIntro: Bool
+    let title: String
+    let caption: String
+    let isNarrating: Bool
+    let speechLevel: Float
+
+    @State private var isTeachingMotion = false
+
+    var body: some View {
+        GeometryReader { proxy in
+            ZStack {
+                Image(isIntro ? "SammyStockStoryBackdrop" : "SammyStockStudioBackdrop")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: proxy.size.width, height: proxy.size.height)
+                    .scaleEffect(isIntro && isNarrating && isTeachingMotion ? 1.018 : 1)
+                    .clipped()
+
+                if !isIntro {
+                    Image("SammyUnicorn")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: proxy.size.width * 0.40, height: proxy.size.height * 0.80)
+                        .position(x: proxy.size.width * 0.25, y: proxy.size.height * 0.66)
+                        .offset(y: isTeachingMotion ? -5 : 0)
+                        .rotationEffect(.degrees(isTeachingMotion ? -1.0 : 1.0))
+                        .scaleEffect(1 + CGFloat(speechLevel) * 0.025)
+                        .animation(.easeInOut(duration: 1.0), value: isTeachingMotion)
+                        .animation(.linear(duration: 0.07), value: speechLevel)
+                }
+
+                VStack {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(isIntro ? "SAMMY'S STORY" : "SAMMY EXPLAINS")
+                                .font(.caption2.weight(.heavy))
+                                .foregroundStyle(Color(red: 0.13, green: 0.31, blue: 0.44))
+
+                            Text(title)
+                                .font(.caption.weight(.bold))
+                                .foregroundStyle(.primary)
+                                .lineLimit(2)
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 7)
+                        .background(.white.opacity(0.90), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+
+                        Spacer()
+                    }
+
+                    Spacer()
+
+                    HStack {
+                        Spacer()
+
+                        Text(caption)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(Color(red: 0.13, green: 0.31, blue: 0.44))
+                            .multilineTextAlignment(.trailing)
+                            .lineLimit(2)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 7)
+                            .background(.white.opacity(0.90), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    }
+                }
+                .padding(13)
+            }
+        }
+        .aspectRatio(16.0 / 9.0, contentMode: .fit)
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(Color.white.opacity(0.6), lineWidth: 1)
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Sammy's Stock Slice Studio")
+        .onAppear {
+            withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
+                isTeachingMotion = true
+            }
+        }
+    }
+}
+
 private struct DinoStoryScene: Identifiable {
     enum Visual {
         case debit
@@ -456,7 +835,7 @@ private struct DinoStoryScene: Identifiable {
     var storyBackdropName: String? {
         switch visual {
         case .debit:
-            return "DinoDebitStoryBackdrop"
+            return "MiaDebitStoryBackdrop"
         case .interest:
             return nil
         case .saving:
