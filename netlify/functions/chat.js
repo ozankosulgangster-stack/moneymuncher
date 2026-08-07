@@ -137,7 +137,6 @@ async function createResponse(message, previousResponseId, page) {
 
   const payload = {
     input: message,
-    instructions: instructions(page),
     stream: false
   };
   if (previousResponseId) payload.previous_response_id = previousResponseId;
