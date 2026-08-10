@@ -120,6 +120,13 @@
 
   function pageSuggestions() {
     const path = window.location.pathname.toLowerCase();
+    if (path.includes("scam-smart")) {
+      return [
+        { label: "What should I say?", question: "Give me the short Stop, Check, Tell script for a suspicious money DM." },
+        { label: "Spot a scam clue", question: "What are three simple clues that a money DM could be a scam?" },
+        { label: "Tell a grown-up", question: "Help me practice telling a trusted adult about a suspicious message." }
+      ];
+    }
     if (path.includes("classroom-market")) {
       return [
         { label: "Best value?", question: "How can a class compare price, quality, and need before choosing?" },

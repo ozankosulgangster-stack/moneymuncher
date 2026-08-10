@@ -4,6 +4,7 @@ import UIKit
 enum AppDestination: Identifiable, Equatable {
     case play
     case questGenerator
+    case scamSmart
     case familySignup
     case account
     case parentGuide
@@ -14,6 +15,7 @@ enum AppDestination: Identifiable, Equatable {
         switch self {
         case .play: return "play"
         case .questGenerator: return "quest-generator"
+        case .scamSmart: return "scam-smart"
         case .familySignup: return "family-signup"
         case .account: return "account"
         case .parentGuide: return "parent-guide"
@@ -26,6 +28,7 @@ enum AppDestination: Identifiable, Equatable {
         switch self {
         case .play: return "Cup Rush"
         case .questGenerator: return "Everyday Quest"
+        case .scamSmart: return "Scam Smart"
         case .familySignup: return "Family Sign Up"
         case .account: return "Account & Data"
         case .parentGuide: return "Parent Guide"
@@ -40,6 +43,8 @@ enum AppDestination: Identifiable, Equatable {
             return URL(string: "https://moneymuncher.ca/kids/play/?source=ios-app")!
         case .questGenerator:
             return URL(string: "https://moneymuncher.ca/kids/?source=ios-app#questGeneratorTitle")!
+        case .scamSmart:
+            return URL(string: "https://moneymuncher.ca/kids/blog/scam-smart.html?source=ios-app")!
         case .familySignup:
             return URL(string: "https://moneymuncher.ca/?source=ios-app&action=signup&reviewBuild=9")!
         case .account:
@@ -57,7 +62,7 @@ enum AppDestination: Identifiable, Equatable {
         switch self {
         case .familySignup, .account, .parentGuide, .support:
             return true
-        case .play, .questGenerator, .privacy:
+        case .play, .questGenerator, .scamSmart, .privacy:
             return false
         }
     }
@@ -94,6 +99,12 @@ struct ContentView: View {
             subtitle: "Turn snack runs, birthdays, and allowance moments into quick money choices.",
             systemImage: "sparkles",
             destination: .questGenerator
+        ),
+        FeatureCard(
+            title: "Scam Smart",
+            subtitle: "Practice Stop, Check, Tell for suspicious money messages and online pressure.",
+            systemImage: "shield.checkered",
+            destination: .scamSmart
         )
     ]
 

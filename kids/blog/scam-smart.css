@@ -1,0 +1,317 @@
+:root {
+  --safe-ink: #10252c;
+  --safe-muted: #435a63;
+  --safe-green: #11795f;
+  --safe-green-soft: #dff6ed;
+  --safe-gold: #f6c44d;
+  --safe-blue: #dff1ff;
+  --safe-coral: #ffdfd0;
+  --safe-line: #c8d9dd;
+}
+
+.scam-smart-page {
+  color: var(--safe-ink);
+  background: #f4faf8;
+}
+
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 20;
+  transform: translateY(-160%);
+  padding: 12px 16px;
+  border-radius: 8px;
+  color: white;
+  background: var(--safe-ink);
+  font-weight: 800;
+}
+.skip-link:focus { transform: translateY(0); }
+
+.scam-site-header { border-bottom: 3px solid var(--safe-green); }
+.scam-site-header a:focus-visible,
+.scam-smart-page button:focus-visible,
+.scam-smart-page summary:focus-visible,
+.scam-smart-page a:focus-visible {
+  outline: 4px solid #315cff;
+  outline-offset: 3px;
+}
+
+.scam-smart-main {
+  width: min(1080px, calc(100% - 32px));
+  margin: 28px auto 60px;
+}
+
+.scam-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(280px, .75fr);
+  gap: 28px;
+  align-items: center;
+  padding: 36px;
+  border: 2px solid var(--safe-line);
+  border-radius: 24px;
+  background: linear-gradient(135deg, #fff8d9, #dff6ed 58%, #dff1ff);
+  box-shadow: 0 18px 40px rgba(16, 37, 44, .1);
+}
+
+.scam-kicker {
+  margin: 0 0 8px;
+  color: var(--safe-green);
+  font-size: .86rem;
+  font-weight: 900;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.scam-hero h1 {
+  max-width: 720px;
+  font-size: clamp(2.5rem, 6vw, 4.8rem);
+  line-height: .98;
+}
+
+.scam-lede {
+  max-width: 700px;
+  margin: 18px 0 0;
+  color: var(--safe-muted);
+  font-size: 1.28rem;
+  line-height: 1.45;
+}
+
+.scam-hero-actions,
+.inline-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.scam-button,
+.bio-phrases button,
+.focus-toolbar button {
+  min-height: 46px;
+  padding: 10px 16px;
+  border: 2px solid var(--safe-ink);
+  border-radius: 10px;
+  color: var(--safe-ink);
+  background: white;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 3px 0 var(--safe-ink);
+}
+
+.scam-button.primary-action { color: white; background: var(--safe-green); }
+.scam-button:hover,
+.bio-phrases button:hover,
+.focus-toolbar button:hover { transform: translateY(-1px); }
+
+.stop-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 5px 12px;
+  padding: 20px;
+  border: 3px solid var(--safe-ink);
+  border-radius: 20px;
+  background: white;
+  box-shadow: 8px 8px 0 var(--safe-ink);
+}
+
+.stop-card span {
+  grid-row: span 2;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: white;
+  background: var(--safe-green);
+  font-weight: 900;
+}
+.stop-card strong { font-size: 1.18rem; }
+.stop-card small { margin-bottom: 9px; color: var(--safe-muted); font-size: .92rem; line-height: 1.35; }
+
+.calm-note {
+  margin: 18px 0;
+  padding: 16px 18px;
+  border-left: 8px solid var(--safe-green);
+  border-radius: 10px;
+  color: var(--safe-ink);
+  background: white;
+  font-size: 1rem;
+}
+
+.focus-sections { display: grid; gap: 16px; }
+.scam-section {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 20px;
+  padding: 28px;
+  border: 2px solid var(--safe-line);
+  border-radius: 20px;
+  background: white;
+}
+
+.section-number {
+  color: var(--safe-green);
+  font-size: 1.45rem;
+  font-weight: 900;
+}
+
+.scam-section h2,
+.source-box h2 { margin: 0 0 14px; font-size: clamp(1.8rem, 4vw, 2.5rem); }
+.scam-section h3 { margin: 0 0 8px; }
+.scam-section p,
+.scam-section li,
+.source-box p,
+.source-box li { color: var(--safe-muted); font-size: 1rem; line-height: 1.55; }
+
+blockquote {
+  margin: 18px 0 0;
+  padding: 22px;
+  border: 0;
+  border-radius: 16px;
+  color: var(--safe-ink);
+  background: var(--safe-green-soft);
+  font-size: clamp(1.35rem, 3vw, 2rem);
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+.permission-line,
+.memory-tip {
+  padding: 13px 15px;
+  border-radius: 10px;
+  color: var(--safe-ink) !important;
+  background: #fff7d7;
+}
+
+.clue-grid,
+.role-play-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.clue-grid article,
+.role-play-grid article {
+  padding: 18px;
+  border: 2px solid var(--safe-line);
+  border-radius: 14px;
+  background: #f9fcfb;
+}
+.clue-grid article > span { display: block; margin-bottom: 8px; font-size: 1.8rem; }
+.clue-grid strong { font-size: 1.15rem; }
+.clue-grid p { margin: 5px 0 0; }
+.activity-time { display: inline-block; margin-bottom: 9px; padding: 5px 8px; border-radius: 999px; color: #6e4700; background: #ffedb5; font-size: .76rem; font-weight: 900; }
+
+.prompt-list,
+.urgent-list,
+.report-first { display: grid; gap: 10px; padding-left: 24px; }
+.prompt-list li::marker { color: var(--safe-green); font-weight: 900; }
+
+.bio-phrases { display: grid; gap: 10px; }
+.bio-phrases div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px 14px;
+  border: 2px solid var(--safe-line);
+  border-radius: 12px;
+  background: #f9fcfb;
+}
+.bio-phrases span { font-weight: 800; line-height: 1.4; }
+.bio-phrases button { min-height: 38px; padding: 6px 10px; }
+
+.platform-guides { display: grid; gap: 10px; margin-top: 18px; }
+.platform-guides details { border: 2px solid var(--safe-line); border-radius: 12px; background: #fbfdfd; }
+.platform-guides summary { padding: 15px; color: var(--safe-ink); font-size: 1.1rem; font-weight: 900; cursor: pointer; }
+.platform-guides details > ol,
+.platform-guides details > p,
+.platform-guides details > a { margin-left: 18px; margin-right: 18px; }
+.platform-guides details > a { display: inline-block; margin-bottom: 18px; color: #075fa8; font-weight: 800; }
+
+.urgent-section { border-color: #efb799; background: #fff8f4; }
+.small-note { font-size: .86rem !important; }
+
+.focus-toolbar {
+  position: sticky;
+  bottom: 12px;
+  z-index: 8;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  width: fit-content;
+  margin: 16px auto;
+  padding: 10px;
+  border: 2px solid var(--safe-ink);
+  border-radius: 14px;
+  background: white;
+  box-shadow: 0 10px 30px rgba(16, 37, 44, .2);
+}
+.focus-toolbar:not([hidden]) { display: flex; }
+.focus-toolbar span { min-width: 100px; text-align: center; font-weight: 900; }
+.focus-toolbar button:disabled { opacity: .45; cursor: not-allowed; }
+
+.focus-mode .focus-section { display: none; }
+.focus-mode .focus-section.is-focused { display: grid; min-height: 420px; align-content: center; }
+.focus-mode .source-box,
+.focus-mode .back-link { display: none; }
+
+.source-box {
+  margin-top: 18px;
+  padding: 24px;
+  border: 2px solid var(--safe-line);
+  border-radius: 16px;
+  background: #eef5f7;
+}
+.source-box a,
+.back-link a { color: #075fa8; font-weight: 800; }
+.back-link { margin: 24px 0; }
+
+.copy-status {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 12;
+  max-width: 280px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  color: white;
+  background: var(--safe-ink);
+  font-weight: 800;
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+  transition: opacity .2s ease, transform .2s ease;
+}
+.copy-status.show { opacity: 1; transform: translateY(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+}
+
+@media (max-width: 760px) {
+  .scam-hero,
+  .clue-grid,
+  .role-play-grid { grid-template-columns: 1fr; }
+  .scam-hero,
+  .scam-section { padding: 22px; }
+  .scam-section { grid-template-columns: 1fr; gap: 8px; }
+  .bio-phrases div { align-items: flex-start; flex-direction: column; }
+}
+
+@media print {
+  .scam-site-header,
+  .scam-hero-actions,
+  .focus-toolbar,
+  .inline-actions,
+  .source-box,
+  .back-link,
+  .dino-chat-launcher,
+  .dino-chat-panel { display: none !important; }
+  .scam-smart-page { background: white; }
+  .scam-smart-main { width: 100%; margin: 0; }
+  .scam-hero,
+  .scam-section { break-inside: avoid; box-shadow: none; }
+  .focus-mode .focus-section { display: grid; min-height: 0; }
+}
