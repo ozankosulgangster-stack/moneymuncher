@@ -59,6 +59,9 @@
   renderSuggestions();
 
   launcher.addEventListener("click", openChat);
+  document.querySelectorAll("[data-open-dino-chat]").forEach((button) => {
+    button.addEventListener("click", openChat);
+  });
   closeButton.addEventListener("click", closeChat);
   newButton.addEventListener("click", startNewChat);
   form.addEventListener("submit", (event) => {

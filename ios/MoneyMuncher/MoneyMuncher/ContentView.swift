@@ -78,6 +78,7 @@ struct ContentView: View {
     @State private var pendingDestinationAfterGate: AppDestination?
     @State private var isShowingParentGate = false
     @State private var isShowingFamilyQuest = false
+    @State private var isShowingDinoChat = false
     @State private var shouldOpenFamilyQuestAfterWebDismiss = false
 
     private let kidCards = [
@@ -128,6 +129,7 @@ struct ContentView: View {
                 VStack(alignment: .leading, spacing: 24) {
                     hero
                     familyQuestSpotlight
+                    dinoChatSpotlight
                     section(title: "Kid Missions", cards: kidCards)
                     section(title: "Family Area", cards: familyCards)
                 }
@@ -155,6 +157,9 @@ struct ContentView: View {
         }
         .fullScreenCover(isPresented: $isShowingFamilyQuest) {
             FamilyQuestView()
+        }
+        .fullScreenCover(isPresented: $isShowingDinoChat) {
+            DinoChatView()
         }
         .sheet(isPresented: $isShowingParentGate, onDismiss: presentPendingDestination) {
             ParentGateView(
@@ -283,6 +288,59 @@ struct ContentView: View {
         }
         .buttonStyle(.plain)
         .accessibilityHint("Opens the native Family Quest experience")
+    }
+
+    private var dinoChatSpotlight: some View {
+        Button {
+            isShowingDinoChat = true
+        } label: {
+            HStack(spacing: 15) {
+                Text("🦕")
+                    .font(.system(size: 46))
+                    .frame(width: 72, height: 72)
+                    .background(Color.white.opacity(0.84))
+                    .clipShape(Circle())
+
+                VStack(alignment: .leading, spacing: 5) {
+                    Text("LIVE · AZURE FOUNDRY AGENT")
+                        .font(.caption.weight(.black))
+                        .tracking(1)
+                        .foregroundStyle(Color(red: 0.06, green: 0.42, blue: 0.36))
+
+                    Text("Ask Dino a money question")
+                        .font(.title3.weight(.black))
+                        .foregroundStyle(Color(red: 0.08, green: 0.20, blue: 0.24))
+                        .multilineTextAlignment(.leading)
+
+                    Text("Chat freely about saving, spending, allowance, needs versus wants, and Market Lab.")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 4)
+
+                Image(systemName: "bubble.left.and.bubble.right.fill")
+                    .font(.title2)
+                    .foregroundStyle(Color(red: 0.04, green: 0.43, blue: 0.36))
+            }
+            .padding(18)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                LinearGradient(
+                    colors: [
+                        Color(red: 0.82, green: 0.96, blue: 0.89),
+                        Color(red: 0.78, green: 0.92, blue: 1.0)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .accessibilityHint("Opens a live chat with the Dino Munch family money agent")
     }
 
     private func section(title: String, cards: [FeatureCard]) -> some View {
