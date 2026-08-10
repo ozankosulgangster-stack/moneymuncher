@@ -25,6 +25,17 @@ body {
 .panel { background: var(--panel); border: 3px solid rgba(255,255,255,.75); border-radius: 32px; box-shadow: var(--shadow); backdrop-filter: blur(10px); }
 .topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 14px 18px; margin-bottom: 18px; position: sticky; top: 10px; z-index: 4; }
 .brand { display: flex; align-items: center; gap: 10px; font-family: "Baloo 2"; font-size: 1.45rem; font-weight: 900; }
+.demo-badge {
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #fff0b8;
+  color: #6d4800;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: .66rem;
+  line-height: 1;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
 .brand-mark { position: relative; width: 54px; height: 40px; display: inline-block; flex: 0 0 auto; }
 .brand-dino {
   position: absolute;
@@ -71,27 +82,14 @@ body {
 .account-status { background: #fff7d0; border-radius: 999px; color: #7a5200; font-size: .9rem; font-weight: 900; padding: 9px 12px; }
 .ios-launch-banner {
   display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 18px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 26px;
   align-items: center;
   padding: 20px;
   margin-bottom: 18px;
   color: white;
   background: linear-gradient(135deg, #102029, #176145 62%, #8abf43);
   border-color: rgba(255,255,255,.86);
-}
-.ios-launch-icon {
-  width: 66px;
-  height: 66px;
-  display: grid;
-  place-items: center;
-  border-radius: 22px;
-  background: rgba(255,255,255,.16);
-  border: 2px solid rgba(255,255,255,.42);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.2);
-  font-family: "Baloo 2", Inter, sans-serif;
-  font-size: 1.35rem;
-  font-weight: 900;
 }
 .ios-launch-copy .eyebrow { color: #ffe58a; }
 .ios-launch-copy h2 { font-size: clamp(1.6rem, 3vw, 2.6rem); }
@@ -104,19 +102,56 @@ body {
 }
 .ios-launch-actions {
   display: flex;
+  align-items: center;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 14px;
   flex-wrap: wrap;
 }
-.ios-launch-banner .primary {
-  background: white;
-  color: var(--ink);
+.app-store-badge-link {
+  display: inline-flex;
+  border-radius: 10px;
   box-shadow: 0 12px 22px rgba(0,0,0,.18);
+  transition: transform .15s ease;
 }
-.ios-launch-banner .secondary {
+.app-store-badge-link:hover { transform: translateY(-2px); }
+.app-store-badge-link img { width: 180px; height: auto; display: block; }
+.qr-card {
+  display: grid;
+  grid-template-columns: 72px auto;
+  align-items: center;
+  gap: 10px;
+  max-width: 190px;
+  padding: 8px;
+  border-radius: 16px;
   color: white;
   background: rgba(255,255,255,.12);
-  border-color: rgba(255,255,255,.36);
+  border: 1px solid rgba(255,255,255,.28);
+  font-size: .78rem;
+  font-weight: 800;
+  line-height: 1.25;
+  text-decoration: none;
+}
+.qr-card img { width: 72px; height: 72px; display: block; border-radius: 9px; background: white; }
+.app-payoff {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin: 18px 0 22px;
+}
+.app-payoff article {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 18px;
+  border: 2px solid rgba(255,255,255,.8);
+  border-radius: 22px;
+  background: rgba(255,255,255,.72);
+  box-shadow: 0 12px 28px rgba(74,47,0,.1);
+}
+.app-payoff article > span { font-size: 1.65rem; }
+.app-payoff strong, .app-payoff small { display: block; }
+.app-payoff strong { margin-bottom: 5px; }
+.app-payoff small { color: var(--muted); line-height: 1.4; }
 }
 .hero { display: grid; grid-template-columns: 1.2fr .8fr; gap: 28px; padding: 42px; align-items: center; }
 .eyebrow { margin: 0 0 10px; color: var(--gold-dark); text-transform: uppercase; letter-spacing: .12em; font-size: .8rem; font-weight: 800; }
@@ -408,12 +443,30 @@ button:disabled { cursor: not-allowed; opacity: .65; transform: none; }
   margin-top: 22px;
   padding: 30px;
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   gap: 18px;
   align-items: center;
-  background: linear-gradient(135deg, rgba(255,255,255,.9), rgba(240,255,248,.9));
+  color: white;
+  background: linear-gradient(135deg, #102029, #174f45 58%, #226c51);
 }
-.kids-copy p:not(.eyebrow) { color: var(--muted); font-size: 1.05rem; line-height: 1.5; margin: 12px 0 0; max-width: 650px; }
+.unity-emblem {
+  width: 108px;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 6px;
+  border-radius: 28px;
+  background: linear-gradient(145deg, #fdd35c, #f29c38);
+  color: #17202a;
+  box-shadow: inset 0 0 0 4px rgba(255,255,255,.32), 0 18px 30px rgba(0,0,0,.2);
+}
+.unity-emblem span { font-size: 2.7rem; }
+.unity-emblem small { font-size: .7rem; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+.kids-copy .eyebrow { color: #ffe58a; }
+.kids-copy p:not(.eyebrow) { color: rgba(255,255,255,.78); font-size: 1.05rem; line-height: 1.5; margin: 12px 0 0; max-width: 650px; }
+.kids-arcade .primary { background: #f8ce50; color: #17202a; }
+.kids-arcade .secondary { background: rgba(255,255,255,.12); color: white; border-color: rgba(255,255,255,.3); }
 .kids-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; }
 .market-lab-teaser {
   margin-top: 22px;
@@ -733,7 +786,7 @@ html.ios-app .modal[open] .modal-card {
 }
 .hidden { display: none; }
 @keyframes bob { 50% { transform: translateY(-10px) rotate(4deg); } }
-@media (max-width: 1000px) { .role-grid { grid-template-columns: repeat(2, 1fr); } .age-grid, .mini-game-grid, .generated-history-list { grid-template-columns: 1fr; } .generator-layout, .generator-controls { grid-template-columns: 1fr; } }
+@media (max-width: 1000px) { .role-grid { grid-template-columns: repeat(2, 1fr); } .app-payoff { grid-template-columns: repeat(2, 1fr); } .age-grid, .mini-game-grid, .generated-history-list { grid-template-columns: 1fr; } .generator-layout, .generator-controls { grid-template-columns: 1fr; } }
 @media (max-width: 900px) { .map-path { grid-template-columns: 1fr; } .map-path::before { left: 50%; right: auto; top: 8%; bottom: 8%; width: 10px; height: auto; } }
 @media (max-width: 800px) {
   .topbar, .hero, .choices, .hub-grid { grid-template-columns: 1fr; }
@@ -741,6 +794,7 @@ html.ios-app .modal[open] .modal-card {
   .account-area { justify-content: flex-start; }
   .ios-launch-banner { grid-template-columns: 1fr; }
   .ios-launch-actions { justify-content: flex-start; }
+  .app-payoff { grid-template-columns: 1fr; }
   .stats { grid-template-columns: repeat(2,1fr); }
   .game-header, .section-heading, .quest-form { flex-direction: column; }
   .kids-arcade { grid-template-columns: 1fr; }
@@ -750,6 +804,8 @@ html.ios-app .modal[open] .modal-card {
   .video-caption { align-items: flex-start; flex-direction: column; }
 }
 @media (max-width: 560px) {
+  .demo-badge { display: none; }
+  .qr-card { display: none; }
   .role-grid { grid-template-columns: 1fr; }
   .play-setup, .age-paths, .mini-games, .quest-generator { padding: 22px; }
 }
