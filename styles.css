@@ -134,7 +134,7 @@ body {
 .qr-card img { width: 72px; height: 72px; display: block; border-radius: 9px; background: white; }
 .app-payoff {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 14px;
   margin: 18px 0 22px;
 }
@@ -786,7 +786,7 @@ html.ios-app .modal[open] .modal-card {
 }
 .hidden { display: none; }
 @keyframes bob { 50% { transform: translateY(-10px) rotate(4deg); } }
-@media (max-width: 1000px) { .role-grid { grid-template-columns: repeat(2, 1fr); } .age-grid, .mini-game-grid, .generated-history-list { grid-template-columns: 1fr; } .generator-layout, .generator-controls { grid-template-columns: 1fr; } }
+@media (max-width: 1000px) { .role-grid { grid-template-columns: repeat(2, 1fr); } .app-payoff { grid-template-columns: repeat(2, 1fr); } .age-grid, .mini-game-grid, .generated-history-list { grid-template-columns: 1fr; } .generator-layout, .generator-controls { grid-template-columns: 1fr; } }
 @media (max-width: 900px) { .map-path { grid-template-columns: 1fr; } .map-path::before { left: 50%; right: auto; top: 8%; bottom: 8%; width: 10px; height: auto; } }
 @media (max-width: 800px) {
   .topbar, .hero, .choices, .hub-grid { grid-template-columns: 1fr; }

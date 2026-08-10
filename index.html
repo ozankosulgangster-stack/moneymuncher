@@ -17,6 +17,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Inter:wght@500;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css?v=10" />
+  <link rel="stylesheet" href="/chore-planner.css" />
   <link rel="stylesheet" href="/dino-chat.css" />
 </head>
 <body>
@@ -31,6 +32,7 @@
         <span class="demo-badge">Web demo</span>
       </div>
       <div class="account-area">
+        <a href="#chorePlanner" class="secondary small nav-link">Chore Planner</a>
         <a href="/market-lab/" class="secondary small nav-link">Market Lab</a>
         <a href="/kids/play/" class="secondary small nav-link">Play Kids Game</a>
         <button id="academyBtn" class="secondary small">Academy</button>
@@ -47,7 +49,7 @@
       <div class="ios-launch-copy">
         <p class="eyebrow">The full family experience</p>
         <h2 id="iosLaunchTitle">The browser is your preview. The adventure lives in the app.</h2>
-        <p>Get native Family Quests, Cup Rush, parent-gated family tools, and Dino Chat together on iPhone and iPad.</p>
+        <p>Get native Family Quests, a reusable Chore Planner, Cup Rush, parent-gated family tools, and Dino Chat together on iPhone and iPad.</p>
       </div>
       <div class="ios-launch-actions">
         <a href="https://apps.apple.com/us/app/money-muncher/id6789588978" class="app-store-badge-link" target="_blank" rel="noopener noreferrer" aria-label="Download Money Muncher on the App Store">
@@ -69,6 +71,7 @@
           <button id="startBtn" class="primary">Try a Web Quest</button>
           <a href="https://apps.apple.com/us/app/money-muncher/id6789588978" class="primary button-link" target="_blank" rel="noopener noreferrer">Get the Full App</a>
           <a href="/kids/play/" class="secondary button-link">Preview Cup Rush</a>
+          <a href="#chorePlanner" class="secondary button-link">Build a Chore Plan</a>
           <button class="secondary" type="button" data-open-dino-chat>Ask Dino</button>
           <button id="mapBtn" class="secondary">Open Map</button>
           <button id="teacherBtn" class="secondary">Teacher / Parent Hub</button>
@@ -97,6 +100,10 @@
       <article>
         <span aria-hidden="true">🔐</span>
         <div><strong>Parent-gated tools</strong><small>Keep account, support, and family settings in the grown-up area.</small></div>
+      </article>
+      <article>
+        <span aria-hidden="true">✅</span>
+        <div><strong>Reusable chore plans</strong><small>Assign dollars or points, split rewards, and track each family win.</small></div>
       </article>
     </section>
 
@@ -225,6 +232,69 @@
         </div>
         <div id="generatedQuestHistory" class="generated-history-list"></div>
       </div>
+    </section>
+
+    <section id="chorePlanner" class="chore-planner panel" aria-labelledby="chorePlannerTitle">
+      <div class="chore-planner-heading">
+        <div>
+          <p class="eyebrow">Ready-to-use family template</p>
+          <h2 id="chorePlannerTitle">Build a chore plan that teaches money choices</h2>
+          <p>Start from a template or make your own. Assign dollars or points, check off completed chores, and show how earned money can move into Spend, Save, and Give.</p>
+        </div>
+        <span class="chore-save-note">Saved on this device</span>
+      </div>
+
+      <div class="chore-template-picker" aria-label="Chore plan templates">
+        <button class="chore-template-card" type="button" data-chore-template="little-helper">
+          <span aria-hidden="true">🌟</span><strong>Little Helper</strong><small>Simple point-based wins</small>
+        </button>
+        <button class="chore-template-card" type="button" data-chore-template="allowance-builder">
+          <span aria-hidden="true">🪙</span><strong>Allowance Builder</strong><small>Dollar rewards and saving</small>
+        </button>
+        <button class="chore-template-card" type="button" data-chore-template="school-week">
+          <span aria-hidden="true">🎒</span><strong>School Week</strong><small>Routine-building points</small>
+        </button>
+      </div>
+
+      <div class="chore-workspace">
+        <div class="chore-list-card">
+          <div class="chore-list-header">
+            <div>
+              <h3>This week's chores</h3>
+              <p id="choreProgressText">0 of 0 complete</p>
+            </div>
+            <button id="addChoreBtn" class="primary small" type="button">+ Add chore</button>
+          </div>
+          <div class="chore-progress" aria-hidden="true"><span id="choreProgressBar"></span></div>
+          <div id="choreList" class="chore-list" aria-live="polite"></div>
+        </div>
+
+        <aside class="chore-reward-card">
+          <p class="eyebrow">Reward plan</p>
+          <h3>Split earned dollars</h3>
+          <p class="chore-helper">Choose percentages that add to 100%. Point rewards stay as points.</p>
+          <div class="chore-split-grid">
+            <label><span>Spend</span><input id="choreSpend" type="number" min="0" max="100" step="5" inputmode="numeric" value="40" /><small>%</small></label>
+            <label><span>Save</span><input id="choreSave" type="number" min="0" max="100" step="5" inputmode="numeric" value="50" /><small>%</small></label>
+            <label><span>Give</span><input id="choreGive" type="number" min="0" max="100" step="5" inputmode="numeric" value="10" /><small>%</small></label>
+          </div>
+          <p id="choreSplitStatus" class="chore-split-status" role="status">Perfect — your split adds to 100%.</p>
+
+          <div class="chore-summary" aria-live="polite">
+            <div><span>Earned</span><strong id="choreEarned">$0.00 + 0 pts</strong></div>
+            <div><span>Spend</span><strong id="choreSpendTotal">$0.00</strong></div>
+            <div><span>Save</span><strong id="choreSaveTotal">$0.00</strong></div>
+            <div><span>Give</span><strong id="choreGiveTotal">$0.00</strong></div>
+          </div>
+
+          <div class="chore-actions">
+            <button id="downloadChorePlanBtn" class="primary" type="button">Download CSV</button>
+            <button id="printChorePlanBtn" class="secondary" type="button">Print Plan</button>
+            <button id="resetChorePlanBtn" class="secondary small" type="button">Start Over</button>
+          </div>
+        </aside>
+      </div>
+      <p class="chore-privacy">Private by default: this planner stays in this browser and is not sent to Dino Chat or stored in Azure.</p>
     </section>
 
     <section id="kids" class="kids-arcade panel">
@@ -406,6 +476,7 @@
 
   <!-- 4. Your game logic (LAST — it needs MoneyMuncher to exist first) -->
   <script src="app.js?v=10"></script>
+  <script src="/chore-planner.js"></script>
   <script src="/dino-chat.js"></script>
 </body>
 </html>

@@ -79,6 +79,7 @@ struct ContentView: View {
     @State private var isShowingParentGate = false
     @State private var isShowingFamilyQuest = false
     @State private var isShowingDinoChat = false
+    @State private var isShowingChorePlanner = false
     @State private var shouldOpenFamilyQuestAfterWebDismiss = false
 
     private let kidCards = [
@@ -129,6 +130,7 @@ struct ContentView: View {
                 VStack(alignment: .leading, spacing: 24) {
                     hero
                     familyQuestSpotlight
+                    chorePlannerSpotlight
                     dinoChatSpotlight
                     section(title: "Kid Missions", cards: kidCards)
                     section(title: "Family Area", cards: familyCards)
@@ -160,6 +162,9 @@ struct ContentView: View {
         }
         .fullScreenCover(isPresented: $isShowingDinoChat) {
             DinoChatView()
+        }
+        .fullScreenCover(isPresented: $isShowingChorePlanner) {
+            ChorePlannerView()
         }
         .sheet(isPresented: $isShowingParentGate, onDismiss: presentPendingDestination) {
             ParentGateView(
@@ -341,6 +346,60 @@ struct ContentView: View {
         }
         .buttonStyle(.plain)
         .accessibilityHint("Opens a live chat with the Dino Munch family money agent")
+    }
+
+    private var chorePlannerSpotlight: some View {
+        Button {
+            isShowingChorePlanner = true
+        } label: {
+            HStack(spacing: 15) {
+                Image(systemName: "checklist.checked")
+                    .font(.system(size: 34, weight: .bold))
+                    .foregroundStyle(Color(red: 0.04, green: 0.43, blue: 0.36))
+                    .frame(width: 72, height: 72)
+                    .background(Color.white.opacity(0.84))
+                    .clipShape(Circle())
+
+                VStack(alignment: .leading, spacing: 5) {
+                    Text("NEW · NATIVE FAMILY TOOL")
+                        .font(.caption.weight(.black))
+                        .tracking(1)
+                        .foregroundStyle(Color(red: 0.45, green: 0.25, blue: 0.02))
+
+                    Text("Turn chores into a money plan")
+                        .font(.title3.weight(.black))
+                        .foregroundStyle(Color(red: 0.08, green: 0.20, blue: 0.24))
+                        .multilineTextAlignment(.leading)
+
+                    Text("Assign dollars or points, split rewards into Spend, Save, and Give, then share the plan as a CSV.")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 4)
+
+                Image(systemName: "chevron.right.circle.fill")
+                    .font(.title2)
+                    .foregroundStyle(Color(red: 0.82, green: 0.48, blue: 0.08))
+            }
+            .padding(18)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                LinearGradient(
+                    colors: [
+                        Color(red: 1.0, green: 0.93, blue: 0.68),
+                        Color(red: 0.82, green: 0.96, blue: 0.89)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .accessibilityHint("Opens the native family chore planner")
     }
 
     private func section(title: String, cards: [FeatureCard]) -> some View {
