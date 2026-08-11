@@ -7,6 +7,10 @@ This folder contains a lightweight iOS app shell for Money Muncher. It is built 
 - Native SwiftUI home screen for kids and families.
 - Fast launch actions for Cup Rush and Everyday Quest Generator.
 - Parent gate before account setup and parent-guide screens.
+- Parent-gated native Family Community with locally saved child profiles and shared activities.
+- Shared family goals with contribution thermometers, participant attribution, and an on-device activity feed.
+- Gift-pool invitations, manual gift recording, found-money celebrations, and round-up tracking that clearly does not move real funds.
+- Up to five child profiles on the free tier; additional profiles require Money Muncher Plus.
 - Native StoreKit 2 paywall for Money Muncher Plus.
 - Parent gate before purchase options are shown.
 - Premium unlock checks using current App Store entitlements.
@@ -24,6 +28,7 @@ Plus content currently includes:
 
 - `Everyday Quest`
 - `Dino Money Lab`
+- More than five child profiles in `Family Community`
 - `Card Captain`: credit cards, debit cards, and safe card habits.
 - `Interest Lab`: borrowing costs, APR, minimum payments, and compounding.
 - `Stock Slice Studio`: stock ownership, trades, risk, and diversification.
@@ -32,6 +37,10 @@ Plus content currently includes:
 Investing lessons use virtual examples only and do not provide real-money trading advice.
 
 Audio lessons use `AVSpeechSynthesizer` with the device's built-in text-to-speech voices. The Ollie interest story also includes the bundled `Narrations/ollie-interest.mp3` recording, which does not require a microphone permission or cloud service.
+
+Family Community data is encoded locally in `UserDefaults`. It does not create remote identities or sync child data to a server. Removing a child profile also removes that child from shared activities; activities with no remaining participants are removed.
+
+Family goal contributions, gift pools, found-money sweeps, and round-ups are progress-tracking records in this version. The app does not connect to bank accounts, detect transactions, collect payments, or transfer money. Gift-pool sharing sends an invitation message; a future authenticated backend and payment integration would be required for live contribution links. `FamilyCommunityStore.addContribution` and `addRoundUp` provide the local domain boundary for that future integration.
 
 Subscription product IDs live in:
 

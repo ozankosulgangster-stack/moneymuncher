@@ -18,12 +18,15 @@
 		A4F7D1136D9148B5902A0037 /* PremiumLearningModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0036 /* PremiumLearningModule.swift */; };
 		A4F7D1136D9148B5902A0039 /* PremiumLearningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0038 /* PremiumLearningView.swift */; };
 		A4F7D1136D9148B5902A0041 /* LessonNarrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0040 /* LessonNarrator.swift */; };
-		A4F7D1136D9148B5902A0042 /* ollie-interest.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0043 /* ollie-interest.mp3 */; };
-		A4F7D1136D9148B5902A0044 /* dino-saving.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0045 /* dino-saving.mp3 */; };
-		A4F7D1136D9148B5902A0046 /* dino-debit.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0047 /* dino-debit.mp3 */; };
-		A4F7D1136D9148B5902A0048 /* sammy-stock-intro.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0049 /* sammy-stock-intro.mp3 */; };
-		A4F7D1136D9148B5902A0050 /* mira-interest-intro.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0051 /* mira-interest-intro.mp3 */; };
-		A4F7D1136D9148B5902A0052 /* captain-jack-card-intro.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0053 /* captain-jack-card-intro.mp3 */; };
+		A4F7D1136D9148B5902A0042 /* Narrations/ollie-interest.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0043 /* Narrations/ollie-interest.mp3 */; };
+		A4F7D1136D9148B5902A0044 /* Narrations/dino-saving.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0045 /* Narrations/dino-saving.mp3 */; };
+		A4F7D1136D9148B5902A0046 /* Narrations/dino-debit.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0047 /* Narrations/dino-debit.mp3 */; };
+		A4F7D1136D9148B5902A0048 /* Narrations/sammy-stock-intro.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0049 /* Narrations/sammy-stock-intro.mp3 */; };
+		A4F7D1136D9148B5902A0050 /* Narrations/mira-interest-intro.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0051 /* Narrations/mira-interest-intro.mp3 */; };
+		A4F7D1136D9148B5902A0052 /* Narrations/captain-jack-card-intro.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0053 /* Narrations/captain-jack-card-intro.mp3 */; };
+		A4F7D1136D9148B5902A0055 /* FamilyCommunityStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0054 /* FamilyCommunityStore.swift */; };
+		A4F7D1136D9148B5902A0057 /* FamilyCommunityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0056 /* FamilyCommunityView.swift */; };
+		A4F7D1136D9148B5902A0059 /* FamilyGoalsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0058 /* FamilyGoalsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,12 +43,15 @@
 		A4F7D1136D9148B5902A0036 /* PremiumLearningModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumLearningModule.swift; sourceTree = "<group>"; };
 		A4F7D1136D9148B5902A0038 /* PremiumLearningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumLearningView.swift; sourceTree = "<group>"; };
 		A4F7D1136D9148B5902A0040 /* LessonNarrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonNarrator.swift; sourceTree = "<group>"; };
-		A4F7D1136D9148B5902A0043 /* ollie-interest.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Narrations/ollie-interest.mp3; sourceTree = "<group>"; };
-		A4F7D1136D9148B5902A0045 /* dino-saving.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Narrations/dino-saving.mp3; sourceTree = "<group>"; };
-		A4F7D1136D9148B5902A0047 /* dino-debit.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Narrations/dino-debit.mp3; sourceTree = "<group>"; };
-		A4F7D1136D9148B5902A0049 /* sammy-stock-intro.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Narrations/sammy-stock-intro.mp3; sourceTree = "<group>"; };
-		A4F7D1136D9148B5902A0051 /* mira-interest-intro.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Narrations/mira-interest-intro.mp3; sourceTree = "<group>"; };
-		A4F7D1136D9148B5902A0053 /* captain-jack-card-intro.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Narrations/captain-jack-card-intro.mp3; sourceTree = "<group>"; };
+		A4F7D1136D9148B5902A0043 /* Narrations/ollie-interest.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "Narrations/ollie-interest.mp3"; sourceTree = "<group>"; };
+		A4F7D1136D9148B5902A0045 /* Narrations/dino-saving.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "Narrations/dino-saving.mp3"; sourceTree = "<group>"; };
+		A4F7D1136D9148B5902A0047 /* Narrations/dino-debit.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "Narrations/dino-debit.mp3"; sourceTree = "<group>"; };
+		A4F7D1136D9148B5902A0049 /* Narrations/sammy-stock-intro.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "Narrations/sammy-stock-intro.mp3"; sourceTree = "<group>"; };
+		A4F7D1136D9148B5902A0051 /* Narrations/mira-interest-intro.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "Narrations/mira-interest-intro.mp3"; sourceTree = "<group>"; };
+		A4F7D1136D9148B5902A0053 /* Narrations/captain-jack-card-intro.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "Narrations/captain-jack-card-intro.mp3"; sourceTree = "<group>"; };
+		A4F7D1136D9148B5902A0054 /* FamilyCommunityStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamilyCommunityStore.swift; sourceTree = "<group>"; };
+		A4F7D1136D9148B5902A0056 /* FamilyCommunityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamilyCommunityView.swift; sourceTree = "<group>"; };
+		A4F7D1136D9148B5902A0058 /* FamilyGoalsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamilyGoalsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,12 +93,15 @@
 				A4F7D1136D9148B5902A0036 /* PremiumLearningModule.swift */,
 				A4F7D1136D9148B5902A0038 /* PremiumLearningView.swift */,
 				A4F7D1136D9148B5902A0040 /* LessonNarrator.swift */,
-				A4F7D1136D9148B5902A0043 /* ollie-interest.mp3 */,
-				A4F7D1136D9148B5902A0045 /* dino-saving.mp3 */,
-				A4F7D1136D9148B5902A0047 /* dino-debit.mp3 */,
-				A4F7D1136D9148B5902A0049 /* sammy-stock-intro.mp3 */,
-				A4F7D1136D9148B5902A0051 /* mira-interest-intro.mp3 */,
-				A4F7D1136D9148B5902A0053 /* captain-jack-card-intro.mp3 */,
+				A4F7D1136D9148B5902A0054 /* FamilyCommunityStore.swift */,
+				A4F7D1136D9148B5902A0056 /* FamilyCommunityView.swift */,
+				A4F7D1136D9148B5902A0058 /* FamilyGoalsView.swift */,
+				A4F7D1136D9148B5902A0043 /* Narrations/ollie-interest.mp3 */,
+				A4F7D1136D9148B5902A0045 /* Narrations/dino-saving.mp3 */,
+				A4F7D1136D9148B5902A0047 /* Narrations/dino-debit.mp3 */,
+				A4F7D1136D9148B5902A0049 /* Narrations/sammy-stock-intro.mp3 */,
+				A4F7D1136D9148B5902A0051 /* Narrations/mira-interest-intro.mp3 */,
+				A4F7D1136D9148B5902A0053 /* Narrations/captain-jack-card-intro.mp3 */,
 				A4F7D1136D9148B5902A0016 /* Info.plist */,
 				A4F7D1136D9148B5902A0017 /* Assets.xcassets */,
 				A4F7D1136D9148B5902A0019 /* PrivacyInfo.xcprivacy */,
@@ -160,12 +169,12 @@
 			files = (
 				A4F7D1136D9148B5902A0018 /* Assets.xcassets in Resources */,
 				A4F7D1136D9148B5902A0020 /* PrivacyInfo.xcprivacy in Resources */,
-				A4F7D1136D9148B5902A0042 /* ollie-interest.mp3 in Resources */,
-				A4F7D1136D9148B5902A0044 /* dino-saving.mp3 in Resources */,
-				A4F7D1136D9148B5902A0046 /* dino-debit.mp3 in Resources */,
-				A4F7D1136D9148B5902A0048 /* sammy-stock-intro.mp3 in Resources */,
-				A4F7D1136D9148B5902A0050 /* mira-interest-intro.mp3 in Resources */,
-				A4F7D1136D9148B5902A0052 /* captain-jack-card-intro.mp3 in Resources */,
+				A4F7D1136D9148B5902A0042 /* Narrations/ollie-interest.mp3 in Resources */,
+				A4F7D1136D9148B5902A0044 /* Narrations/dino-saving.mp3 in Resources */,
+				A4F7D1136D9148B5902A0046 /* Narrations/dino-debit.mp3 in Resources */,
+				A4F7D1136D9148B5902A0048 /* Narrations/sammy-stock-intro.mp3 in Resources */,
+				A4F7D1136D9148B5902A0050 /* Narrations/mira-interest-intro.mp3 in Resources */,
+				A4F7D1136D9148B5902A0052 /* Narrations/captain-jack-card-intro.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -185,6 +194,9 @@
 				A4F7D1136D9148B5902A0037 /* PremiumLearningModule.swift in Sources */,
 				A4F7D1136D9148B5902A0039 /* PremiumLearningView.swift in Sources */,
 				A4F7D1136D9148B5902A0041 /* LessonNarrator.swift in Sources */,
+				A4F7D1136D9148B5902A0055 /* FamilyCommunityStore.swift in Sources */,
+				A4F7D1136D9148B5902A0057 /* FamilyCommunityView.swift in Sources */,
+				A4F7D1136D9148B5902A0059 /* FamilyGoalsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -311,7 +323,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 28;
+				CURRENT_PROJECT_VERSION = 29;
 				DEVELOPMENT_TEAM = A2TAG4GHM2;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = MoneyMuncher/Info.plist;
@@ -320,7 +332,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2;
+				MARKETING_VERSION = 1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = ca.moneymuncher.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -338,7 +350,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 28;
+				CURRENT_PROJECT_VERSION = 29;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = A2TAG4GHM2;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -348,7 +360,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2;
+				MARKETING_VERSION = 1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = ca.moneymuncher.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

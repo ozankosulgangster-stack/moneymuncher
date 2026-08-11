@@ -5,6 +5,7 @@ struct PaywallView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var purchaseManager: PurchaseManager
 
+    var primaryActionTitle = "Open Dino Lessons"
     let onOpenLessons: () -> Void
 
     var body: some View {
@@ -75,6 +76,7 @@ struct PaywallView: View {
         VStack(alignment: .leading, spacing: 12) {
             PaywallBenefitRow(systemImage: "map.fill", title: "Level path", subtitle: "Unlock premium mission packs as the Duolingo-style path expands.")
             PaywallBenefitRow(systemImage: "sparkles", title: "Everyday quests", subtitle: "Turn allowance, snacks, birthdays, and saving goals into quick challenges.")
+            PaywallBenefitRow(systemImage: "person.3.fill", title: "More family profiles", subtitle: "Grow beyond five child profiles in Family Community.")
             PaywallBenefitRow(systemImage: "book.closed.fill", title: "Dino lessons", subtitle: "Learn cards, interest, and stock-market basics with character-led modules.")
         }
     }
@@ -177,7 +179,7 @@ struct PaywallView: View {
                 onOpenLessons()
                 dismiss()
             } label: {
-                Label("Open Dino Lessons", systemImage: "book.closed.fill")
+                Label(primaryActionTitle, systemImage: "arrow.right.circle.fill")
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(PrimaryActionButtonStyle())

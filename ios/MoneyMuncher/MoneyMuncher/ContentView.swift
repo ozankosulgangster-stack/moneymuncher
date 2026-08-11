@@ -1,8 +1,9 @@
 import SwiftUI
 
-enum AppDestination: Identifiable {
+enum AppDestination: Identifiable, Equatable {
     case play
     case questGenerator
+    case familyCommunity
     case familyQuest
     case familySignup
     case parentGuide
@@ -12,6 +13,7 @@ enum AppDestination: Identifiable {
         switch self {
         case .play: return "play"
         case .questGenerator: return "quest-generator"
+        case .familyCommunity: return "family-community"
         case .familyQuest: return "family-quest"
         case .familySignup: return "family-signup"
         case .parentGuide: return "parent-guide"
@@ -23,6 +25,7 @@ enum AppDestination: Identifiable {
         switch self {
         case .play: return "Cup Rush"
         case .questGenerator: return "Everyday Quest"
+        case .familyCommunity: return "Family Community"
         case .familyQuest: return "Family Quest"
         case .familySignup: return "Family Sign Up"
         case .parentGuide: return "Parent Guide"
@@ -30,12 +33,14 @@ enum AppDestination: Identifiable {
         }
     }
 
-    var url: URL {
+    var url: URL? {
         switch self {
         case .play:
             return URL(string: "https://moneymuncher.ca/kids/play/?source=ios-app")!
         case .questGenerator:
             return URL(string: "https://moneymuncher.ca/kids/?source=ios-app#questGeneratorTitle")!
+        case .familyCommunity:
+            return nil
         case .familyQuest:
             return URL(string: "https://moneymuncher.ca/kids/?source=ios-app&entry=family-quest#questGeneratorTitle")!
         case .familySignup:
@@ -49,7 +54,7 @@ enum AppDestination: Identifiable {
 
     var requiresParentGate: Bool {
         switch self {
-        case .familyQuest, .familySignup, .parentGuide:
+        case .familyCommunity, .familyQuest, .familySignup, .parentGuide:
             return true
         case .play, .questGenerator, .privacy:
             return false
@@ -93,6 +98,12 @@ struct ContentView: View {
     ]
 
     private let familyCards = [
+        FeatureCard(
+            title: "Family Community",
+            subtitle: "Create child profiles, track family goals, and complete shared money activities.",
+            systemImage: "house.and.flag.fill",
+            destination: .familyCommunity
+        ),
         FeatureCard(
             title: "Family Quest",
             subtitle: "Create a quick money choice game from a real family moment.",
@@ -139,7 +150,11 @@ struct ContentView: View {
             }
         }
         .sheet(item: $activeDestination) { destination in
-            WebExperienceView(destination: destination)
+            if destination == .familyCommunity {
+                FamilyCommunityView()
+            } else {
+                WebExperienceView(destination: destination)
+            }
         }
         .task {
             await purchaseManager.refreshPurchasedProducts()
@@ -423,17 +438,19 @@ private struct WebExperienceView: View {
 
     var body: some View {
         NavigationStack {
-            MoneyMuncherWebView(url: destination.url)
-                .ignoresSafeArea(edges: .bottom)
-                .navigationTitle(destination.title)
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button("Done") {
-                            dismiss()
+            if let url = destination.url {
+                MoneyMuncherWebView(url: url)
+                    .ignoresSafeArea(edges: .bottom)
+                    .navigationTitle(destination.title)
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Done") {
+                                dismiss()
+                            }
                         }
                     }
-                }
+            }
         }
     }
 }
