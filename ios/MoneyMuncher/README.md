@@ -10,6 +10,7 @@ This folder contains a lightweight iOS app shell for Money Muncher. It is built 
 - Parent-gated native Family Community with locally saved child profiles and shared activities.
 - Shared family goals with contribution thermometers, participant attribution, and an on-device activity feed.
 - Gift-pool invitations, manual gift recording, found-money celebrations, and round-up tracking that clearly does not move real funds.
+- Device-local weekly and inactivity follow-up reminders for family goals, including a built-in test notification.
 - Up to five child profiles on the free tier; additional profiles require Money Muncher Plus.
 - Native StoreKit 2 paywall for Money Muncher Plus.
 - Parent gate before purchase options are shown.
@@ -41,6 +42,8 @@ Audio lessons use `AVSpeechSynthesizer` with the device's built-in text-to-speec
 Family Community data is encoded locally in `UserDefaults`. It does not create remote identities or sync child data to a server. Removing a child profile also removes that child from shared activities; activities with no remaining participants are removed.
 
 Family goal contributions, gift pools, found-money sweeps, and round-ups are progress-tracking records in this version. The app does not connect to bank accounts, detect transactions, collect payments, or transfer money. Gift-pool sharing sends an invitation message; a future authenticated backend and payment integration would be required for live contribution links. `FamilyCommunityStore.addContribution` and `addRoundUp` provide the local domain boundary for that future integration.
+
+Family goal reminders use Apple's local `UserNotifications` APIs. Permission is requested only when a parent saves or tests a reminder. Weekly reminders repeat at the selected day and time; inactivity reminders are rescheduled whenever goal progress changes. Reminder content deliberately omits child names, goal titles, balances, and contribution amounts. No Push Notifications capability, APNs token, Firebase service, or notification server is required for these device-local reminders.
 
 Subscription product IDs live in:
 

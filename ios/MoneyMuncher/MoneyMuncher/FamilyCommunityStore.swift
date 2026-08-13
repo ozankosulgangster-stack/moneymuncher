@@ -97,6 +97,59 @@ enum FamilyContributionSource: String, Codable, CaseIterable, Identifiable {
     }
 }
 
+enum FamilyGoalReminderKind: String, Codable, CaseIterable, Identifiable {
+    case weekly
+    case inactivity
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .weekly: return "Weekly"
+        case .inactivity: return "No Progress"
+        }
+    }
+}
+
+struct FamilyGoalReminder: Codable, Equatable {
+    var kind: FamilyGoalReminderKind
+    var weekday: Int
+    var hour: Int
+    var minute: Int
+    var inactivityDays: Int
+
+    init(
+        kind: FamilyGoalReminderKind,
+        weekday: Int = 1,
+        hour: Int = 18,
+        minute: Int = 0,
+        inactivityDays: Int = 7
+    ) {
+        self.kind = kind
+        self.weekday = min(max(weekday, 1), 7)
+        self.hour = min(max(hour, 0), 23)
+        self.minute = min(max(minute, 0), 59)
+        self.inactivityDays = min(max(inactivityDays, 1), 30)
+    }
+
+    var summary: String {
+        switch kind {
+        case .weekly:
+            let weekdayName = Calendar.current.weekdaySymbols[weekday - 1]
+            var components = DateComponents()
+            components.hour = hour
+            components.minute = minute
+            let time = Calendar.current.date(from: components) ?? Date()
+            let formatter = DateFormatter()
+            formatter.timeStyle = .short
+            formatter.dateStyle = .none
+            return "Every \(weekdayName) at \(formatter.string(from: time))"
+        case .inactivity:
+            return inactivityDays == 1 ? "After 1 day without progress" : "After \(inactivityDays) days without progress"
+        }
+    }
+}
+
 struct FamilyGoalContribution: Codable, Identifiable, Equatable {
     let id: UUID
     let amountInCents: Int
@@ -133,6 +186,7 @@ struct FamilyGoal: Codable, Identifiable, Equatable {
     var participantIDs: [UUID]
     var kind: FamilyGoalKind
     var roundUpTrackingEnabled: Bool
+    var reminder: FamilyGoalReminder?
     var contributions: [FamilyGoalContribution]
     let createdAt: Date
 
@@ -144,6 +198,7 @@ struct FamilyGoal: Codable, Identifiable, Equatable {
         participantIDs: [UUID],
         kind: FamilyGoalKind,
         roundUpTrackingEnabled: Bool = false,
+        reminder: FamilyGoalReminder? = nil,
         contributions: [FamilyGoalContribution] = [],
         createdAt: Date = Date()
     ) {
@@ -154,6 +209,7 @@ struct FamilyGoal: Codable, Identifiable, Equatable {
         self.participantIDs = participantIDs
         self.kind = kind
         self.roundUpTrackingEnabled = roundUpTrackingEnabled
+        self.reminder = reminder
         self.contributions = contributions
         self.createdAt = createdAt
     }
@@ -392,6 +448,12 @@ final class FamilyCommunityStore: ObservableObject {
     func setRoundUpTracking(goalID: UUID, isEnabled: Bool) {
         guard let index = goals.firstIndex(where: { $0.id == goalID }) else { return }
         goals[index].roundUpTrackingEnabled = isEnabled
+        persistGoals()
+    }
+
+    func setGoalReminder(goalID: UUID, reminder: FamilyGoalReminder?) {
+        guard let index = goals.firstIndex(where: { $0.id == goalID }) else { return }
+        goals[index].reminder = reminder
         persistGoals()
     }
 

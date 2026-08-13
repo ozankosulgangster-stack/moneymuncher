@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct FamilyGoalsSection: View {
     @EnvironmentObject private var familyStore: FamilyCommunityStore
@@ -6,11 +7,13 @@ struct FamilyGoalsSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack(alignment: .firstTextBaseline) {
+            HStack(alignment: .center, spacing: 12) {
                 VStack(alignment: .leading, spacing: 3) {
                     Text("Family Goals")
-                        .font(.headline)
-                        .foregroundStyle(Color(red: 0.05, green: 0.26, blue: 0.23))
+                        .font(.subheadline.weight(.black))
+                        .textCase(.uppercase)
+                        .tracking(0.7)
+                        .foregroundStyle(MoneyMuncherDesign.purple)
                     Text("\(familyStore.activeGoals.count) active · \(familyStore.completedGoals.count) reached")
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -18,26 +21,28 @@ struct FamilyGoalsSection: View {
 
                 Spacer()
 
-                Button {
+                MoneyMuncherActionChip(
+                    title: "Create",
+                    systemImage: "plus",
+                    isEnabled: !familyStore.members.isEmpty
+                ) {
                     isShowingNewGoal = true
-                } label: {
-                    Label("Create", systemImage: "plus")
-                        .font(.subheadline.weight(.bold))
                 }
-                .disabled(familyStore.members.isEmpty)
             }
 
             if familyStore.members.isEmpty {
                 FamilyGoalEmptyCard(
                     systemImage: "target",
                     title: "Profiles come first",
-                    message: "Add at least one child profile before creating a family goal."
+                    message: "Add at least one child profile before creating a family goal.",
+                    imageName: "DinoTeacher"
                 )
             } else if familyStore.goals.isEmpty {
                 FamilyGoalEmptyCard(
                     systemImage: "chart.bar.fill",
                     title: "Make progress visible",
-                    message: "Create a cottage fund, bike fund, or any goal the family can reach together."
+                    message: "Create a cottage fund, bike fund, or any goal the family can reach together.",
+                    imageName: "MiraTurtle"
                 )
             } else {
                 if !familyStore.activeGoals.isEmpty {
@@ -75,6 +80,7 @@ struct FamilyGoalsSection: View {
 }
 
 private struct FamilyGoalRow: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let goal: FamilyGoal
 
     var body: some View {
@@ -89,7 +95,7 @@ private struct FamilyGoalRow: View {
                 VStack(alignment: .leading, spacing: 3) {
                     Text(goal.title)
                         .font(.headline)
-                        .foregroundStyle(.primary)
+                        .foregroundStyle(MoneyMuncherDesign.ink)
                     Label(goal.kind.title, systemImage: goal.kind.systemImage)
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -113,12 +119,13 @@ private struct FamilyGoalRow: View {
             }
         }
         .padding(16)
-        .background(Color(uiColor: .secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .moneyMuncherCard()
+        .animation(reduceMotion ? nil : .spring(response: 0.5, dampingFraction: 0.78), value: goal.progress)
     }
 }
 
 private struct GoalProgressBar: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let progress: Double
 
     var body: some View {
@@ -134,7 +141,7 @@ private struct GoalProgressBar: View {
                         )
                     )
                     .frame(width: proxy.size.width * max(0, min(progress, 1)))
-                    .animation(.spring(response: 0.6, dampingFraction: 0.8), value: progress)
+                    .animation(reduceMotion ? nil : .spring(response: 0.6, dampingFraction: 0.8), value: progress)
             }
         }
         .frame(height: 14)
@@ -148,28 +155,37 @@ private struct FamilyGoalEmptyCard: View {
     let systemImage: String
     let title: String
     let message: String
+    let imageName: String
 
     var body: some View {
         HStack(spacing: 14) {
-            Image(systemName: systemImage)
-                .font(.title2.weight(.bold))
-                .frame(width: 44, height: 44)
-                .foregroundStyle(Color(red: 0.05, green: 0.46, blue: 0.39))
-                .background(Color(red: 0.88, green: 0.96, blue: 0.89))
-                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            MoneyMuncherIconBadge(
+                systemImage: systemImage,
+                foreground: MoneyMuncherDesign.green,
+                background: Color(red: 0.88, green: 0.96, blue: 0.89)
+            )
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(title).font(.headline)
+                Text(title)
+                    .font(.headline)
+                    .foregroundStyle(MoneyMuncherDesign.ink)
                 Text(message)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
+
+            Spacer(minLength: 2)
+
+            MoneyMuncherCharacterBadge(
+                imageName: imageName,
+                size: 38,
+                tint: MoneyMuncherDesign.familyGreen
+            )
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(uiColor: .secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .moneyMuncherCard()
     }
 }
 
@@ -293,11 +309,13 @@ private enum FamilyGoalSheet: String, Identifiable {
     case gift
     case foundMoney
     case roundUp
+    case reminder
 
     var id: String { rawValue }
 }
 
 private struct FamilyGoalDetailView: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var familyStore: FamilyCommunityStore
 
@@ -306,20 +324,44 @@ private struct FamilyGoalDetailView: View {
     @State private var activeSheet: FamilyGoalSheet?
     @State private var isShowingDeleteConfirmation = false
     @State private var showGoalReachedCelebration = false
+    @State private var showProgressCelebration = false
 
     var body: some View {
         Group {
             if let goal = familyStore.goal(id: goalID) {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 22) {
-                        goalHeader(goal)
-                        actionGrid(goal)
-                        roundUpCard(goal)
-                        familyChat(goal)
+                ZStack {
+                    MoneyMuncherScreenBackground()
+
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 22) {
+                            goalHeader(goal)
+                            actionGrid(goal)
+                            roundUpCard(goal)
+                            reminderCard(goal)
+                            goalUpdates(goal)
+                        }
+                        .padding(20)
                     }
-                    .padding(20)
+
+                    if showProgressCelebration {
+                        ProgressAddedOverlay(reduceMotion: reduceMotion)
+                            .transition(.scale(scale: 0.75).combined(with: .opacity))
+                            .zIndex(1)
+                    }
+
+                    if showGoalReachedCelebration {
+                        GoalReachedCelebrationOverlay(
+                            goalTitle: goal.title,
+                            reduceMotion: reduceMotion
+                        ) {
+                            withAnimation(reduceMotion ? nil : .easeOut(duration: 0.2)) {
+                                showGoalReachedCelebration = false
+                            }
+                        }
+                        .transition(.opacity)
+                        .zIndex(2)
+                    }
                 }
-                .background(Color(uiColor: .systemGroupedBackground))
                 .navigationTitle(goal.title)
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
@@ -345,6 +387,8 @@ private struct FamilyGoalDetailView: View {
                         FamilyContributionView(goalID: goalID, source: .foundMoney, onSaved: contributionSaved)
                     case .roundUp:
                         FamilyRoundUpView(goalID: goalID, onSaved: contributionSaved)
+                    case .reminder:
+                        FamilyGoalReminderView(goalID: goalID, reminder: goal.reminder)
                     }
                 }
                 .confirmationDialog("Delete this goal?", isPresented: $isShowingDeleteConfirmation, titleVisibility: .visible) {
@@ -355,11 +399,6 @@ private struct FamilyGoalDetailView: View {
                     Button("Cancel", role: .cancel) {}
                 } message: {
                     Text("Its contribution history will also be deleted from this device.")
-                }
-                .alert("Goal reached! 🎉", isPresented: $showGoalReachedCelebration) {
-                    Button("Celebrate!") {}
-                } message: {
-                    Text("The family filled the thermometer for \(goal.title).")
                 }
             } else {
                 Text("This goal is no longer available.")
@@ -376,7 +415,8 @@ private struct FamilyGoalDetailView: View {
             VStack(spacing: 4) {
                 Text(FamilyMoneyFormatter.string(cents: goal.savedInCents))
                     .font(.system(size: 38, weight: .heavy, design: .rounded))
-                    .foregroundStyle(Color(red: 0.05, green: 0.26, blue: 0.23))
+                    .monospacedDigit()
+                    .foregroundStyle(MoneyMuncherDesign.ink)
                 Text("of \(FamilyMoneyFormatter.string(cents: goal.targetInCents))")
                     .font(.headline)
                     .foregroundStyle(.secondary)
@@ -413,6 +453,7 @@ private struct FamilyGoalDetailView: View {
             )
         )
         .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .shadow(color: MoneyMuncherDesign.gold.opacity(0.14), radius: 12, y: 6)
     }
 
     private func actionGrid(_ goal: FamilyGoal) -> some View {
@@ -476,23 +517,62 @@ private struct FamilyGoalDetailView: View {
             }
         }
         .padding(16)
-        .background(Color(uiColor: .secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .moneyMuncherCard()
     }
 
-    private func familyChat(_ goal: FamilyGoal) -> some View {
+    private func reminderCard(_ goal: FamilyGoal) -> some View {
+        Button {
+            activeSheet = .reminder
+        } label: {
+            HStack(spacing: 14) {
+                MoneyMuncherIconBadge(
+                    systemImage: goal.reminder == nil ? "bell" : "bell.badge.fill",
+                    foreground: MoneyMuncherDesign.green,
+                    background: Color(red: 0.88, green: 0.96, blue: 0.89)
+                )
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Follow-up Reminder")
+                        .font(.headline)
+                        .foregroundStyle(MoneyMuncherDesign.ink)
+                    Text(goal.reminder?.summary ?? "Off · Tap to choose a schedule")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 8)
+                Image(systemName: "chevron.right")
+                    .foregroundStyle(.tertiary)
+            }
+            .padding(16)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .moneyMuncherCard()
+        }
+        .buttonStyle(.plain)
+        .accessibilityHint("Opens family goal notification settings")
+    }
+
+    private func goalUpdates(_ goal: FamilyGoal) -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            Label("Family Goal Chat", systemImage: "bubble.left.and.bubble.right.fill")
-                .font(.headline)
+            Label("Goal Updates", systemImage: "clock.arrow.circlepath")
+                .font(.headline.weight(.heavy))
+                .foregroundStyle(MoneyMuncherDesign.ink)
 
             if goal.contributions.isEmpty {
-                Text("Contributions and celebrations will appear here for everyone using this device.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .padding(16)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color(uiColor: .secondarySystemGroupedBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                HStack(spacing: 12) {
+                    MoneyMuncherCharacterBadge(
+                        imageName: "SammyUnicorn",
+                        size: 40,
+                        tint: MoneyMuncherDesign.purpleLight
+                    )
+                    Text("Contributions and celebrations will appear here for everyone using this device.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                .padding(16)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .moneyMuncherCard()
             } else {
                 ForEach(goal.contributions.sorted { $0.createdAt > $1.createdAt }) { contribution in
                     ContributionBubble(contribution: contribution)
@@ -507,9 +587,133 @@ private struct FamilyGoalDetailView: View {
 
     private func contributionSaved(didReachGoal: Bool) {
         activeSheet = nil
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+
         if didReachGoal {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                showGoalReachedCelebration = true
+                withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.25)) {
+                    showGoalReachedCelebration = true
+                }
+            }
+        } else {
+            withAnimation(reduceMotion ? nil : .spring(response: 0.42, dampingFraction: 0.62)) {
+                showProgressCelebration = true
+            }
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.15) {
+                withAnimation(reduceMotion ? nil : .easeOut(duration: 0.22)) {
+                    showProgressCelebration = false
+                }
+            }
+        }
+    }
+}
+
+private struct ProgressAddedOverlay: View {
+    let reduceMotion: Bool
+    @State private var isVisible = false
+
+    var body: some View {
+        VStack(spacing: 8) {
+            ZStack {
+                Circle()
+                    .fill(MoneyMuncherDesign.gold)
+                    .frame(width: 62, height: 62)
+                    .shadow(color: MoneyMuncherDesign.gold.opacity(0.35), radius: 10, y: 5)
+                Image(systemName: "dollarsign")
+                    .font(.title.weight(.black))
+                    .foregroundStyle(Color(red: 0.38, green: 0.25, blue: 0.04))
+            }
+            .rotationEffect(.degrees(isVisible ? 0 : -18))
+            .offset(y: isVisible ? 0 : 24)
+
+            Text("Progress added!")
+                .font(.headline.weight(.heavy))
+                .foregroundStyle(MoneyMuncherDesign.ink)
+        }
+        .padding(.horizontal, 24)
+        .padding(.vertical, 18)
+        .background(.regularMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .shadow(color: .black.opacity(0.14), radius: 18, y: 8)
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isStaticText)
+        .onAppear {
+            if reduceMotion {
+                isVisible = true
+            } else {
+                withAnimation(.spring(response: 0.45, dampingFraction: 0.58)) {
+                    isVisible = true
+                }
+            }
+        }
+    }
+}
+
+private struct GoalReachedCelebrationOverlay: View {
+    let goalTitle: String
+    let reduceMotion: Bool
+    let onDismiss: () -> Void
+
+    @State private var burst = false
+
+    private let particles: [(x: CGFloat, y: CGFloat, rotation: Double)] = [
+        (-126, -190, -24), (-76, -220, 18), (-20, -202, -12), (52, -216, 28), (118, -174, -20),
+        (-132, -86, 20), (132, -76, -28), (-112, 42, -16), (120, 54, 22), (-62, 108, 14), (74, 112, -18)
+    ]
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.38)
+                .ignoresSafeArea()
+                .onTapGesture(perform: onDismiss)
+
+            ForEach(Array(particles.enumerated()), id: \.offset) { index, particle in
+                Image(systemName: index.isMultiple(of: 2) ? "sparkles" : "circle.fill")
+                    .font(index.isMultiple(of: 2) ? .title2 : .caption)
+                    .foregroundStyle(index.isMultiple(of: 3) ? MoneyMuncherDesign.gold : MoneyMuncherDesign.mint)
+                    .offset(
+                        x: burst ? particle.x : 0,
+                        y: burst ? particle.y : 0
+                    )
+                    .rotationEffect(.degrees(burst ? particle.rotation : 0))
+                    .opacity(burst ? 0.30 : 1)
+            }
+
+            VStack(spacing: 16) {
+                Text("🎉")
+                    .font(.system(size: 74))
+                    .scaleEffect(burst ? 1 : 0.65)
+
+                Text("Goal reached!")
+                    .font(.system(.largeTitle, design: .rounded, weight: .heavy))
+                    .foregroundStyle(MoneyMuncherDesign.ink)
+
+                Text("Your family filled the progress bar for \(goalTitle).")
+                    .font(.headline)
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(.secondary)
+
+                Button("Celebrate") {
+                    onDismiss()
+                }
+                .buttonStyle(PrimaryActionButtonStyle())
+            }
+            .padding(26)
+            .frame(maxWidth: 330)
+            .background(.regularMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 30, style: .continuous))
+            .shadow(color: .black.opacity(0.20), radius: 24, y: 12)
+        }
+        .accessibilityElement(children: .contain)
+        .onAppear {
+            UINotificationFeedbackGenerator().notificationOccurred(.success)
+            if reduceMotion {
+                burst = true
+            } else {
+                withAnimation(.easeOut(duration: 0.9)) {
+                    burst = true
+                }
             }
         }
     }

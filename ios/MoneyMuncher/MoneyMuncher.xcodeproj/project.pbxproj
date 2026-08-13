@@ -27,7 +27,39 @@
 		A4F7D1136D9148B5902A0055 /* FamilyCommunityStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0054 /* FamilyCommunityStore.swift */; };
 		A4F7D1136D9148B5902A0057 /* FamilyCommunityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0056 /* FamilyCommunityView.swift */; };
 		A4F7D1136D9148B5902A0059 /* FamilyGoalsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0058 /* FamilyGoalsView.swift */; };
+		A4F7D1136D9148B5902A0061 /* FamilyNotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0060 /* FamilyNotificationManager.swift */; };
+		A4F7D1136D9148B5902A0063 /* FamilyGoalReminderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0062 /* FamilyGoalReminderView.swift */; };
+		A4F7D1136D9148B5902A0065 /* MoneyMuncherDesign.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0064 /* MoneyMuncherDesign.swift */; };
+		B5C1A1000000000000000101 /* MoneyMuncherClipApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C1A1000000000000000201 /* MoneyMuncherClipApp.swift */; };
+		B5C1A1000000000000000102 /* MoneyMissionClipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C1A1000000000000000202 /* MoneyMissionClipView.swift */; };
+		B5C1A1000000000000000103 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B5C1A1000000000000000205 /* Assets.xcassets */; };
+		B5C1A1000000000000000104 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = B5C1A1000000000000000206 /* PrivacyInfo.xcprivacy */; };
+		B5C1A1000000000000000105 /* MoneyMuncherClip.app in Embed App Clips */ = {isa = PBXBuildFile; fileRef = B5C1A1000000000000000207 /* MoneyMuncherClip.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		B5C1A1000000000000000701 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A4F7D1136D9148B5902A0001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B5C1A1000000000000000501;
+			remoteInfo = MoneyMuncherClip;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		B5C1A1000000000000000601 /* Embed App Clips */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/AppClips";
+			dstSubfolderSpec = 16;
+			files = (
+				B5C1A1000000000000000105 /* MoneyMuncherClip.app in Embed App Clips */,
+			);
+			name = "Embed App Clips";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		A4F7D1136D9148B5902A0006 /* MoneyMuncher.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoneyMuncher.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -52,10 +84,27 @@
 		A4F7D1136D9148B5902A0054 /* FamilyCommunityStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamilyCommunityStore.swift; sourceTree = "<group>"; };
 		A4F7D1136D9148B5902A0056 /* FamilyCommunityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamilyCommunityView.swift; sourceTree = "<group>"; };
 		A4F7D1136D9148B5902A0058 /* FamilyGoalsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamilyGoalsView.swift; sourceTree = "<group>"; };
+		A4F7D1136D9148B5902A0060 /* FamilyNotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamilyNotificationManager.swift; sourceTree = "<group>"; };
+		A4F7D1136D9148B5902A0062 /* FamilyGoalReminderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamilyGoalReminderView.swift; sourceTree = "<group>"; };
+		A4F7D1136D9148B5902A0064 /* MoneyMuncherDesign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneyMuncherDesign.swift; sourceTree = "<group>"; };
+		B5C1A1000000000000000201 /* MoneyMuncherClipApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneyMuncherClipApp.swift; sourceTree = "<group>"; };
+		B5C1A1000000000000000202 /* MoneyMissionClipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneyMissionClipView.swift; sourceTree = "<group>"; };
+		B5C1A1000000000000000203 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B5C1A1000000000000000204 /* MoneyMuncherClip.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MoneyMuncherClip.entitlements; sourceTree = "<group>"; };
+		B5C1A1000000000000000205 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B5C1A1000000000000000206 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		B5C1A1000000000000000207 /* MoneyMuncherClip.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoneyMuncherClip.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		A4F7D1136D9148B5902A0009 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B5C1A1000000000000000301 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -69,6 +118,7 @@
 			isa = PBXGroup;
 			children = (
 				A4F7D1136D9148B5902A0006 /* MoneyMuncher.app */,
+				B5C1A1000000000000000207 /* MoneyMuncherClip.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -77,6 +127,7 @@
 			isa = PBXGroup;
 			children = (
 				A4F7D1136D9148B5902A0005 /* MoneyMuncher */,
+				B5C1A1000000000000000401 /* MoneyMuncherClip */,
 				A4F7D1136D9148B5902A0003 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -96,6 +147,9 @@
 				A4F7D1136D9148B5902A0054 /* FamilyCommunityStore.swift */,
 				A4F7D1136D9148B5902A0056 /* FamilyCommunityView.swift */,
 				A4F7D1136D9148B5902A0058 /* FamilyGoalsView.swift */,
+				A4F7D1136D9148B5902A0060 /* FamilyNotificationManager.swift */,
+				A4F7D1136D9148B5902A0062 /* FamilyGoalReminderView.swift */,
+				A4F7D1136D9148B5902A0064 /* MoneyMuncherDesign.swift */,
 				A4F7D1136D9148B5902A0043 /* Narrations/ollie-interest.mp3 */,
 				A4F7D1136D9148B5902A0045 /* Narrations/dino-saving.mp3 */,
 				A4F7D1136D9148B5902A0047 /* Narrations/dino-debit.mp3 */,
@@ -109,6 +163,19 @@
 			path = MoneyMuncher;
 			sourceTree = "<group>";
 		};
+		B5C1A1000000000000000401 /* MoneyMuncherClip */ = {
+			isa = PBXGroup;
+			children = (
+				B5C1A1000000000000000201 /* MoneyMuncherClipApp.swift */,
+				B5C1A1000000000000000202 /* MoneyMissionClipView.swift */,
+				B5C1A1000000000000000203 /* Info.plist */,
+				B5C1A1000000000000000204 /* MoneyMuncherClip.entitlements */,
+				B5C1A1000000000000000205 /* Assets.xcassets */,
+				B5C1A1000000000000000206 /* PrivacyInfo.xcprivacy */,
+			);
+			path = MoneyMuncherClip;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -119,15 +186,34 @@
 				A4F7D1136D9148B5902A0007 /* Sources */,
 				A4F7D1136D9148B5902A0009 /* Frameworks */,
 				A4F7D1136D9148B5902A0008 /* Resources */,
+				B5C1A1000000000000000601 /* Embed App Clips */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				B5C1A1000000000000000801 /* PBXTargetDependency */,
 			);
 			name = MoneyMuncher;
 			productName = MoneyMuncher;
 			productReference = A4F7D1136D9148B5902A0006 /* MoneyMuncher.app */;
 			productType = "com.apple.product-type.application";
+		};
+		B5C1A1000000000000000501 /* MoneyMuncherClip */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B5C1A1000000000000000C01 /* Build configuration list for PBXNativeTarget "MoneyMuncherClip" */;
+			buildPhases = (
+				B5C1A1000000000000000A01 /* Sources */,
+				B5C1A1000000000000000301 /* Frameworks */,
+				B5C1A1000000000000000901 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MoneyMuncherClip;
+			productName = MoneyMuncherClip;
+			productReference = B5C1A1000000000000000207 /* MoneyMuncherClip.app */;
+			productType = "com.apple.product-type.application.on-demand-install-capable";
 		};
 /* End PBXNativeTarget section */
 
@@ -141,6 +227,11 @@
 				TargetAttributes = {
 					A4F7D1136D9148B5902A0002 = {
 						CreatedOnToolsVersion = 16.0;
+					};
+					B5C1A1000000000000000501 = {
+						CreatedOnToolsVersion = 16.0;
+						DevelopmentTeam = A2TAG4GHM2;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -158,6 +249,7 @@
 			projectRoot = "";
 			targets = (
 				A4F7D1136D9148B5902A0002 /* MoneyMuncher */,
+				B5C1A1000000000000000501 /* MoneyMuncherClip */,
 			);
 		};
 /* End PBXProject section */
@@ -175,6 +267,15 @@
 				A4F7D1136D9148B5902A0048 /* Narrations/sammy-stock-intro.mp3 in Resources */,
 				A4F7D1136D9148B5902A0050 /* Narrations/mira-interest-intro.mp3 in Resources */,
 				A4F7D1136D9148B5902A0052 /* Narrations/captain-jack-card-intro.mp3 in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B5C1A1000000000000000901 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B5C1A1000000000000000103 /* Assets.xcassets in Resources */,
+				B5C1A1000000000000000104 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -197,10 +298,30 @@
 				A4F7D1136D9148B5902A0055 /* FamilyCommunityStore.swift in Sources */,
 				A4F7D1136D9148B5902A0057 /* FamilyCommunityView.swift in Sources */,
 				A4F7D1136D9148B5902A0059 /* FamilyGoalsView.swift in Sources */,
+				A4F7D1136D9148B5902A0061 /* FamilyNotificationManager.swift in Sources */,
+				A4F7D1136D9148B5902A0063 /* FamilyGoalReminderView.swift in Sources */,
+				A4F7D1136D9148B5902A0065 /* MoneyMuncherDesign.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B5C1A1000000000000000A01 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B5C1A1000000000000000101 /* MoneyMuncherClipApp.swift in Sources */,
+				B5C1A1000000000000000102 /* MoneyMissionClipView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		B5C1A1000000000000000801 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B5C1A1000000000000000501 /* MoneyMuncherClip */;
+			targetProxy = B5C1A1000000000000000701 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		A4F7D1136D9148B5902A0023 /* Debug */ = {
@@ -322,8 +443,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = MoneyMuncher/MoneyMuncher.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 29;
+				CURRENT_PROJECT_VERSION = 34;
 				DEVELOPMENT_TEAM = A2TAG4GHM2;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = MoneyMuncher/Info.plist;
@@ -348,9 +470,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = MoneyMuncher/MoneyMuncher.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 29;
+				CURRENT_PROJECT_VERSION = 34;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = A2TAG4GHM2;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -365,6 +488,62 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MoneyMuncher App Store";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		B5C1A1000000000000000B01 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = MoneyMuncherClip/MoneyMuncherClip.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 34;
+				DEVELOPMENT_TEAM = A2TAG4GHM2;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MoneyMuncherClip/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.3;
+				PRODUCT_BUNDLE_IDENTIFIER = ca.moneymuncher.app.Clip;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		B5C1A1000000000000000B02 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = MoneyMuncherClip/MoneyMuncherClip.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 34;
+				DEVELOPMENT_TEAM = A2TAG4GHM2;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MoneyMuncherClip/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.3;
+				PRODUCT_BUNDLE_IDENTIFIER = ca.moneymuncher.app.Clip;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -391,6 +570,15 @@
 			buildConfigurations = (
 				A4F7D1136D9148B5902A0025 /* Debug */,
 				A4F7D1136D9148B5902A0026 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B5C1A1000000000000000C01 /* Build configuration list for PBXNativeTarget "MoneyMuncherClip" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B5C1A1000000000000000B01 /* Debug */,
+				B5C1A1000000000000000B02 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

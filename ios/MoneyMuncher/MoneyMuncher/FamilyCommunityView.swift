@@ -1,6 +1,8 @@
 import SwiftUI
+import UIKit
 
 struct FamilyCommunityView: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var purchaseManager: PurchaseManager
     @EnvironmentObject private var familyStore: FamilyCommunityStore
@@ -9,24 +11,37 @@ struct FamilyCommunityView: View {
     @State private var isShowingNewActivity = false
     @State private var isShowingPaywall = false
     @State private var addMemberAfterUpgrade = false
+    @State private var hasAppeared = false
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
-                    header
-                    familySection
-                    FamilyGoalsSection()
-                    activitySection
+            ZStack {
+                MoneyMuncherScreenBackground()
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 22) {
+                        header
+                        devicePrivacyPill
+                        familySection
+
+                        if !familyStore.members.isEmpty {
+                            FamilyGoalsSection()
+                            activitySection
+                            familyTip
+                        }
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 8)
+                    .padding(.bottom, 28)
                 }
-                .padding(20)
             }
-            .background(Color(uiColor: .systemGroupedBackground))
             .navigationTitle("Family Community")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Done") { dismiss() }
+                        .fontWeight(.bold)
+                        .tint(MoneyMuncherDesign.green)
                 }
             }
             .sheet(isPresented: $isShowingAddMember) {
@@ -47,41 +62,75 @@ struct FamilyCommunityView: View {
                 )
                 .environmentObject(purchaseManager)
             }
+            .onAppear {
+                guard !hasAppeared else { return }
+                if reduceMotion {
+                    hasAppeared = true
+                } else {
+                    withAnimation(.spring(response: 0.65, dampingFraction: 0.76)) {
+                        hasAppeared = true
+                    }
+                }
+            }
         }
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Image(systemName: "house.and.flag.fill")
-                .font(.system(size: 42, weight: .bold))
-                .foregroundStyle(Color(red: 0.05, green: 0.46, blue: 0.39))
+        ZStack(alignment: .bottomTrailing) {
+            Circle()
+                .fill(.white.opacity(0.28))
+                .frame(width: 110, height: 110)
+                .offset(x: 35, y: 40)
 
-            Text("Learn and grow together")
-                .font(.system(size: 32, weight: .heavy, design: .rounded))
-                .foregroundStyle(Color(red: 0.05, green: 0.26, blue: 0.23))
+            HStack(alignment: .center, spacing: 15) {
+                ZStack {
+                    Circle()
+                        .fill(.white.opacity(0.78))
+                        .frame(width: 62, height: 62)
+                    Image(systemName: "house.and.flag.fill")
+                        .font(.system(size: 29, weight: .bold))
+                        .foregroundStyle(MoneyMuncherDesign.green)
+                }
+                .scaleEffect(hasAppeared ? 1 : 0.72)
 
-            Text("Create child profiles, grow shared goals, choose activities, and celebrate progress as a family.")
-                .font(.title3.weight(.semibold))
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Learn and grow together")
+                        .font(.system(.title2, design: .rounded, weight: .heavy))
+                        .foregroundStyle(MoneyMuncherDesign.ink)
 
-            Label("Saved only on this device", systemImage: "iphone.gen3")
-                .font(.footnote.weight(.semibold))
-                .foregroundStyle(.secondary)
+                    Text("Add your crew, set goals, and celebrate progress as a family.")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(MoneyMuncherDesign.ink.opacity(0.72))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            HStack(spacing: -7) {
+                MoneyMuncherCharacterBadge(imageName: "DinoTeacher", size: 34, tint: .white.opacity(0.90))
+                MoneyMuncherCharacterBadge(imageName: "MiraTurtle", size: 34, tint: .white.opacity(0.90))
+                MoneyMuncherCharacterBadge(imageName: "SammyUnicorn", size: 34, tint: .white.opacity(0.90))
+            }
+            .offset(x: 4, y: 9)
+            .opacity(hasAppeared ? 1 : 0)
         }
-        .padding(22)
+        .padding(20)
+        .padding(.bottom, 14)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             LinearGradient(
                 colors: [
-                    Color(red: 0.91, green: 0.98, blue: 0.82),
-                    Color(red: 0.75, green: 0.91, blue: 0.98)
+                    MoneyMuncherDesign.warmGold,
+                    MoneyMuncherDesign.warmPink
                 ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
         )
-        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .shadow(color: MoneyMuncherDesign.purple.opacity(0.10), radius: 14, y: 7)
+        .opacity(hasAppeared ? 1 : 0)
+        .offset(y: hasAppeared ? 0 : 12)
     }
 
     private var familySection: some View {
@@ -96,11 +145,7 @@ struct FamilyCommunityView: View {
             }
 
             if familyStore.members.isEmpty {
-                emptyCard(
-                    systemImage: "person.2.fill",
-                    title: "Add your first child profile",
-                    message: "Profiles keep each child's activity progress separate."
-                )
+                onboardingCard
             } else {
                 VStack(spacing: 10) {
                     ForEach(familyStore.members) { member in
@@ -109,8 +154,20 @@ struct FamilyCommunityView: View {
                         }
                     }
                 }
+                .animation(reduceMotion ? nil : .spring(response: 0.45, dampingFraction: 0.78), value: familyStore.members)
             }
         }
+    }
+
+    private var devicePrivacyPill: some View {
+        Label("Family profiles and progress stay on this device", systemImage: "iphone.gen3")
+            .font(.footnote.weight(.bold))
+            .foregroundStyle(MoneyMuncherDesign.green)
+            .padding(.horizontal, 13)
+            .frame(minHeight: 38)
+            .background(Color(red: 0.88, green: 0.96, blue: 0.89))
+            .clipShape(Capsule())
+            .accessibilityHint("No family profile data is uploaded by this feature")
     }
 
     private var activitySection: some View {
@@ -124,17 +181,12 @@ struct FamilyCommunityView: View {
                 isShowingNewActivity = true
             }
 
-            if familyStore.members.isEmpty {
-                emptyCard(
-                    systemImage: "checklist",
-                    title: "Profiles come first",
-                    message: "Add at least one child before creating a shared activity."
-                )
-            } else if familyStore.activities.isEmpty {
+            if familyStore.activities.isEmpty {
                 emptyCard(
                     systemImage: "flag.checkered",
                     title: "Create a family activity",
-                    message: "Try a savings goal, grocery budget, or no-spend challenge."
+                    message: "Try a grocery challenge, a no-spend day, or a family money conversation.",
+                    imageName: "CaptainJackShark"
                 )
             } else {
                 if !familyStore.openActivities.isEmpty {
@@ -182,11 +234,13 @@ struct FamilyCommunityView: View {
         actionSystemImage: String,
         action: @escaping () -> Void
     ) -> some View {
-        HStack(alignment: .firstTextBaseline) {
+        HStack(alignment: .center, spacing: 12) {
             VStack(alignment: .leading, spacing: 3) {
                 Text(title)
-                    .font(.headline)
-                    .foregroundStyle(Color(red: 0.05, green: 0.26, blue: 0.23))
+                    .font(.subheadline.weight(.black))
+                    .textCase(.uppercase)
+                    .tracking(0.7)
+                    .foregroundStyle(MoneyMuncherDesign.purple)
                 Text(detail)
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -194,34 +248,125 @@ struct FamilyCommunityView: View {
 
             Spacer()
 
-            Button(action: action) {
-                Label(actionTitle, systemImage: actionSystemImage)
-                    .font(.subheadline.weight(.bold))
-            }
-            .disabled(title == "Shared Activities" && familyStore.members.isEmpty)
+            MoneyMuncherActionChip(
+                title: actionTitle,
+                systemImage: actionSystemImage,
+                isEnabled: title != "Shared Activities" || !familyStore.members.isEmpty,
+                action: action
+            )
         }
     }
 
-    private func emptyCard(systemImage: String, title: String, message: String) -> some View {
+    private func emptyCard(
+        systemImage: String,
+        title: String,
+        message: String,
+        imageName: String = "DinoTeacher"
+    ) -> some View {
         HStack(spacing: 14) {
-            Image(systemName: systemImage)
-                .font(.title2.weight(.bold))
-                .frame(width: 44, height: 44)
-                .foregroundStyle(Color(red: 0.05, green: 0.46, blue: 0.39))
-                .background(Color(red: 0.88, green: 0.96, blue: 0.89))
-                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            MoneyMuncherIconBadge(
+                systemImage: systemImage,
+                foreground: MoneyMuncherDesign.green,
+                background: Color(red: 0.88, green: 0.96, blue: 0.89)
+            )
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(title).font(.headline)
+                Text(title)
+                    .font(.headline)
+                    .foregroundStyle(MoneyMuncherDesign.ink)
                 Text(message)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
+
+            Spacer(minLength: 2)
+
+            MoneyMuncherCharacterBadge(
+                imageName: imageName,
+                size: 38,
+                tint: MoneyMuncherDesign.familyGreen
+            )
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .moneyMuncherCard()
+    }
+
+    private var onboardingCard: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack(alignment: .top, spacing: 13) {
+                MoneyMuncherCharacterBadge(
+                    imageName: "DinoTeacher",
+                    size: 52,
+                    tint: MoneyMuncherDesign.familyGreen
+                )
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Start your family journey")
+                        .font(.title3.weight(.heavy))
+                        .foregroundStyle(MoneyMuncherDesign.ink)
+                    Text("One quick setup unlocks goals and shared activities.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            VStack(alignment: .leading, spacing: 12) {
+                journeyStep(number: 1, title: "Add a child profile", isAvailable: true)
+                journeyStep(number: 2, title: "Create a family goal", isAvailable: false)
+                journeyStep(number: 3, title: "Complete an activity together", isAvailable: false)
+            }
+
+            Button {
+                requestAddMember()
+            } label: {
+                Label("Add First Profile", systemImage: "person.badge.plus")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(PrimaryActionButtonStyle())
+        }
+        .padding(18)
+        .moneyMuncherCard()
+    }
+
+    private func journeyStep(number: Int, title: String, isAvailable: Bool) -> some View {
+        HStack(spacing: 11) {
+            Text("\(number)")
+                .font(.subheadline.monospacedDigit().weight(.black))
+                .foregroundStyle(isAvailable ? .white : MoneyMuncherDesign.purple)
+                .frame(width: 30, height: 30)
+                .background(isAvailable ? MoneyMuncherDesign.purple : MoneyMuncherDesign.purpleLight)
+                .clipShape(Circle())
+
+            Text(title)
+                .font(.subheadline.weight(.bold))
+                .foregroundStyle(isAvailable ? MoneyMuncherDesign.ink : Color.secondary)
+
+            Spacer()
+
+            Image(systemName: isAvailable ? "arrow.right" : "lock.fill")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(isAvailable ? MoneyMuncherDesign.purple : Color.secondary)
+        }
+        .accessibilityElement(children: .combine)
+    }
+
+    private var familyTip: some View {
+        HStack(alignment: .top, spacing: 12) {
+            MoneyMuncherIconBadge(
+                systemImage: "lightbulb.fill",
+                foreground: Color(red: 0.67, green: 0.46, blue: 0.02),
+                background: MoneyMuncherDesign.warmGold,
+                size: 38
+            )
+            Text("Small goals work best. Pick one visible win and celebrate every contribution together.")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(MoneyMuncherDesign.ink.opacity(0.78))
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(15)
+        .background(MoneyMuncherDesign.purpleLight.opacity(0.75))
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
     }
 
@@ -267,12 +412,13 @@ private struct FamilyMemberRow: View {
             Text(member.avatar)
                 .font(.system(size: 28))
                 .frame(width: 48, height: 48)
-                .background(Color(red: 0.90, green: 0.96, blue: 0.99))
+                .background(MoneyMuncherDesign.purpleLight)
                 .clipShape(Circle())
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(member.name)
                     .font(.headline)
+                    .foregroundStyle(MoneyMuncherDesign.ink)
                 Text("Child profile")
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -292,8 +438,8 @@ private struct FamilyMemberRow: View {
             .accessibilityLabel("Options for \(member.name)")
         }
         .padding(14)
-        .background(Color(uiColor: .secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .moneyMuncherCard()
+        .transition(.scale(scale: 0.94).combined(with: .opacity))
     }
 }
 
@@ -305,22 +451,22 @@ private struct FamilyActivityRow: View {
             HStack {
                 Text(activity.title)
                     .font(.headline)
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(MoneyMuncherDesign.ink)
                 Spacer()
                 Image(systemName: activity.isComplete ? "checkmark.seal.fill" : "chevron.right")
                     .foregroundStyle(activity.isComplete ? Color.green : Color.secondary)
             }
 
             ProgressView(value: activity.progress)
-                .tint(Color(red: 0.05, green: 0.46, blue: 0.39))
+                .tint(MoneyMuncherDesign.mint)
+                .animation(.spring(response: 0.5, dampingFraction: 0.78), value: activity.progress)
 
             Text("\(activity.completedParticipantIDs.count) of \(activity.participantIDs.count) participants complete")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
         .padding(16)
-        .background(Color(uiColor: .secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .moneyMuncherCard()
     }
 }
 
@@ -345,15 +491,16 @@ private struct AddFamilyMemberView: View {
                         ForEach(avatars, id: \.self) { avatar in
                             Button {
                                 selectedAvatar = avatar
+                                UISelectionFeedbackGenerator().selectionChanged()
                             } label: {
                                 Text(avatar)
                                     .font(.system(size: 30))
                                     .frame(maxWidth: .infinity, minHeight: 52)
-                                    .background(selectedAvatar == avatar ? Color.green.opacity(0.18) : Color.clear)
+                                    .background(selectedAvatar == avatar ? MoneyMuncherDesign.purpleLight : Color.clear)
                                     .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                                     .overlay {
                                         RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                            .stroke(selectedAvatar == avatar ? Color.green : Color.secondary.opacity(0.25), lineWidth: 2)
+                                            .stroke(selectedAvatar == avatar ? MoneyMuncherDesign.purple : Color.secondary.opacity(0.25), lineWidth: 2)
                                     }
                             }
                             .buttonStyle(.plain)
@@ -383,6 +530,7 @@ private struct AddFamilyMemberView: View {
                             avatar: selectedAvatar,
                             hasPremiumAccess: purchaseManager.hasPremiumAccess
                         ) != nil {
+                            UINotificationFeedbackGenerator().notificationOccurred(.success)
                             dismiss()
                         }
                     }
@@ -499,6 +647,7 @@ private struct FamilyActivityDetailView: View {
                                     let isComplete = activity.completedParticipantIDs.contains(memberID)
                                     Button {
                                         familyStore.toggleCompletion(activityID: activityID, memberID: memberID)
+                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                     } label: {
                                         HStack(spacing: 12) {
                                             Text(member.avatar).font(.title2)
@@ -508,7 +657,9 @@ private struct FamilyActivityDetailView: View {
                                             Spacer()
                                             Image(systemName: isComplete ? "checkmark.circle.fill" : "circle")
                                                 .font(.title2)
-                                                .foregroundStyle(isComplete ? Color.green : Color.secondary)
+                                                .foregroundStyle(isComplete ? MoneyMuncherDesign.mint : Color.secondary)
+                                                .scaleEffect(isComplete ? 1.08 : 1)
+                                                .animation(.spring(response: 0.38, dampingFraction: 0.58), value: isComplete)
                                         }
                                         .padding(14)
                                         .background(Color(uiColor: .secondarySystemGroupedBackground))
