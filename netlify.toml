@@ -77,6 +77,22 @@
   to = "/market-lab/index.html"
   status = 200
 
+[[redirects]]
+  from = "/appclip"
+  to = "/appclip/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/appclip/"
+  to = "/appclip/index.html"
+  status = 200
+
+[[headers]]
+  for = "/.well-known/apple-app-site-association"
+  [headers.values]
+    Content-Type = "application/json"
+    Cache-Control = "public, max-age=3600"
+
 [[headers]]
   for = "/kids/play/Build/*.wasm.br"
   [headers.values]

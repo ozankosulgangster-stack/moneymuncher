@@ -1,0 +1,10 @@
+Use case: ads-marketing
+Asset type: reusable background for App Store iPad screenshots
+Primary request: Create a polished, premium abstract background for a playful family financial-learning app called Money Muncher.
+Scene/backdrop: full-bleed landscape background, no objects that imply hardware, smooth layered gradients with very subtle oversized rounded shapes and faint coin-like circles.
+Style/medium: clean modern iOS App Store marketing backdrop, vector-like raster finish.
+Composition/framing: 4:3 landscape, keep the center and lower two-thirds calm and low-detail so a large real app screenshot can be placed there; allow gentle visual interest near the outer edges and top corners.
+Color palette: deep emerald green, teal, dark aubergine purple, warm golden yellow accents, pale mint highlights.
+Text: none.
+Constraints: no logos, no app interface, no device frame, no characters, no currency symbols, no readable text, no watermark. High polish, child-friendly but credible for parents.
+Avoid: busy patterns, sharp geometry, photorealism, fake UI, noisy texture.
