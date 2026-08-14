@@ -49,6 +49,11 @@ public class PickupSpawner : MonoBehaviour
 
     private MoneyPickup PickPrefab()
     {
+        if (spawnTable == null || spawnTable.Length == 0)
+        {
+            return null;
+        }
+
         int totalWeight = 0;
 
         foreach (SpawnEntry entry in spawnTable)

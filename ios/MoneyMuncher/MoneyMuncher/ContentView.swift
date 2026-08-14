@@ -1,22 +1,27 @@
 import SwiftUI
+import UIKit
 
 enum AppDestination: Identifiable, Equatable {
     case play
     case questGenerator
+    case scamSmart
     case familyCommunity
-    case familyQuest
     case familySignup
+    case account
     case parentGuide
+    case support
     case privacy
 
     var id: String {
         switch self {
         case .play: return "play"
         case .questGenerator: return "quest-generator"
+        case .scamSmart: return "scam-smart"
         case .familyCommunity: return "family-community"
-        case .familyQuest: return "family-quest"
         case .familySignup: return "family-signup"
+        case .account: return "account"
         case .parentGuide: return "parent-guide"
+        case .support: return "support"
         case .privacy: return "privacy"
         }
     }
@@ -25,10 +30,12 @@ enum AppDestination: Identifiable, Equatable {
         switch self {
         case .play: return "Cup Rush"
         case .questGenerator: return "Everyday Quest"
+        case .scamSmart: return "Scam Smart"
         case .familyCommunity: return "Family Community"
-        case .familyQuest: return "Family Quest"
         case .familySignup: return "Family Sign Up"
+        case .account: return "Account & Data"
         case .parentGuide: return "Parent Guide"
+        case .support: return "Help & Support"
         case .privacy: return "Privacy"
         }
     }
@@ -39,14 +46,18 @@ enum AppDestination: Identifiable, Equatable {
             return URL(string: "https://moneymuncher.ca/kids/play/?source=ios-app")!
         case .questGenerator:
             return URL(string: "https://moneymuncher.ca/kids/?source=ios-app#questGeneratorTitle")!
+        case .scamSmart:
+            return URL(string: "https://moneymuncher.ca/kids/blog/scam-smart.html?source=ios-app")!
         case .familyCommunity:
             return nil
-        case .familyQuest:
-            return URL(string: "https://moneymuncher.ca/kids/?source=ios-app&entry=family-quest#questGeneratorTitle")!
         case .familySignup:
-            return URL(string: "https://moneymuncher.ca/?source=ios-app")!
+            return URL(string: "https://moneymuncher.ca/?source=ios-app&action=signup&reviewBuild=9")!
+        case .account:
+            return URL(string: "https://moneymuncher.ca/?source=ios-app&action=signin&reviewBuild=9#account")!
         case .parentGuide:
             return URL(string: "https://moneymuncher.ca/kids/parent-guide.html?source=ios-app")!
+        case .support:
+            return URL(string: "https://moneymuncher.ca/support.html?source=ios-app")!
         case .privacy:
             return URL(string: "https://moneymuncher.ca/kids/privacy.html?source=ios-app")!
         }
@@ -54,9 +65,9 @@ enum AppDestination: Identifiable, Equatable {
 
     var requiresParentGate: Bool {
         switch self {
-        case .familyCommunity, .familyQuest, .familySignup, .parentGuide:
+        case .familyCommunity, .familySignup, .account, .parentGuide, .support:
             return true
-        case .play, .questGenerator, .privacy:
+        case .play, .questGenerator, .scamSmart, .privacy:
             return false
         }
     }
@@ -67,14 +78,20 @@ struct ContentView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @EnvironmentObject private var purchaseManager: PurchaseManager
     @EnvironmentObject private var familyStore: FamilyCommunityStore
+    @StateObject private var parentAccess = ParentAccessManager.shared
 
     @State private var activeDestination: AppDestination?
     @State private var gatedDestination: AppDestination?
+    @State private var pendingDestinationAfterGate: AppDestination?
     @State private var isShowingParentGate = false
     @State private var isPaywallPending = false
     @State private var isShowingPaywall = false
     @State private var isShowingPremiumLearning = false
     @State private var pendingPremiumLearning = false
+    @State private var isShowingFamilyQuest = false
+    @State private var isShowingDinoChat = false
+    @State private var isShowingChorePlanner = false
+    @State private var shouldOpenFamilyQuestAfterWebDismiss = false
 
     var body: some View {
         NavigationStack {
@@ -91,6 +108,7 @@ struct ContentView: View {
 
                         todayCard
                         adventureSection
+                        familyToolsSection
                         plusLearning
                         grownUpCorner
                     }
@@ -112,12 +130,24 @@ struct ContentView: View {
                 }
             }
         }
-        .sheet(item: $activeDestination) { destination in
+        .fullScreenCover(item: $activeDestination, onDismiss: presentFamilyQuestAfterWebDismiss) { destination in
             if destination == .familyCommunity {
                 FamilyCommunityView()
             } else {
-                WebExperienceView(destination: destination)
+                WebExperienceView(destination: destination) {
+                    shouldOpenFamilyQuestAfterWebDismiss = true
+                    activeDestination = nil
+                }
             }
+        }
+        .fullScreenCover(isPresented: $isShowingFamilyQuest) {
+            FamilyQuestView()
+        }
+        .fullScreenCover(isPresented: $isShowingDinoChat) {
+            DinoChatView()
+        }
+        .fullScreenCover(isPresented: $isShowingChorePlanner) {
+            ChorePlannerView()
         }
         .task {
             await purchaseManager.refreshPurchasedProducts()
@@ -138,8 +168,9 @@ struct ContentView: View {
             )
             .environmentObject(purchaseManager)
         }
-        .sheet(isPresented: $isShowingParentGate) {
+        .sheet(isPresented: $isShowingParentGate, onDismiss: presentPendingDestination) {
             ParentGateView(
+                access: parentAccess,
                 onUnlock: {
                     let destination = gatedDestination
                     let shouldShowPaywall = isPaywallPending
@@ -149,9 +180,7 @@ struct ContentView: View {
                     isShowingParentGate = false
 
                     if let destination {
-                        DispatchQueue.main.async {
-                            activeDestination = destination
-                        }
+                        pendingDestinationAfterGate = destination
                     } else if shouldShowPaywall {
                         Task { @MainActor in
                             let restoredPremiumAccess = await purchaseManager.restorePurchases()
@@ -172,6 +201,17 @@ struct ContentView: View {
                     isShowingParentGate = false
                 }
             )
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)) { _ in
+            parentAccess.lock()
+            if activeDestination?.requiresParentGate == true {
+                activeDestination = nil
+            }
+        }
+        .onReceive(Timer.publish(every: 1, on: .main, in: .common).autoconnect()) { _ in
+            if activeDestination?.requiresParentGate == true && !parentAccess.refreshSession() {
+                activeDestination = nil
+            }
         }
     }
 
@@ -418,16 +458,72 @@ struct ContentView: View {
         }
     }
 
+    private var familyToolsSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            landingSectionTitle("Family tools", systemImage: "person.3.fill")
+
+            Button { isShowingFamilyQuest = true } label: {
+                nativeToolRow(
+                    title: "Family Quest Loop",
+                    subtitle: "Create a mission, celebrate the effort, then split virtual coins into Spend, Save, and Share.",
+                    systemImage: "flag.checkered",
+                    tint: MoneyMuncherDesign.purple
+                )
+            }
+
+            Button { isShowingChorePlanner = true } label: {
+                nativeToolRow(
+                    title: "Family Chore Planner",
+                    subtitle: "Assign dollars or points and turn completed chores into a simple money plan.",
+                    systemImage: "checklist.checked",
+                    tint: MoneyMuncherDesign.green
+                )
+            }
+
+            Button { isShowingDinoChat = true } label: {
+                nativeToolRow(
+                    title: "Ask Dino",
+                    subtitle: "Chat about saving, spending, allowance, needs versus wants, and Market Lab.",
+                    systemImage: "bubble.left.and.bubble.right.fill",
+                    tint: Color(red: 0.72, green: 0.47, blue: 0.02)
+                )
+            }
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func nativeToolRow(title: String, subtitle: String, systemImage: String, tint: Color) -> some View {
+        HStack(spacing: 14) {
+            MoneyMuncherIconBadge(systemImage: systemImage, foreground: tint, background: tint.opacity(0.13), size: 48)
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title).font(.headline).foregroundStyle(MoneyMuncherDesign.ink)
+                Text(subtitle).font(.subheadline).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 4)
+            Image(systemName: "chevron.right.circle.fill").font(.title3).foregroundStyle(tint)
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .moneyMuncherCard()
+    }
+
     private var grownUpCorner: some View {
         VStack(alignment: .leading, spacing: 12) {
             landingSectionTitle("Grown-up corner", systemImage: "lock.shield.fill")
 
             VStack(spacing: 0) {
                 grownUpLink(
-                    title: "Create a Family Quest",
-                    subtitle: "Build a quick game from a real family moment.",
-                    systemImage: "flag.checkered",
-                    destination: .familyQuest
+                    title: "Family Community",
+                    subtitle: "Manage profiles, shared goals, activities, and reminders.",
+                    systemImage: "person.3.fill",
+                    destination: .familyCommunity
+                )
+                Divider().padding(.leading, 60)
+                grownUpLink(
+                    title: "Account & Data",
+                    subtitle: "Sign in, sign out, or permanently delete an account.",
+                    systemImage: "person.crop.circle.badge.checkmark",
+                    destination: .account
                 )
                 Divider().padding(.leading, 60)
                 grownUpLink(
@@ -442,6 +538,13 @@ struct ContentView: View {
                     subtitle: "Learning approach, privacy, and play ideas.",
                     systemImage: "checklist.checked",
                     destination: .parentGuide
+                )
+                Divider().padding(.leading, 60)
+                grownUpLink(
+                    title: "Help & Support",
+                    subtitle: "Get answers or contact Money Muncher support.",
+                    systemImage: "questionmark.bubble",
+                    destination: .support
                 )
             }
             .moneyMuncherCard()
@@ -495,11 +598,27 @@ struct ContentView: View {
 
     private func open(_ destination: AppDestination) {
         if destination.requiresParentGate {
+            if parentAccess.refreshSession() {
+                activeDestination = destination
+                return
+            }
             gatedDestination = destination
             isShowingParentGate = true
         } else {
             activeDestination = destination
         }
+    }
+
+    private func presentPendingDestination() {
+        guard let destination = pendingDestinationAfterGate else { return }
+        pendingDestinationAfterGate = nil
+        activeDestination = destination
+    }
+
+    private func presentFamilyQuestAfterWebDismiss() {
+        guard shouldOpenFamilyQuestAfterWebDismiss else { return }
+        shouldOpenFamilyQuestAfterWebDismiss = false
+        DispatchQueue.main.async { isShowingFamilyQuest = true }
     }
 
     private func requestPaywall(opensLearningHub: Bool = false) {
@@ -807,11 +926,14 @@ private struct GoalSnapshotProgress: View {
 private struct WebExperienceView: View {
     @Environment(\.dismiss) private var dismiss
     let destination: AppDestination
+    let onOpenFamilyQuest: () -> Void
 
     var body: some View {
         NavigationStack {
             if let url = destination.url {
-                MoneyMuncherWebView(url: url)
+                MoneyMuncherWebView(url: url) { event in
+                    if event == .openFamilyQuest { openFamilyQuest() }
+                }
                     .ignoresSafeArea(edges: .bottom)
                     .navigationTitle(destination.title)
                     .navigationBarTitleDisplayMode(.inline)
@@ -821,74 +943,17 @@ private struct WebExperienceView: View {
                                 dismiss()
                             }
                         }
+                        if destination == .familySignup || destination == .account {
+                            ToolbarItem(placement: .confirmationAction) {
+                                Button("Family Quest", action: openFamilyQuest).fontWeight(.semibold)
+                            }
+                        }
                     }
             }
         }
     }
-}
 
-private struct ParentGateView: View {
-    let onUnlock: () -> Void
-    let onCancel: () -> Void
-
-    @State private var answer = ""
-    @State private var errorMessage: String?
-
-    var body: some View {
-        NavigationStack {
-            VStack(alignment: .leading, spacing: 18) {
-                Image(systemName: "lock.shield.fill")
-                    .font(.system(size: 46, weight: .bold))
-                    .foregroundStyle(Color(red: 0.05, green: 0.46, blue: 0.39))
-
-                Text("Parent Check")
-                    .font(.largeTitle.bold())
-
-                Text("Grown-up areas can include account setup, purchases, or guidance links. Enter the answer to continue.")
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("What is 9 + 4?")
-                        .font(.headline)
-
-                    TextField("Answer", text: $answer)
-                        .keyboardType(.numberPad)
-                        .textFieldStyle(.roundedBorder)
-
-                    if let errorMessage {
-                        Text(errorMessage)
-                            .font(.footnote.weight(.semibold))
-                            .foregroundStyle(.red)
-                    }
-                }
-
-                Button {
-                    if answer.trimmingCharacters(in: .whitespacesAndNewlines) == "13" {
-                        onUnlock()
-                    } else {
-                        errorMessage = "Try again or ask a grown-up."
-                    }
-                } label: {
-                    Text("Unlock")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(PrimaryActionButtonStyle())
-
-                Spacer()
-            }
-            .padding(24)
-            .navigationTitle("Parent Gate")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        onCancel()
-                    }
-                }
-            }
-        }
-    }
+    private func openFamilyQuest() { onOpenFamilyQuest() }
 }
 
 struct PrimaryActionButtonStyle: ButtonStyle {

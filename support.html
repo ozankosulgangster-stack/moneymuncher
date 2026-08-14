@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Money Muncher Support</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <nav class="topbar panel">
+      <a class="brand" href="/">Money Muncher</a>
+      <a class="secondary small nav-link" href="/kids/parent-guide.html">Parent Guide</a>
+    </nav>
+
+    <section class="panel" style="padding:clamp(24px,5vw,52px);">
+      <p class="eyebrow">Help &amp; Support</p>
+      <h1>How can we help?</h1>
+      <p class="subtitle">Ask a question, report a problem, or request help with your Money Muncher account.</p>
+      <form name="support-request" method="POST" data-netlify="true" action="/support-thanks.html">
+        <input type="hidden" name="form-name" value="support-request" />
+        <label>Your email
+          <input name="email" type="email" autocomplete="email" required />
+        </label>
+        <label>How can we help?
+          <textarea name="message" rows="6" required></textarea>
+        </label>
+        <button class="primary" type="submit">Send support request</button>
+      </form>
+      <p>Please include your device model, iOS or iPadOS version, app version, and a short description of what happened. Do not send a password or a child's personal information.</p>
+    </section>
+
+    <section class="panel" style="padding:clamp(24px,5vw,52px);">
+      <h2>Common questions</h2>
+      <h3>How do I permanently delete an account?</h3>
+      <p>In the iOS app, open <strong>Family Area</strong>, choose <strong>Account &amp; Data</strong>, sign in, choose <strong>Delete account</strong>, and confirm. The account and its cloud-saved profile and progress are permanently removed.</p>
+      <h3>Cup Rush does not respond</h3>
+      <p>Wait for the loading bar to finish, then use the on-screen arrow controls below the game. Keep the device connected to the internet while the game loads.</p>
+      <h3>How is family data used?</h3>
+      <p>Review the <a href="/kids/privacy.html">Money Muncher privacy notice</a> for information about data handling.</p>
+    </section>
+  </main>
+</body>
+</html>

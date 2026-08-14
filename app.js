@@ -6,6 +6,64 @@
 // --- 0. Helpers ---
 function $(id) { return document.getElementById(id); }
 
+var pageParams = new URLSearchParams(window.location.search);
+var isIOSAppExperience = pageParams.get('source') === 'ios-app';
+if (isIOSAppExperience) document.documentElement.classList.add('ios-app');
+
+function canOpenNativeFamilyQuest() {
+  return Boolean(
+    isIOSAppExperience &&
+    window.webkit &&
+    window.webkit.messageHandlers &&
+    window.webkit.messageHandlers.moneyMuncher
+  );
+}
+
+function openNativeFamilyQuest() {
+  if (!canOpenNativeFamilyQuest()) return false;
+  window.webkit.messageHandlers.moneyMuncher.postMessage({ type: 'open-family-quest' });
+  return true;
+}
+
+function safeStorageGet(key, fallback) {
+  try {
+    var value = localStorage.getItem(key);
+    return value === null ? fallback : value;
+  } catch (error) {
+    console.warn('[MM] Local storage read failed for ' + key, error);
+    return fallback;
+  }
+}
+
+function safeStorageSet(key, value) {
+  try {
+    localStorage.setItem(key, value);
+    return true;
+  } catch (error) {
+    console.warn('[MM] Local storage write failed for ' + key, error);
+    return false;
+  }
+}
+
+function safeStorageRemove(key) {
+  try {
+    localStorage.removeItem(key);
+    return true;
+  } catch (error) {
+    console.warn('[MM] Local storage removal failed for ' + key, error);
+    return false;
+  }
+}
+
+function safeStorageJson(key, fallback) {
+  try {
+    return JSON.parse(safeStorageGet(key, JSON.stringify(fallback)));
+  } catch (error) {
+    console.warn('[MM] Local storage JSON was invalid for ' + key, error);
+    return fallback;
+  }
+}
+
 const hasMM = typeof window.MoneyMuncher !== 'undefined';
 
 // --- 1. Data ---
@@ -13,8 +71,8 @@ const defaultState = { coins: 30, saved: 0, joy: 50, wisdom: 0, currentLevel: 0 
 let state   = { ...defaultState };
 let progress = { unlockedLevel: 0, completedLevels: [] };
 let account = { id: "", name: "", role: "" };
-let selectedRole = localStorage.getItem('moneymuncherRole') || 'Kid Explorer';
-let selectedAgePath = localStorage.getItem('moneymuncherAgePath') || 'coin-collectors';
+let selectedRole = safeStorageGet('moneymuncherRole', 'Kid Explorer') || 'Kid Explorer';
+let selectedAgePath = safeStorageGet('moneymuncherAgePath', 'coin-collectors') || 'coin-collectors';
 let activeGeneratedQuest = null;
 let generatedQuestHistory = loadGeneratedQuestHistory();
 let currentGeneratedQuest = generatedQuestHistory[0] || null;
@@ -280,7 +338,7 @@ function loadFromManager() {
   progress.completedLevels = Array.isArray(p.completedLevels) ? [...p.completedLevels] : [];
 
   // Local name/role display
-  var sess = JSON.parse(localStorage.getItem('moneymuncherSession') || 'null');
+  var sess = safeStorageJson('moneymuncherSession', null);
   if (sess && sess.name) account = sess;
 }
 
@@ -299,10 +357,10 @@ function sync() {
 }
 
 // --- 4. Local session (for name/role display) ---
-function saveSession()  { localStorage.setItem('moneymuncherSession', JSON.stringify(account)); }
-function clearSession() { localStorage.removeItem('moneymuncherSession'); }
+function saveSession()  { safeStorageSet('moneymuncherSession', JSON.stringify(account)); }
+function clearSession() { safeStorageRemove('moneymuncherSession'); }
 function restoreSession() {
-  var s = JSON.parse(localStorage.getItem('moneymuncherSession') || 'null');
+  var s = safeStorageJson('moneymuncherSession', null);
   if (s && s.name) account = s;
 }
 
@@ -407,12 +465,72 @@ document.addEventListener('DOMContentLoaded', function() {
   var roleIn     = $('roleInput');
   var emailIn    = $('emailInput');
   var passIn     = $('passInput');
+  var authStatus = $('authFormStatus');
+  var authTitle  = $('authDialogTitle');
+  var authCopy   = $('authDialogCopy');
+  var nameField  = $('authNameField');
+  var roleField  = $('authRoleField');
+
+  function setAuthStatus(message) {
+    authStatus.textContent = message || '';
+    authStatus.classList.toggle('visible', Boolean(message));
+    if (message) {
+      requestAnimationFrame(function() {
+        authStatus.scrollIntoView({ block: 'nearest' });
+      });
+    }
+  }
+
+  function setAuthBusy(busy, action) {
+    signUpBtn.disabled = busy;
+    signInBtn.disabled = busy;
+    forgotPasswordBtn.disabled = busy;
+    signInBtn.textContent = busy && action === 'signin' ? 'Signing in…' : 'Sign In';
+    signUpBtn.textContent = busy && action === 'signup' ? 'Creating account…' : 'Sign Up';
+  }
+
+  function authErrorMessage(error) {
+    var code = error && error.code ? error.code : '';
+    if (code === 'auth/user-not-found' || code === 'auth/wrong-password' || code === 'auth/invalid-login-credentials' || code === 'auth/invalid-credential') {
+      return 'The email or password is incorrect.';
+    }
+    if (code === 'auth/network-request-failed' || code === 'auth/timeout') {
+      return 'Sign in could not reach the account service. Check the internet connection and try again.';
+    }
+    if (code === 'auth/too-many-requests') {
+      return 'Too many attempts. Wait a moment, then try again or reset the password.';
+    }
+    return error && error.message ? error.message : 'The account request failed. Please try again.';
+  }
+
+  // Native iOS "Family Sign Up" links here with action=signup. Open the
+  // account dialog immediately so reviewers do not have to find Log in first.
+  var requestedAction = pageParams.get('action');
+  if (requestedAction === 'signup' || requestedAction === 'signin') {
+    if (requestedAction === 'signup') {
+      selectedRole = 'Family Team';
+      safeStorageSet('moneymuncherRole', selectedRole);
+      if (roleIn) roleIn.value = selectedRole;
+    } else {
+      if (authTitle) authTitle.textContent = 'Sign in to Money Muncher';
+      if (authCopy) authCopy.textContent = 'Enter the family review account email and password.';
+      if (nameField) nameField.classList.add('hidden');
+      if (roleField) roleField.classList.add('hidden');
+      if (signUpBtn) signUpBtn.hidden = true;
+    }
+    setTimeout(function() {
+      openDialog('loginDialog');
+      if (requestedAction === 'signin') setAuthStatus('Enter the review account email and password, then tap Sign In.');
+      var firstField = requestedAction === 'signin' ? emailIn : nameIn;
+      if (firstField && window.matchMedia && window.matchMedia('(pointer: fine)').matches) firstField.focus();
+    }, 0);
+  }
 
   if (roleIn) {
     roleIn.value = selectedRole;
     roleIn.addEventListener('change', function() {
       selectedRole = roleIn.value;
-      localStorage.setItem('moneymuncherRole', selectedRole);
+      safeStorageSet('moneymuncherRole', selectedRole);
       renderPlaySetup();
       renderMiniGames();
       renderQuestGeneratorBadge();
@@ -430,11 +548,18 @@ document.addEventListener('DOMContentLoaded', function() {
         platformInterest: betaSignupIntent ? 'ios' : '',
         betaJoinedAt: betaSignupIntent ? new Date().toISOString() : ''
       };
-      if (!em || !pw) return alert('Enter email and password');
+      if (!em || !pw) {
+        setAuthStatus('Enter both an email address and password.');
+        (!em ? emailIn : passIn).focus();
+        return;
+      }
+      setAuthStatus('Creating your account…');
+      setAuthBusy(true, 'signup');
       MoneyMuncher.signUp(em, pw, profile).then(function(u) {
         account = {
           id: u.uid,
           email: u.email,
+          emailVerified: Boolean(u.emailVerified),
           name: profile.name,
           role: profile.role,
           betaInterest: profile.betaInterest,
@@ -444,22 +569,41 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         saveSession(); sync();
         $('loginDialog').close();
-        $('feedback').textContent = betaSignupIntent
-          ? 'You are on the iOS beta list. Cloud save active.'
-          : 'Account created! Cloud save active.';
+        $('feedback').textContent = u.verificationSent
+          ? 'Account created. Check ' + u.email + ' for the verification link.'
+          : 'Account created, but the verification email could not be sent. Use Resend verification.';
+        $('verificationEmail').textContent = u.email;
+        $('verificationDialogStatus').textContent = u.verificationSent
+          ? 'Verification email sent. Check your inbox and spam folder.'
+          : 'Email was not sent. Tap Resend email to try again.';
+        openDialog('emailVerificationDialog');
         betaSignupIntent = false;
         renderAccount(); renderStats(); renderMap();
-      }).catch(function(e) { alert(e.message); });
+      }).catch(function(e) {
+        setAuthStatus(authErrorMessage(e));
+      }).finally(function() {
+        setAuthBusy(false);
+      });
     });
   }
 
   if (forgotPasswordBtn && emailIn) {
     forgotPasswordBtn.addEventListener('click', function() {
       var em = emailIn.value.trim();
-      if (!em) return alert('Enter your email first, then tap Forgot password.');
+      if (!em) {
+        setAuthStatus('Enter your email first, then tap Forgot password.');
+        emailIn.focus();
+        return;
+      }
+      setAuthStatus('Sending password-reset email…');
+      setAuthBusy(true, 'reset');
       MoneyMuncher.resetPassword(em).then(function() {
-        alert('Password reset email sent. Please check your inbox.');
-      }).catch(function(e) { alert(e.message); });
+        setAuthStatus('Password-reset email sent to ' + em + '. Check your inbox and spam folder.');
+      }).catch(function(e) {
+        setAuthStatus(authErrorMessage(e));
+      }).finally(function() {
+        setAuthBusy(false);
+      });
     });
   }
 
@@ -475,12 +619,23 @@ document.addEventListener('DOMContentLoaded', function() {
         platformInterest: betaSignupIntent ? 'ios' : '',
         betaJoinedAt: betaSignupIntent ? new Date().toISOString() : ''
       } : null;
-      if (!em || !pw) return alert('Enter email and password');
+      if (!em || !pw) {
+        setAuthStatus('Enter both an email address and password.');
+        (!em ? emailIn : passIn).focus();
+        return;
+      }
+      if (!hasMM || typeof MoneyMuncher.signIn !== 'function') {
+        setAuthStatus('The account service is still loading. Check the internet connection and try again.');
+        return;
+      }
+      setAuthStatus('Signing in securely…');
+      setAuthBusy(true, 'signin');
       MoneyMuncher.signIn(em, pw, profile).then(function(u) {
         var saved = (hasMM && MoneyMuncher.getUser && MoneyMuncher.getUser()) || {};
         account = {
           id: u.uid,
           email: u.email,
+          emailVerified: Boolean(u.emailVerified),
           name: (profile && profile.name) || saved.name || em.split('@')[0],
           role: (profile && profile.role) || saved.role || 'Player',
           betaInterest: (profile && profile.betaInterest) || saved.betaInterest || false,
@@ -490,10 +645,16 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         saveSession();
         $('loginDialog').close();
-        $('feedback').textContent = betaSignupIntent ? 'Thanks. Your account is marked for iOS beta interest.' : 'Welcome back!';
+        $('feedback').textContent = !u.emailVerified
+          ? 'Welcome back. Please verify ' + u.email + '.'
+          : (betaSignupIntent ? 'Thanks. Your account is marked for iOS beta interest.' : 'Welcome back!');
         betaSignupIntent = false;
         renderAccount(); renderStats(); renderMap();
-      }).catch(function(e) { alert(e.message); });
+      }).catch(function(e) {
+        setAuthStatus(authErrorMessage(e));
+      }).finally(function() {
+        setAuthBusy(false);
+      });
     });
   }
 });
@@ -516,22 +677,29 @@ function renderStats() {
 
 function renderAccount() {
   var loggedIn = Boolean(account.id) || (hasMM && MoneyMuncher.isLoggedIn());
-  if (loggedIn && hasMM && MoneyMuncher.getUser && !account.id) {
+  if (loggedIn && hasMM && MoneyMuncher.getUser) {
     var user = MoneyMuncher.getUser();
     if (user) {
       account = {
         id: user.uid,
         email: user.email,
+        emailVerified: Boolean(user.emailVerified),
         name: user.name || (user.email ? user.email.split('@')[0] : 'Player'),
         role: user.role || 'Player'
       };
     }
   }
+  var cloudLoggedIn = hasMM && MoneyMuncher.isLoggedIn();
   $('accountStatus').textContent = loggedIn
-    ? (account.name || 'Player') + (hasMM && MoneyMuncher.isLoggedIn() ? ' • cloud saved' : ' • local')
+    ? (account.name || 'Player') + (cloudLoggedIn
+      ? (account.emailVerified ? ' • email verified' : ' • verify ' + (account.email || 'email'))
+      : ' • local')
     : 'Guest explorer';
   $('loginOpenBtn').classList.toggle('hidden', loggedIn);
+  $('resendVerificationBtn').classList.toggle('hidden', !cloudLoggedIn || account.emailVerified);
+  $('refreshVerificationBtn').classList.toggle('hidden', !cloudLoggedIn || account.emailVerified);
   $('logoutBtn').classList.toggle('hidden', !loggedIn);
+  $('deleteAccountOpenBtn').classList.toggle('hidden', !loggedIn || !cloudLoggedIn);
 }
 
 function getSelectedMode() {
@@ -571,7 +739,7 @@ function renderPlaySetup() {
       '<small>' + item.hint + '</small>';
     card.addEventListener('click', function() {
       selectedRole = item.id;
-      localStorage.setItem('moneymuncherRole', selectedRole);
+      safeStorageSet('moneymuncherRole', selectedRole);
       if (account.name) {
         account.role = selectedRole;
         saveSession();
@@ -603,7 +771,7 @@ function renderAgePaths() {
       '<div class="age-topics">' + path.topics.map(function(topic) { return '<span>' + topic + '</span>'; }).join('') + '</div>';
     card.addEventListener('click', function() {
       selectedAgePath = path.id;
-      localStorage.setItem('moneymuncherAgePath', selectedAgePath);
+      safeStorageSet('moneymuncherAgePath', selectedAgePath);
       renderAgePaths();
       renderMiniGames();
       renderAcademy();
@@ -660,7 +828,7 @@ function scaledCoins(coins, ratio, minimum) {
 
 function loadGeneratedQuestHistory() {
   try {
-    var saved = JSON.parse(localStorage.getItem('moneymuncherGeneratedQuests') || '[]');
+    var saved = safeStorageJson('moneymuncherGeneratedQuests', []);
     if (!Array.isArray(saved)) return [];
     return saved.filter(isGeneratedQuest).slice(0, 6);
   } catch (e) {
@@ -679,7 +847,7 @@ function isGeneratedQuest(quest) {
 }
 
 function saveGeneratedQuestHistory() {
-  localStorage.setItem('moneymuncherGeneratedQuests', JSON.stringify(generatedQuestHistory.slice(0, 6)));
+  safeStorageSet('moneymuncherGeneratedQuests', JSON.stringify(generatedQuestHistory.slice(0, 6)));
 }
 
 function getQuestCoinBudget() {
@@ -888,8 +1056,18 @@ function renderScenario() {
 
 function openDialog(id) {
   var d = $(id);
-  if (typeof d.showModal === 'function') d.showModal();
-  else d.classList.remove('hidden');
+  if (!d || d.open) return Boolean(d);
+  if (typeof d.showModal === 'function') {
+    try {
+      d.showModal();
+      return true;
+    } catch (error) {
+      console.warn('[MM] Native dialog presentation failed for ' + id, error);
+    }
+  }
+  d.classList.remove('hidden');
+  d.setAttribute('open', '');
+  return true;
 }
 
 function startLevel(index) {
@@ -979,20 +1157,83 @@ $('marketLabLoginBtn').addEventListener('click', function() {
   openDialog('loginDialog');
 });
 
-$('betaSignupOpenBtn').addEventListener('click', function() {
-  betaSignupIntent = true;
-  selectedRole = 'Family Team';
-  localStorage.setItem('moneymuncherRole', selectedRole);
-  var roleInput = $('roleInput');
-  if (roleInput) roleInput.value = selectedRole;
-  openDialog('loginDialog');
-  setTimeout(function() {
-    var emailInput = $('emailInput');
-    if (emailInput) emailInput.focus();
-  }, 0);
+$('loginOpenBtn').addEventListener('click', function() { openDialog('loginDialog'); });
+
+var verificationResendPending = false;
+
+function resendVerification(statusElement, button) {
+  if (verificationResendPending) return Promise.resolve();
+  verificationResendPending = true;
+  if (button) button.disabled = true;
+  statusElement.textContent = 'Sending verification email…';
+  return MoneyMuncher.resendEmailVerification().then(function(result) {
+    statusElement.textContent = result.alreadyVerified
+      ? 'This email is already verified.'
+      : 'Verification email sent to ' + result.email + '. Check your inbox and spam folder.';
+    renderAccount();
+  }).catch(function(error) {
+    statusElement.textContent = 'Verification email failed: ' + (error.message || 'Please try again.');
+  }).finally(function() {
+    // Prevent accidental rapid retries and Firebase rate-limit errors.
+    setTimeout(function() {
+      verificationResendPending = false;
+      if (button) button.disabled = false;
+    }, 15000);
+  });
+}
+
+$('resendVerificationBtn').addEventListener('click', function() {
+  $('verificationEmail').textContent = account.email || '';
+  $('verificationDialogStatus').textContent = '';
+  openDialog('emailVerificationDialog');
+  resendVerification($('verificationDialogStatus'), $('verificationDialogResendBtn'));
 });
 
-$('loginOpenBtn').addEventListener('click', function() { openDialog('loginDialog'); });
+$('verificationDialogResendBtn').addEventListener('click', function() {
+  resendVerification($('verificationDialogStatus'), $('verificationDialogResendBtn'));
+});
+
+var continueToFamilyQuestBtn = $('continueToFamilyQuestBtn');
+if (continueToFamilyQuestBtn && canOpenNativeFamilyQuest()) {
+  continueToFamilyQuestBtn.hidden = false;
+  continueToFamilyQuestBtn.addEventListener('click', function() {
+    openNativeFamilyQuest();
+  });
+}
+
+function quietlyRefreshVerification() {
+  if (!(hasMM && MoneyMuncher.isLoggedIn()) || account.emailVerified) return;
+  MoneyMuncher.refreshEmailVerification().then(function(result) {
+    account.emailVerified = result.emailVerified;
+    if (result.emailVerified) {
+      $('feedback').textContent = 'Email verified. Thank you!';
+      renderAccount();
+    }
+  }).catch(function() {});
+}
+
+document.addEventListener('visibilitychange', function() {
+  if (document.visibilityState === 'visible') quietlyRefreshVerification();
+});
+window.addEventListener('pageshow', quietlyRefreshVerification);
+
+$('refreshVerificationBtn').addEventListener('click', function() {
+  var button = $('refreshVerificationBtn');
+  button.disabled = true;
+  button.textContent = 'Checking…';
+  MoneyMuncher.refreshEmailVerification().then(function(result) {
+    account.emailVerified = result.emailVerified;
+    $('feedback').textContent = result.emailVerified
+      ? 'Email verified. Thank you!'
+      : 'Email is not verified yet. Open the link sent to ' + result.email + ', then try again.';
+    renderAccount();
+  }).catch(function(error) {
+    $('feedback').textContent = 'Could not refresh verification: ' + (error.message || 'Please try again.');
+  }).finally(function() {
+    button.disabled = false;
+    button.textContent = "I've verified";
+  });
+});
 
 $('logoutBtn').addEventListener('click', function() {
   account = { id: "", email: "", name: "", role: "" };
@@ -1001,20 +1242,43 @@ $('logoutBtn').addEventListener('click', function() {
   renderAccount(); renderStats(); renderMap(); renderScenario();
 });
 
-// Original name/role form (local-only login)
+$('deleteAccountOpenBtn').addEventListener('click', function() {
+  $('deleteAccountStatus').textContent = '';
+  openDialog('deleteAccountDialog');
+});
+
+$('confirmDeleteAccountBtn').addEventListener('click', function() {
+  var button = $('confirmDeleteAccountBtn');
+  var status = $('deleteAccountStatus');
+  button.disabled = true;
+  status.textContent = 'Deleting account and cloud data…';
+
+  MoneyMuncher.deleteAccount(function(message) {
+    status.textContent = message;
+  }).then(function() {
+    account = { id: "", email: "", name: "", role: "" };
+    clearSession();
+    state = { ...defaultState };
+    progress = { unlockedLevel: 0, completedLevels: [] };
+    loadFromManager();
+    $('deleteAccountDialog').close();
+    $('feedback').textContent = 'Your account and cloud-saved data were permanently deleted.';
+    renderAccount(); renderStats(); renderMap(); renderScenario();
+  }).catch(function(error) {
+    status.textContent = error && error.code === 'auth/requires-recent-login'
+      ? 'For security, sign out, sign in again, and then retry account deletion.'
+      : 'Account deletion failed: ' + (error.message || 'Please try again.');
+  }).finally(function() {
+    button.disabled = false;
+  });
+});
+
+// Treat Return/Go from the iOS keyboard as Sign In. Account creation remains
+// an explicit choice, preventing existing users from receiving an ambiguous
+// email-already-in-use error when they press Return on iPad.
 $('loginForm').addEventListener('submit', function(ev) {
   ev.preventDefault();
-  var name = $('nameInput').value.trim();
-  var role = $('roleInput').value;
-  var email = $('emailInput').value.trim();
-  if (!name && !email) return;
-  account = { id: 'local_' + Date.now(), email: email, name: name || email.split('@')[0], role: role };
-  selectedRole = role;
-  localStorage.setItem('moneymuncherRole', selectedRole);
-  saveSession();
-  $('loginDialog').close();
-  $('feedback').textContent = 'Welcome, ' + account.name + '. Your progress is saved on this device.';
-  renderAccount(); renderMap(); renderScenario();
+  if (!$('signInBtn').disabled) $('signInBtn').click();
 });
 
 $('questForm').addEventListener('submit', function(ev) {
@@ -1052,7 +1316,7 @@ $('clearGeneratedQuestsBtn').addEventListener('click', function() {
   restoreSession();
   loadFromManager();
   selectedRole = normalizeRole(account.role || selectedRole);
-  localStorage.setItem('moneymuncherRole', selectedRole);
+  safeStorageSet('moneymuncherRole', selectedRole);
   renderPlaySetup();
   renderAgePaths();
   renderMiniGames();

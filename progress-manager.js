@@ -141,7 +141,8 @@
     ready: false,
     user: null,
     auth: null,
-    db: null
+    db: null,
+    config: null
   };
 
   function initCloud(config) {
@@ -152,6 +153,7 @@
     try {
       if (!firebase.apps.length) firebase.initializeApp(config);
       cloud.ready = true;
+      cloud.config = config;
       cloud.auth = firebase.auth();
       cloud.db = firebase.firestore();
 
@@ -175,6 +177,26 @@
       return JSON.parse(localStorage.getItem("moneymuncherSession") || "null") || {};
     } catch (e) {
       return {};
+    }
+  }
+
+  function setProfileLocal(profile) {
+    try {
+      localStorage.setItem("moneymuncherSession", JSON.stringify(profile));
+      return true;
+    } catch (e) {
+      console.error("[MM] Profile storage write failed", e);
+      return false;
+    }
+  }
+
+  function removeProfileLocal() {
+    try {
+      localStorage.removeItem("moneymuncherSession");
+      return true;
+    } catch (e) {
+      console.error("[MM] Profile storage removal failed", e);
+      return false;
     }
   }
 
@@ -225,7 +247,7 @@
         };
         setLocal(merged);
         if (data.email || data.name || data.role) {
-          localStorage.setItem("moneymuncherSession", JSON.stringify({
+          setProfileLocal({
             id: cloud.user.uid,
             email: data.email || cloud.user.email || "",
             name: data.name || (cloud.user.email ? cloud.user.email.split("@")[0] : "Player"),
@@ -234,7 +256,7 @@
             signupSource: data.signupSource || "",
             platformInterest: data.platformInterest || "",
             betaJoinedAt: data.betaJoinedAt || ""
-          }));
+          });
         }
         console.log("[MM] Cloud progress merged into local");
       } else {
@@ -252,6 +274,31 @@
       if (out.indexOf(b[i]) === -1) out.push(b[i]);
     }
     return out;
+  }
+
+  function withTimeout(promise, milliseconds, message) {
+    return new Promise(function (resolve, reject) {
+      var finished = false;
+      var timer = setTimeout(function () {
+        if (finished) return;
+        finished = true;
+        var error = new Error(message || "The account service took too long to respond.");
+        error.code = "auth/timeout";
+        reject(error);
+      }, milliseconds);
+
+      promise.then(function (value) {
+        if (finished) return;
+        finished = true;
+        clearTimeout(timer);
+        resolve(value);
+      }).catch(function (error) {
+        if (finished) return;
+        finished = true;
+        clearTimeout(timer);
+        reject(error);
+      });
+    });
   }
 
   /* --- 4. PUBLIC API --- */
@@ -287,7 +334,7 @@
         platformInterest: profile.platformInterest || existing.platformInterest || "",
         betaJoinedAt: profile.betaJoinedAt || existing.betaJoinedAt || ""
       };
-      localStorage.setItem("moneymuncherSession", JSON.stringify(next));
+      setProfileLocal(next);
       if (cloud.ready && cloud.user) pushCloud();
       return next;
     },
@@ -298,6 +345,7 @@
       return {
         uid: cloud.user.uid,
         email: cloud.user.email || profile.email || "",
+        emailVerified: Boolean(cloud.user.emailVerified),
         name: profile.name || "",
         role: profile.role || "Player",
         betaInterest: Boolean(profile.betaInterest),
@@ -427,7 +475,14 @@
               betaJoinedAt: profile && profile.betaJoinedAt ? profile.betaJoinedAt : ""
             });
             pushCloud(); // push current local progress immediately
-            resolve({ uid: cred.user.uid, email: cred.user.email });
+            return cred.user.sendEmailVerification()
+              .then(function () {
+                resolve({ uid: cred.user.uid, email: cred.user.email, emailVerified: false, verificationSent: true });
+              })
+              .catch(function (error) {
+                console.warn("[MM] Verification email could not be sent", error);
+                resolve({ uid: cred.user.uid, email: cred.user.email, emailVerified: false, verificationSent: false });
+              });
           })
           .catch(reject);
       });
@@ -436,7 +491,11 @@
     signIn: function (email, password, profile) {
       return new Promise(function (resolve, reject) {
         if (!cloud.ready) return reject(new Error("Cloud not initialized"));
-        cloud.auth.signInWithEmailAndPassword(email, password)
+        withTimeout(
+          cloud.auth.signInWithEmailAndPassword(email, password),
+          15000,
+          "Sign in timed out. Check the internet connection and try again."
+        )
           .then(function (cred) {
             cloud.user = cred.user;
             if (profile && (profile.name || profile.role)) {
@@ -451,10 +510,25 @@
                 betaJoinedAt: profile.betaJoinedAt || ""
               });
             }
-            resolve({ uid: cred.user.uid, email: cred.user.email });
+            resolve({ uid: cred.user.uid, email: cred.user.email, emailVerified: Boolean(cred.user.emailVerified) });
             // pullCloud() will auto-fire via onAuthStateChanged
           })
           .catch(reject);
+      });
+    },
+
+    resendEmailVerification: function () {
+      if (!cloud.ready || !cloud.user) return Promise.reject(new Error("Sign in before requesting another verification email."));
+      if (cloud.user.emailVerified) return Promise.resolve({ alreadyVerified: true, email: cloud.user.email || "" });
+      return cloud.user.sendEmailVerification().then(function () {
+        return { alreadyVerified: false, email: cloud.user.email || "" };
+      });
+    },
+
+    refreshEmailVerification: function () {
+      if (!cloud.ready || !cloud.user) return Promise.reject(new Error("Sign in to refresh email verification."));
+      return cloud.user.reload().then(function () {
+        return { email: cloud.user.email || "", emailVerified: Boolean(cloud.user.emailVerified) };
       });
     },
 
@@ -479,6 +553,84 @@
     signOut: function () {
       if (!cloud.ready) return Promise.resolve();
       return cloud.auth.signOut();
+    },
+
+    deleteAccount: function (onProgress) {
+      return new Promise(function (resolve, reject) {
+        if (!cloud.ready || !cloud.user) {
+          return reject(new Error("Sign in before deleting your account."));
+        }
+
+        var user = cloud.user;
+        var userId = user.uid;
+
+        function report(message) {
+          if (typeof onProgress === "function") onProgress(message);
+        }
+
+        function deadline(milliseconds) {
+          return new Promise(function (finish) { setTimeout(finish, milliseconds); });
+        }
+
+        function parseFirebaseError(response) {
+          return response.json().catch(function () { return {}; }).then(function (body) {
+            var message = body && body.error && body.error.message
+              ? body.error.message
+              : "Firebase request failed (" + response.status + ")";
+            var error = new Error(message);
+            if (message.indexOf("TOKEN_EXPIRED") !== -1 || message.indexOf("CREDENTIAL_TOO_OLD_LOGIN_AGAIN") !== -1) {
+              error.code = "auth/requires-recent-login";
+            }
+            throw error;
+          });
+        }
+
+        report("Preparing permanent account deletion…");
+        user.getIdToken(true)
+          .then(function (idToken) {
+            var config = cloud.config || {};
+            if (!config.projectId || !config.apiKey) {
+              throw new Error("Account service configuration is unavailable. Please close and reopen the app.");
+            }
+
+            report("Deleting cloud-saved profile and progress…");
+            var firestoreBase = "https://firestore.googleapis.com/v1/projects/" +
+              encodeURIComponent(config.projectId) + "/databases/(default)/documents/players/" +
+              encodeURIComponent(userId);
+            var requestOptions = {
+              method: "DELETE",
+              headers: { "Authorization": "Bearer " + idToken }
+            };
+            var cleanup = Promise.allSettled([
+              fetch(firestoreBase + "/marketLab/portfolio", requestOptions),
+              fetch(firestoreBase, requestOptions)
+            ]);
+
+            // Never leave the user trapped if Firestore is slow or offline.
+            return Promise.race([cleanup, deadline(6000)]).then(function () {
+              report("Deleting sign-in account…");
+              return fetch(
+                "https://identitytoolkit.googleapis.com/v1/accounts:delete?key=" + encodeURIComponent(config.apiKey),
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ idToken: idToken })
+                }
+              );
+            });
+          })
+          .then(function (response) {
+            if (!response.ok) return parseFirebaseError(response);
+            return response.json();
+          })
+          .then(function () {
+            cloud.user = null;
+            setLocal(clone(DEFAULT_PROGRESS));
+            removeProfileLocal();
+            return cloud.auth.signOut().catch(function () {}).then(resolve);
+          })
+          .catch(reject);
+      });
     },
 
     isLoggedIn: function () { return !!(cloud.ready && cloud.user); }

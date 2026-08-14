@@ -331,6 +331,24 @@
     });
   }
 
+  function resetMemberPassword(email) {
+    var resetButton = $("memberForgotPasswordBtn");
+    if (!email) {
+      $("authMessage").textContent = "Enter your email first, then tap Forgot password.";
+      return;
+    }
+
+    resetButton.disabled = true;
+    $("authMessage").textContent = "Sending password reset email...";
+    MoneyMuncher.resetPassword(email).then(function () {
+      $("authMessage").textContent = "Password reset email sent. Please check your inbox.";
+    }).catch(function (error) {
+      $("authMessage").textContent = error.message;
+    }).then(function () {
+      resetButton.disabled = false;
+    });
+  }
+
   function buySelectedAsset() {
     var symbol = $("assetSelect").value;
     var coins = Math.max(10, Number($("coinInput").value || 0));
@@ -369,6 +387,9 @@
     });
     $("memberSignUpBtn").addEventListener("click", function () {
       signUp($("memberEmail").value.trim(), $("memberPassword").value);
+    });
+    $("memberForgotPasswordBtn").addEventListener("click", function () {
+      resetMemberPassword($("memberEmail").value.trim());
     });
     $("signOutBtn").addEventListener("click", function () {
       MoneyMuncher.signOut();

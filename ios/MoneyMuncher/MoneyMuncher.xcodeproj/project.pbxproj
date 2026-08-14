@@ -30,6 +30,10 @@
 		A4F7D1136D9148B5902A0061 /* FamilyNotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0060 /* FamilyNotificationManager.swift */; };
 		A4F7D1136D9148B5902A0063 /* FamilyGoalReminderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0062 /* FamilyGoalReminderView.swift */; };
 		A4F7D1136D9148B5902A0065 /* MoneyMuncherDesign.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F7D1136D9148B5902A0064 /* MoneyMuncherDesign.swift */; };
+		C6B9F3358F136AD7B24C0041 /* FamilyQuestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6B9F3358F136AD7B24C0040 /* FamilyQuestView.swift */; };
+		D7CAA4469A247BE8C35D0051 /* ParentAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7CAA4469A247BE8C35D0050 /* ParentAccess.swift */; };
+		E8D1C557AA358CF9D46E0061 /* DinoChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D1C557AA358CF9D46E0060 /* DinoChatView.swift */; };
+		F9E2D668BB469D0AE57F0071 /* ChorePlannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E2D668BB469D0AE57F0070 /* ChorePlannerView.swift */; };
 		B5C1A1000000000000000101 /* MoneyMuncherClipApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C1A1000000000000000201 /* MoneyMuncherClipApp.swift */; };
 		B5C1A1000000000000000102 /* MoneyMissionClipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C1A1000000000000000202 /* MoneyMissionClipView.swift */; };
 		B5C1A1000000000000000103 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B5C1A1000000000000000205 /* Assets.xcassets */; };
@@ -87,6 +91,10 @@
 		A4F7D1136D9148B5902A0060 /* FamilyNotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamilyNotificationManager.swift; sourceTree = "<group>"; };
 		A4F7D1136D9148B5902A0062 /* FamilyGoalReminderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamilyGoalReminderView.swift; sourceTree = "<group>"; };
 		A4F7D1136D9148B5902A0064 /* MoneyMuncherDesign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneyMuncherDesign.swift; sourceTree = "<group>"; };
+		C6B9F3358F136AD7B24C0040 /* FamilyQuestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamilyQuestView.swift; sourceTree = "<group>"; };
+		D7CAA4469A247BE8C35D0050 /* ParentAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParentAccess.swift; sourceTree = "<group>"; };
+		E8D1C557AA358CF9D46E0060 /* DinoChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DinoChatView.swift; sourceTree = "<group>"; };
+		F9E2D668BB469D0AE57F0070 /* ChorePlannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChorePlannerView.swift; sourceTree = "<group>"; };
 		B5C1A1000000000000000201 /* MoneyMuncherClipApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneyMuncherClipApp.swift; sourceTree = "<group>"; };
 		B5C1A1000000000000000202 /* MoneyMissionClipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneyMissionClipView.swift; sourceTree = "<group>"; };
 		B5C1A1000000000000000203 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -138,6 +146,10 @@
 				A4F7D1136D9148B5902A0010 /* MoneyMuncherApp.swift */,
 				A4F7D1136D9148B5902A0012 /* ContentView.swift */,
 				A4F7D1136D9148B5902A0014 /* WebView.swift */,
+				C6B9F3358F136AD7B24C0040 /* FamilyQuestView.swift */,
+				D7CAA4469A247BE8C35D0050 /* ParentAccess.swift */,
+				E8D1C557AA358CF9D46E0060 /* DinoChatView.swift */,
+				F9E2D668BB469D0AE57F0070 /* ChorePlannerView.swift */,
 				A4F7D1136D9148B5902A0030 /* SubscriptionProducts.swift */,
 				A4F7D1136D9148B5902A0032 /* PurchaseManager.swift */,
 				A4F7D1136D9148B5902A0034 /* PaywallView.swift */,
@@ -301,6 +313,10 @@
 				A4F7D1136D9148B5902A0061 /* FamilyNotificationManager.swift in Sources */,
 				A4F7D1136D9148B5902A0063 /* FamilyGoalReminderView.swift in Sources */,
 				A4F7D1136D9148B5902A0065 /* MoneyMuncherDesign.swift in Sources */,
+				C6B9F3358F136AD7B24C0041 /* FamilyQuestView.swift in Sources */,
+				D7CAA4469A247BE8C35D0051 /* ParentAccess.swift in Sources */,
+				E8D1C557AA358CF9D46E0061 /* DinoChatView.swift in Sources */,
+				F9E2D668BB469D0AE57F0071 /* ChorePlannerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
