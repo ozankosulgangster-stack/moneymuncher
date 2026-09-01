@@ -1138,9 +1138,12 @@ function choose(choice) {
 // --- 8. UI Event wiring ---
 $('startBtn').addEventListener('click', function() { startLevel(progress.unlockedLevel); });
 
-$('generatorBtn').addEventListener('click', function() {
-  $('questGenerator').scrollIntoView({ behavior: 'smooth', block: 'start' });
-});
+var generatorBtn = $('generatorBtn');
+if (generatorBtn) {
+  generatorBtn.addEventListener('click', function() {
+    $('questGenerator').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+}
 
 $('mapBtn').addEventListener('click', function() {
   $('worldMap').classList.remove('hidden');
