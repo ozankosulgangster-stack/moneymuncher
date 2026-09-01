@@ -1,0 +1,33 @@
+.workshop-banner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: center;
+  margin-bottom: 18px;
+  padding: 28px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 92% 10%, rgba(255,255,255,.72), transparent 28%),
+    linear-gradient(135deg, #fff0b8, #ffd6e8 54%, #c9f6e2);
+}
+.workshop-banner-copy { max-width: 760px; }
+.workshop-banner-copy h2 { font-size: clamp(2rem, 4vw, 3.35rem); }
+.workshop-banner-copy > p:not(.eyebrow) { margin: 12px 0 0; color: #4b5563; line-height: 1.6; }
+.workshop-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.workshop-chips span, .workshop-status {
+  display: inline-flex;
+  padding: 8px 11px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.78);
+  border: 1px solid rgba(23,32,42,.1);
+  color: #374151;
+  font-size: .82rem;
+  font-weight: 800;
+}
+.workshop-banner-action { display: flex; min-width: 240px; align-items: stretch; flex-direction: column; gap: 10px; text-align: center; }
+.workshop-banner-action .workshop-status { justify-content: center; align-self: center; color: #7a5200; background: #fff7d0; }
+.workshop-banner-action small { max-width: 250px; color: #5d6d7e; line-height: 1.4; }
+@media (max-width: 800px) {
+  .workshop-banner { grid-template-columns: 1fr; }
+  .workshop-banner-action { min-width: 0; align-items: flex-start; text-align: left; }
+}
