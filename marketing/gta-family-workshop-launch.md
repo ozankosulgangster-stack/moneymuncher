@@ -23,7 +23,7 @@ We’re looking for founding families across the GTA to help us choose the best 
 ✅ Approximately 60–75 minutes
 ✅ Designed for ages 6–12
 
-Join the interest list—no payment today:
+Join the interest list—this family workshop is free:
 https://moneymuncher.ca/gta-workshop/
 
 #GTAFamilies #TorontoParents #KidsFinancialLiteracy #MoneySmartKids #FamilyWorkshop #MoneyMuncher #ParentingGTA #FinancialEducation
@@ -101,7 +101,7 @@ Money confidence grows through small, safe conversations—and those conversatio
 
 MoneyMuncher is planning its first in-person GTA family workshop for kids ages 6–12 and their caregivers. Families will team up for playful challenges about earning, saving, spending, sharing, and setting goals.
 
-We’re inviting founding families to help us choose the best GTA location and time. Joining the list is free, requires no payment, and lets you hear first when the full workshop details are confirmed.
+We’re inviting founding families to help us choose the best GTA location and time. The workshop is free, and joining the list lets you hear first when the full details are confirmed.
 
 Join here: https://moneymuncher.ca/gta-workshop/
 
@@ -144,7 +144,7 @@ moneymuncher.ca/gta-workshop
 ## Promotion guardrails
 
 - Never publish photos or names of participating children without written caregiver consent.
-- Do not promise a free workshop until pricing is decided; say “no payment today.”
+- Clearly state that the workshop is free; do not imply that paid products or services are required.
 - Do not imply guaranteed admission from the interest form.
 - Avoid claims that the workshop guarantees financial success or changes behaviour.
 - Keep the “educational only—not financial advice” and “no financial-product sales” language.
