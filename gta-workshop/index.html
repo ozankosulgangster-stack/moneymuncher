@@ -79,12 +79,13 @@
       <div class="registration-copy">
         <p class="eyebrow">Register your interest</p>
         <h2>Help us choose the best GTA location and time.</h2>
-        <p>Join the list and we’ll contact you when the date, venue, capacity, and any participation fee are confirmed. Please enter parent or caregiver information only.</p>
+        <p>Join the list and we’ll contact you when the free workshop’s date, venue, time, and capacity are confirmed. Please enter parent or caregiver information only.</p>
         <div class="privacy-note"><strong>Your child’s privacy matters.</strong> We do not ask for a child’s name in this form. Your information is used only for MoneyMuncher workshop planning and updates.</div>
       </div>
 
       <form class="interest-form" name="gta-workshop-interest" method="POST" data-netlify="true" netlify-honeypot="bot-field" action="/workshop-thanks.html">
         <input type="hidden" name="form-name" value="gta-workshop-interest" />
+        <input type="hidden" name="subject" value="New GTA workshop registration (%{submissionId})" />
         <input type="hidden" name="source" value="gta-workshop-landing-page" />
         <p class="hidden-field"><label>Don’t fill this out: <input name="bot-field" /></label></p>
 
