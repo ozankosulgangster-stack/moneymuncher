@@ -87,6 +87,16 @@
   to = "/appclip/index.html"
   status = 200
 
+[[redirects]]
+  from = "/delete-account"
+  to = "/delete-account.html"
+  status = 200
+
+[[redirects]]
+  from = "/delete-account/"
+  to = "/delete-account.html"
+  status = 200
+
 [[headers]]
   for = "/.well-known/apple-app-site-association"
   [headers.values]
